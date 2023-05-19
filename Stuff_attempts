@@ -1,0 +1,11 @@
+# File containging attempts of working
+---------------------------------------------------------------
+QuadraturePoints::Points10 points9;
+    for(unsigned int i=0; i< points9.n; ++i){
+        std::cout << points9.nodes[i] << std::endl;
+        std::cout << points9.weights[i] << std::endl;
+        std::cout << std::endl;
+}
+----------------------------------------------------------------
+
+    
