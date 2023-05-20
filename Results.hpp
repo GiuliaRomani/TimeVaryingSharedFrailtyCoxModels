@@ -3,9 +3,9 @@
 
 #include "TypeTraits.hpp"
 
+namespace ResultsMethod{
 using T = TypeTraits;
 
-namespace ResultsMethod{
 class Results{
 public:
     // Constructor
@@ -36,7 +36,7 @@ private:
 
     // Method for compute the AIC 
     T::VariableType compute_AIC() const;
-}
+};
 } // end namespace
 
 

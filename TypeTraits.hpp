@@ -12,6 +12,10 @@ struct TypeTraits{
     using VariableType = double;                    // Type used to indicate the basic type variables
     using NumberType = unsigned int;                // Type used to indicate a positive integer number of elements
     using IndexType = unsigned int;                 // Type used to indicate any index of a matrix or of a vector
+    using CheckType = bool;                        // Type used to indicate any check condition
+
+    // Type for file name
+    using FileNameType = std::string;               // Type used to indicate the name of the file passed to constructors
 
     // Basic containers types
     using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic,1>;                                        // Type used for any dynamic vector
@@ -28,7 +32,7 @@ struct TypeTraits{
 
     // Type for time variables
     using TimeType = double;                        // Type used for the time variables
-    using TimeIntervalType = VectorType;            // Type used for the time interval variable
+    using TimeIntervalType = VectorXdr;            // Type used for the time interval variable
 
     // Other containers types
     // Type of the factory used. It is a map, where the first element indicates the numeric id of the method and the second element
