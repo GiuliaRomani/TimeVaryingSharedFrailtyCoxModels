@@ -1,7 +1,7 @@
 # CPPFLAGS: optimization of level3 is performed, almost all warnings are activated
 
 # The user has to change this. Fill it with the path of the PACS Exampled directory
-PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/pacs-examples/Examples
+PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/Giulia_Project/Project_PACS
 
 # PACS libraries are stored here
 export PACS_LIB_DIR=$(PACS_PATH)/lib
@@ -13,7 +13,7 @@ XX      ?= g++
 CXXFLAGS ?= -std=c++20
 CPPFLAGS ?= -O3 -Wall -pedantic -I. -I$(PACS_INC_DIR) -I${mkEigenInc}
 LDFLAGS  ?= -L$(PACS_LIB_DIR) -Wl,-rpath=$(PACS_LIB_DIR)
-LDLIBS	?= -lpacs
+LDLIBS	?= 
 LINK.o := $(LINK.cc) # Use C++ linker.
 
 DEPEND = make.dep

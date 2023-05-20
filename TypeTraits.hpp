@@ -11,6 +11,7 @@ struct TypeTraits{
     // Basic types
     using VariableType = double;                    // Type used to indicate the basic type variables
     using NumberType = unsigned int;                // Type used to indicate a positive integer number of elements
+    using IntType = int;                            // Type used for an integer elements
     using IndexType = unsigned int;                 // Type used to indicate any index of a matrix or of a vector
     using CheckType = bool;                        // Type used to indicate any check condition
 

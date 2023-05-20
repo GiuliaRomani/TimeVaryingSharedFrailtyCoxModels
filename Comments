@@ -1,5 +1,6 @@
 Any comments:
-1) QuadraturePoints class tried and working
+) QuadraturePoints class tried and working
+) Not provided, negative and zero value for length_inetervals are checked. Vector of intervals not provieded is checked
 2) Try to change the check for negative sign of variables
 
 

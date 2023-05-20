@@ -1,10 +1,14 @@
-#-------------------------------------------------------------------
-# 		DataTool for Likelihood methods
-#-------------------------------------------------------------------
-[TimeParameters]
-	[./Intervals]
-		length_list_intervals = 8 
-		list_intervals = '0.0 1.0 1.5 2.0 3.0 4.0 5.0 6.1'
-	[../]
+#------------------------------------------------------------------
+#				DataTool for Likelihood Methods
+#------------------------------------------------------------------
 
+[TimeDomain]
+	length_vector_intervals = 8 
+	vector_intervals = '0.0 1.0 1.5 2.0 3.0 4.0 5.0 6.1'
+[../]
+
+[Parameters]
+	n_ranges = 3
+	range_min = '-20. 0 0'
+	range_max = '20 100 100'
 [../]
