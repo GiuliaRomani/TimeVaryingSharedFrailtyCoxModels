@@ -24,6 +24,7 @@ struct TypeTraits{
     using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;         // Type used for any dynamic matrix
     using VectorType = std::vector<VariableType>;                               // Type used for any vector of VariableType type
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
+    using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
 
     // Types for methods
     using IdType = unsigned int;                    // Type for the numeric Id of a method

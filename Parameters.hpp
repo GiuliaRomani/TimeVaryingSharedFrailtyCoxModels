@@ -27,6 +27,7 @@ public:
 
     // Overload the getter so that it can return a non-const l-value reference
     T::VectorXdr& get_v_parameters() {return v_parameters;};
+    T::NumberType& get_n_parameters() {return n_parameters;};
 
     // Setter for the vector of parameters
     // void set_v_parameters(const T::VectorType& v_parameters_);

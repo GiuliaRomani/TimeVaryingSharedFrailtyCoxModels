@@ -10,7 +10,7 @@ T::VariableType Results::compute_AIC() const {
 
 void Results::print_results() const {
     std::cout << "------------------- Printing results -----------------------" << std::endl;
-    std::cout << "Method " << name_method << ", with " << n_parameters << "parameters." << std::endl;
+    std::cout << "Method " << name_method << ", with " << n_parameters << " parameters." << std::endl;
     std::cout << "Log-likelihood = " << std::setprecision(3) << optimal_loglikelihood << std::endl;
     std::cout << "AIC = " << std::setprecision(3) << AIC << std::endl;
 };

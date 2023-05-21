@@ -14,5 +14,5 @@
 [../]
 
 [Method]
-	id_method = 0
+	id_method = 1
 [../]

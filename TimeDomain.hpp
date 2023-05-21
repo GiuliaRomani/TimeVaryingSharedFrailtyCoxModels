@@ -22,6 +22,7 @@ public:
 
     // Overload 
     T::VectorXdr& get_vector_intervals() {return vector_intervals;};
+    T::NumberType& get_n_intervals() {return n_intervals;};
 
     // Print vector of intervals
     void print_v_intervals() const {std::cout << vector_intervals << std::endl;};
