@@ -5,37 +5,62 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
-
+#include <fstream>
 
 namespace TimeDomainInfo{
 
 // Method for reading data from file using GetPot
-// const T::FileNameType& filename
 void TimeDomain::read_from_file(const T::FileNameType& filename){
+    // Check filename is correctly provided
+    if(!check_filename(filename))
+        std::exit(1);
+
+    // If the filename is correctly provided
     GetPot datafile(filename.c_str());
 
     // Read number of subdivision of time domain and check correctness
-    const T::NumberType size_intervals = datafile("time/length_list_intervals", std::numeric_limits<T::IntType>::quiet_NaN());
+    const T::NumberType size_intervals = datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::IntType>::quiet_NaN());
     if(!check_condition(size_intervals))
         std::exit(1);
 
-    // Initialize the vector of the time domain subdivision and check correctness
-    time_intervals.reserve(size_intervals);
-    for(T::NumberType i=0; i < size_intervals; ++i){
-        time_intervals.push_back(datafile("time/list_intervals", std::numeric_limits<T::TimeType>::quiet_NaN(), i));
+    // To check if the vector of time intervals is sorted, to load it into a normal vector
+    T::VectorType vector_intervals_copy(size_intervals, 0.);
+    for(T::NumberType i = 0; i < size_intervals; ++i){
+        vector_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::TimeType>::quiet_NaN(), i);
     }
-    std::sort(time_intervals.begin(), time_intervals.end());
-    if(!check_condition(time_intervals)){
+    std::sort(vector_intervals_copy.begin(), vector_intervals_copy.end());
+
+    if(!check_condition(vector_intervals_copy)){
         std::exit(1);
     }
 
     // Initialize the time bounds
-    time_begin = time_intervals[0];
-    time_end = time_intervals[size_intervals-1];
+    //time_begin = *(vector_intervals_copy.begin());
+    //time_end = *(vector_intervals_copy.end() - 1);
+
+    time_begin = vector_intervals_copy[0];
+    time_end = vector_intervals_copy[size_intervals - 1];
+
+    // Initialize the vector of the time domain subdivision and check correctness
+    vector_intervals.resize(size_intervals);
+    for(T::NumberType i = 0; i < size_intervals; ++i)
+        vector_intervals(i) = vector_intervals_copy[i];
 
     // Initialize the number of intervals 
-    n_interval = size_intervals - 1;
+    n_intervals = size_intervals - 1;
 };
+
+// Method for checking the filname is correct
+T::CheckType TimeDomain::check_filename(const T::FileNameType& filename_) const{
+    std::ifstream check(filename_);
+    if(check.fail()){
+        std::cerr << "File called " << filename_ << " does not exist." << std::endl;
+        return false;
+    }
+
+    // The filename is correctly provided
+    return true;
+}
 
 // Method for checking condition for the number of intervals
 T::CheckType TimeDomain::check_condition(const T::NumberType& size_int) const{
@@ -50,21 +75,20 @@ T::CheckType TimeDomain::check_condition(const T::NumberType& size_int) const{
 
     // If number of subdivision of time domain is correctly provided
     return true;
-
 };
 
 // Method for checking conditions for time bounds
-T::CheckType TimeDomain::check_condition(const T::VectorType& time_intervals_) const{
+T::CheckType TimeDomain::check_condition(const T::VectorType & vector_intervals_) const{
     // If the entire vector is not provided, the first element will be NaN.
-    if(std::isnan(*(time_intervals.begin()))){
+    if(std::isnan(*(vector_intervals_.begin()))){
         std::cerr << "List of time intervals is not provided" << std::endl;
         return false;
     }
 
     // If the vector is provided but with a different dimension from the one 
     // indicated, the programs aborts
-    for(const auto& instant: time_intervals){
-        if(std::isnan(instant)){
+    for(const auto & t: vector_intervals_){
+        if(std::isnan(t)){
             std::cerr << "Wrong information about the lenght of the time intervals vector" << std::endl;
             return false;
         }
@@ -72,7 +96,6 @@ T::CheckType TimeDomain::check_condition(const T::VectorType& time_intervals_) c
 
     // If both time bounds are correctly provided
     return true;
-
 };
 
 

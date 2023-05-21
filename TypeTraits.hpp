@@ -13,13 +13,14 @@ struct TypeTraits{
     using NumberType = unsigned int;                // Type used to indicate a positive integer number of elements
     using IntType = int;                            // Type used for an integer elements
     using IndexType = unsigned int;                 // Type used to indicate any index of a matrix or of a vector
+    using SizeType = std::size_t;                    // Type used for a size
     using CheckType = bool;                        // Type used to indicate any check condition
 
     // Type for file name
     using FileNameType = std::string;               // Type used to indicate the name of the file passed to constructors
 
     // Basic containers types
-    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic,1>;                                        // Type used for any dynamic vector
+    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                                        // Type used for any dynamic vector
     using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;         // Type used for any dynamic matrix
     using VectorType = std::vector<VariableType>;                               // Type used for any vector of VariableType type
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
