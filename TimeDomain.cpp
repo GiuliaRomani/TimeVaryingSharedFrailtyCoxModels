@@ -1,3 +1,4 @@
+/*
 #include "TimeDomain.hpp"
 #include "GetPot"
 
@@ -100,3 +101,5 @@ T::CheckType TimeDomain::check_condition(const T::VectorType & vector_intervals_
 
 
 } // end namespace
+
+*/

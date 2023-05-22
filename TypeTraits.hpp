@@ -19,6 +19,13 @@ struct TypeTraits{
     // Type for file name
     using FileNameType = std::string;               // Type used to indicate the name of the file passed to constructors
 
+    // Types for methods
+    using IdType = unsigned int;                    // Type for the numeric Id of a method
+    using IdNameType = std::string;                 // Type for the name of a method
+    
+    // Type for groups
+    using GroupNameType = std::string;              // Type used to indicate the name of the group an individual belongs to
+
     // Basic containers types
     using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                                        // Type used for any dynamic vector
     using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;         // Type used for any dynamic matrix
@@ -26,12 +33,6 @@ struct TypeTraits{
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
     using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
 
-    // Types for methods
-    using IdType = unsigned int;                    // Type for the numeric Id of a method
-    using IdNameType = std::string;                 // Type for the name of a method
-    
-    // Type for groups
-    using GroupNameType = std::string;              // Type used to indicate the name of the group an individual belongs to
 
     // Type for time variables
     using TimeType = double;                        // Type used for the time variables

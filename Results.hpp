@@ -1,3 +1,4 @@
+/*
 #ifndef RESULTS_HPP
 #define RESULTS_HPP
 
@@ -42,3 +43,4 @@ private:
 
 
 #endif // RESULTS_HPP
+*/

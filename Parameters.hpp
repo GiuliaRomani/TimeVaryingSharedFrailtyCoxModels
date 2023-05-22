@@ -1,3 +1,4 @@
+/*
 #ifndef PARAMETERS_HPP
 #define PARAMETERS_HPP
 
@@ -74,3 +75,4 @@ private:
 
 
 #endif // PARAMETERS_HPP
+*/

@@ -1,3 +1,4 @@
+/*
 #include "Parameters.hpp"
 #include "GetPot"
 
@@ -142,3 +143,5 @@ T::CheckType Parameters::check_condition(const T::VectorType& range_min_, const 
 
 
 } // end namespace
+
+*/

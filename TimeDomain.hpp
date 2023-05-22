@@ -1,3 +1,4 @@
+/*
 #ifndef TIMEDOMAIN_HPP
 #define TIMEDOMAIN_HPP
 
@@ -51,3 +52,4 @@ private:
 } // end namespace
 
 #endif // TIMEDOMAIN_HPP
+/*

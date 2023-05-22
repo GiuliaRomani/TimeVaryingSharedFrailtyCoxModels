@@ -1,8 +1,8 @@
 #include "QuadraturePoints.hpp"
-#include "TimeDomain.hpp"
-#include "Parameters.hpp"
+//#include "TimeDomain.hpp"
+//#include "Parameters.hpp"
 #include "TypeTraits.hpp"
-#include "Results.hpp"
+//#include "Results.hpp"
 #include "Dataset.hpp"
 
 #include <iostream>
