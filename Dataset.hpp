@@ -23,17 +23,19 @@ private:
 
     T::NumberType n_individuals;                    // Number of individuals 
     T::NumberType n_regressors;                     // Number of regressors
-    //T::NumberType n_groups;                         // Number of groups in the cluster variable
+    T::NumberType n_groups;                         // Number of groups in the cluster variable
 
     T::MatrixXdr dataset;                           // Matrix of the dataset (individual, regressors)
     T::VectorXdr time_to_event;                     // Vector of time-to-event
     //T::MatrixXdr dropout_intervals;                 // Matrix of the dropout events
     T::VectorXdrGroupType dataset_group;            // Vector of the individual group
 
-    //T::MapType map_groups;                          // Map associating to each group the index of individuals belonging to that group
+    T::MapType map_groups;                          // Map associating to each group the index of individuals belonging to that group
 
     // Method for reading data from file
     void read_from_file(const T::FileNameType& filename2);
+
+    void add_to_map_groups(T::GroupNameType& name_group, T::IndexType index_individual);
 };
 
 } // end namespace
