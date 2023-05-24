@@ -8,7 +8,7 @@ namespace DatasetInfoClass{
 // Constructor
 DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2){
     // Initialize TimeDomain time object through its constructor
-    //time(filename1);
+    time = TimeDomainInfo::TimeDomain(filename1);
 
     // Initialize the number of groups to zero
     n_groups = 0;
@@ -16,6 +16,8 @@ DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType
     // Initialize the rest of the class
     read_from_file(filename2);
 
+    // Initialize the dropout_intervals variable
+    initialize_dropout_intervals();
 };
 
 // Method for reading from file
@@ -59,10 +61,6 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2){
             j = 0;
             i += 1;
         }
-
-
-        // Save the first element (group belonging) into the corresponding variable
-
     }
 };
 
@@ -78,6 +76,26 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
         group_position->second->push_back(index_individual);
     }
 };
+
+// Initialize the dropout_intervals variable
+void DatasetInfo::initialize_dropout_intervals(){
+    // Get the necessary variables as const reference
+    const T::NumberType & n_intervals = time.get_n_intervals();
+    const T::VectorXdr & vector_intervals = time.get_vector_intervals();
+    std::cout << time.get_n_intervals() << std::endl;
+
+    // Resize the matrix according to the right dimensions and fill it with null elements
+    dropout_intervals.resize(n_individuals, n_intervals);
+    dropout_intervals.setZero();
+
+    // Fill the matrix according to the condition
+    for(T::NumberType i = 0; i < n_individuals; ++i){
+        for(T::NumberType k = 0; k < n_intervals; ++k){
+            if((time_to_event(i) < vector_intervals(k+1)) & (time_to_event(i) >= vector_intervals(k)))
+                dropout_intervals(i,k) = 1;
+        }
+    } 
+}
 
 // Method for print the element of the map
 void DatasetInfo::print_map_groups() const{

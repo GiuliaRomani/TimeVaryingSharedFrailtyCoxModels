@@ -42,7 +42,8 @@ int main(){
     database.print_dataset();
     database.print_dataset_group();
     database.print_map_groups();
-    std::cout << database.get_n_groups() << std::endl;
+    database.print_dropout_intervals();
+
     
     
 

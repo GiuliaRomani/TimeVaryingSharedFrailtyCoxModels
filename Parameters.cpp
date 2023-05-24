@@ -140,8 +140,6 @@ T::CheckType Parameters::check_condition(const T::VectorType& range_min_, const 
     return true;
 };
 
-
-
 } // end namespace
 
 */
