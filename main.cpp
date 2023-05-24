@@ -10,13 +10,20 @@
 
 int main(){
     using T = TypeTraits;
+    
     /*
     // Prove Time class for errors
-    TimeDomainInfo::TimeDomain time(".txt");
+    std::cout << "Direct initialization" << std::endl;
+    TimeDomainInfo::TimeDomain time("DataToolFile.txt");
     std::cout << time.get_time_begin() << std::endl;
     std::cout << time.get_n_intervals() << std::endl;
     time.print_v_intervals();
+
+    std::cout << "Using a different initialization" << std::endl;
+    TimeDomainInfo::TimeDomain time_alternative(TimeDomainInfo::TimeDomain("DataToolFile.txt"));
+    time.print_v_intervals();
     */
+    
     
     /*
     // Prova Parameters class and Results class for errors 
@@ -29,10 +36,14 @@ int main(){
     results.print_results();
     */
 
+    
     // Prova Dataset class for errors
     DatasetInfoClass::DatasetInfo database("DataToolFile.txt", "DataIndividualsFile.txt");
     database.print_dataset();
     database.print_dataset_group();
+    database.print_map_groups();
+    std::cout << database.get_n_groups() << std::endl;
+    
     
 
     return 0;

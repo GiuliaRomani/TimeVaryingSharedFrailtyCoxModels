@@ -4,7 +4,7 @@
 
 [TimeDomain]
 	length_vector_intervals = 8 
-	vector_intervals = '2.0 1.0 1.5 2.0 3.0 4.0 5.0 6.1'
+	vector_intervals = '0.0 1.0 1.5 2.0 3.0 4.0 5.0 6.1'
 [../]
 
 [Parameters]

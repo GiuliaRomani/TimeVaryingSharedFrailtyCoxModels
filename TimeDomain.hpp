@@ -1,4 +1,4 @@
-/*
+
 #ifndef TIMEDOMAIN_HPP
 #define TIMEDOMAIN_HPP
 
@@ -12,6 +12,9 @@ using T = TypeTraits;
 
 class TimeDomain{
 public:
+    // Default Constructor
+    TimeDomain();
+
     // Constructor
     TimeDomain(const T::FileNameType& filename) {read_from_file(filename);};
 
@@ -52,4 +55,4 @@ private:
 } // end namespace
 
 #endif // TIMEDOMAIN_HPP
-/*
+

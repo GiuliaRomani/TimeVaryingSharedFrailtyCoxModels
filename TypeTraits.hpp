@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <memory>
 
 #include <Eigen/Dense>
 
@@ -44,7 +45,7 @@ struct TypeTraits{
     using FactoryType = std::map<IdType, IdNameType>;     
 
     // Type used for mapping the group name with the indexes of the individuals belonging to that group
-    using MapType = std::map<GroupNameType, VectorIndexType>;
+    using MapType = std::map<GroupNameType, std::unique_ptr<VectorIndexType>>;
 
 
 };

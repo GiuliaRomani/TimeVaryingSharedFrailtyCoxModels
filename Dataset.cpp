@@ -2,6 +2,7 @@
 #include "GetPot"
 
 #include <sstream>
+#include <memory>
 
 namespace DatasetInfoClass{
 // Constructor
@@ -17,6 +18,7 @@ DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType
 
 };
 
+// Method for reading from file
 void DatasetInfo::read_from_file(const T::FileNameType& filename2){
     T::CheckType first_line = false;
     T::NumberType i = 0;                                // Number of row
@@ -64,17 +66,29 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2){
     }
 };
 
-void DatasetInfo::add_to_map_groups(T::GroupNameType& name_group, T::IndexType index_individual){
+// Method for adding individual code group name and index to the map
+void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual){
     T::MapType::iterator group_position = map_groups.find(name_group);
     if(group_position == map_groups.end()){
-        map_groups[name_group].push_back(index_individual);
+        map_groups[name_group] = std::make_unique<T::VectorIndexType>();
+        map_groups[name_group]->push_back(index_individual);
         n_groups += 1;
     }
     else{
-        group_position->second.push_back(index_individual);
+        group_position->second->push_back(index_individual);
     }
+};
 
-}
+// Method for print the element of the map
+void DatasetInfo::print_map_groups() const{
+    for(auto& [name_group, ptr_vector_index]: map_groups){
+        std::cout << "In group " << name_group << " individuals with index:"<<std::endl;
+        for(auto& index: *ptr_vector_index){
+            std::cout << index << std::endl;
+        }
+    }
+};
 
 
 } // end namespace
+

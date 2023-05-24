@@ -1,4 +1,4 @@
-/*
+
 #include "TimeDomain.hpp"
 #include "GetPot"
 
@@ -9,6 +9,11 @@
 #include <fstream>
 
 namespace TimeDomainInfo{
+
+// Default constructor
+TimeDomain::TimeDomain(): time_begin(0), time_end(0), n_intervals(0) {
+    vector_intervals.resize(n_intervals);
+};
 
 // Method for reading data from file using GetPot
 void TimeDomain::read_from_file(const T::FileNameType& filename){
@@ -102,4 +107,3 @@ T::CheckType TimeDomain::check_condition(const T::VectorType & vector_intervals_
 
 } // end namespace
 
-*/
