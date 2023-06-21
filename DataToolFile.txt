@@ -8,9 +8,8 @@
 [../]
 
 [Parameters]
-	n_ranges = 3
-	range_min = '-5. 2. 2.'
-	range_max = '5. 10. 10.'
+	range_min = '-5. 2. 2. 0'
+	range_max = '5. 10. 10. 1'
 [../]
 
 [Method]

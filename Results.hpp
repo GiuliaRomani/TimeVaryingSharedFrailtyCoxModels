@@ -1,4 +1,3 @@
-/*
 #ifndef RESULTS_HPP
 #define RESULTS_HPP
 
@@ -19,6 +18,9 @@ public:
             AIC(compute_AIC()) 
             {};
 
+    // Default constructor
+    Results() = default;
+
     // Method for printing in a fine way the results
     void print_results() const;
 
@@ -32,7 +34,7 @@ private:
     T::VectorXdr optimal_parameters;                    // Parameters obtained by the maximization procedure
 
     T::VariableType optimal_loglikelihood;              // Value of the maximez log-likelihooh
-    T::VariableType AIC;                                // AIKAKE INFORMATION CRITERION
+    T::VariableType AIC;                                // AKAIKE INFORMATION CRITERION
 
 
     // Method for compute the AIC 
@@ -43,4 +45,3 @@ private:
 
 
 #endif // RESULTS_HPP
-*/

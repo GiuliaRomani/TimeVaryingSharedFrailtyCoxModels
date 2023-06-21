@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace DatasetInfoClass{
+    
 // Constructor
 DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2){
     // Initialize TimeDomain time object through its constructor
@@ -18,6 +19,9 @@ DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType
 
     // Initialize the dropout_intervals variable
     initialize_dropout_intervals();
+
+    // Initialize the e_time matrix
+    initialize_e_time();
 };
 
 // Method for reading from file
@@ -44,6 +48,7 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2){
             // Save the group inside the vector
             T::GroupNameType code_group;
             getline(value_line, code_group, ',');
+            code_group = code_group.substr(1,4);
             dataset_group(i) = code_group;
             add_to_map_groups(code_group, i);
 
@@ -68,7 +73,7 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2){
 void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual){
     T::MapType::iterator group_position = map_groups.find(name_group);
     if(group_position == map_groups.end()){
-        map_groups[name_group] = std::make_unique<T::VectorIndexType>();
+        map_groups[name_group] = std::make_shared<T::VectorIndexType>();
         map_groups[name_group]->push_back(index_individual);
         n_groups += 1;
     }
@@ -81,8 +86,7 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
 void DatasetInfo::initialize_dropout_intervals(){
     // Get the necessary variables as const reference
     const T::NumberType & n_intervals = time.get_n_intervals();
-    const T::VectorXdr & vector_intervals = time.get_vector_intervals();
-    std::cout << time.get_n_intervals() << std::endl;
+    const T::VectorXdr & vector_intervals = time.get_v_intervals();
 
     // Resize the matrix according to the right dimensions and fill it with null elements
     dropout_intervals.resize(n_individuals, n_intervals);
@@ -95,7 +99,31 @@ void DatasetInfo::initialize_dropout_intervals(){
                 dropout_intervals(i,k) = 1;
         }
     } 
+};
+
+// Initialize the e_time matrix
+void DatasetInfo::initialize_e_time(){
+    // Resize the matrix
+    e_time.resize(n_individuals, n_intervals);
+
+    // Fill the matrix
+    for(T::IndexType i = 0; i < n_individuals; ++i){
+        T::VariableType time_individual = time_to_event(j);
+        for(T::IndexType k = 0; k < n_intervals; ++k){
+            e_time(i,j) = e_time_function(time_individual, k);
+        }
+    }
 }
+
+// Define the function to compute the e_time value in the matrix
+T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::IndexType k){
+    if(time_t < v_intervals(k))
+        return 0.;
+    else if((time_t >= v_intervals(k)) & (time_t < v_intervals(k+1)))
+        return (time_t - v_intervals(k));
+    else if(time_t >= v_intervals(k+1))
+        return (v_intervals(k+1) - v_intervals(k));
+};
 
 // Method for print the element of the map
 void DatasetInfo::print_map_groups() const{
@@ -104,6 +132,29 @@ void DatasetInfo::print_map_groups() const{
         for(auto& index: *ptr_vector_index){
             std::cout << index << std::endl;
         }
+    }
+};
+
+// Method for ptinting the element of a single group
+void DatasetInfo::print_individuals_group(const T::GroupNameType& name_group) const{
+    std::shared_ptr<T::VectorIndexType> individuals_group = extract_individuals_group(name_group);
+    if(individuals_group == nullptr)
+        std::cerr << "No group with this name!" << std::endl;
+    else{
+        std::cout << "Indexes in group " << name_group << std::endl;
+        for(const auto i: *individuals_group)
+            std::cout << i << std::endl;
+    }
+};
+
+
+// Extract the shared pointer to the name group in the map of groups
+std::shared_ptr<T::VectorIndexType> DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{
+    T::MapType::const_iterator group_position = map_groups.find(name_group);
+    if(group_position == map_groups.cend())
+        return nullptr;
+    else{
+        return group_position->second;
     }
 };
 

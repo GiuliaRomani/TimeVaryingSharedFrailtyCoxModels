@@ -33,7 +33,7 @@ struct TypeTraits{
     using VectorType = std::vector<VariableType>;                               // Type used for any vector of VariableType type
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
     using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
-
+    using VectorNumberType = std::vector<NumberType>;                               // Type used for storing integers
 
     // Type for time variables
     using TimeType = double;                        // Type used for the time variables
@@ -45,7 +45,9 @@ struct TypeTraits{
     using FactoryType = std::map<IdType, IdNameType>;     
 
     // Type used for mapping the group name with the indexes of the individuals belonging to that group
-    using MapType = std::map<GroupNameType, std::unique_ptr<VectorIndexType>>;
+    using SharedPtrType = std::shared_ptr<VectorIndexType>;
+    using MapType = std::map<GroupNameType, SharedPtrType>;
+
 
 
 };

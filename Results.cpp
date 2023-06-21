@@ -1,4 +1,3 @@
-/*
 #include "Results.hpp"
 
 #include <iostream>
@@ -21,4 +20,3 @@ void Results::print_help() const {
 };
 
 } // end namespace
-*/

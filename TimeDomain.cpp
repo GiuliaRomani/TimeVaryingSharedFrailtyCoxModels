@@ -1,4 +1,3 @@
-
 #include "TimeDomain.hpp"
 #include "GetPot"
 
@@ -12,7 +11,7 @@ namespace TimeDomainInfo{
 
 // Default constructor
 TimeDomain::TimeDomain(): time_begin(0), time_end(0), n_intervals(0) {
-    vector_intervals.resize(n_intervals);
+    v_intervals.resize(n_intervals);
 };
 
 // Method for reading data from file using GetPot
@@ -30,27 +29,27 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
         std::exit(1);
 
     // To check if the vector of time intervals is sorted, to load it into a normal vector
-    T::VectorType vector_intervals_copy(size_intervals, 0.);
+    T::VectorType v_intervals_copy(size_intervals, 0.);
     for(T::NumberType i = 0; i < size_intervals; ++i){
-        vector_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::TimeType>::quiet_NaN(), i);
+        v_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::TimeType>::quiet_NaN(), i);
     }
-    std::sort(vector_intervals_copy.begin(), vector_intervals_copy.end());
+    std::sort(v_intervals_copy.begin(), v_intervals_copy.end());
 
-    if(!check_condition(vector_intervals_copy)){
+    if(!check_condition(v_intervals_copy)){
         std::exit(1);
     }
 
     // Initialize the time bounds
-    //time_begin = *(vector_intervals_copy.begin());
-    //time_end = *(vector_intervals_copy.end() - 1);
+    //time_begin = *(v_intervals_copy.begin());
+    //time_end = *(v_intervals_copy.end() - 1);
 
-    time_begin = vector_intervals_copy[0];
-    time_end = vector_intervals_copy[size_intervals - 1];
+    time_begin = v_intervals_copy[0];
+    time_end = v_intervals_copy[size_intervals - 1];
 
     // Initialize the vector of the time domain subdivision and check correctness
-    vector_intervals.resize(size_intervals);
+    v_intervals.resize(size_intervals);
     for(T::NumberType i = 0; i < size_intervals; ++i)
-        vector_intervals(i) = vector_intervals_copy[i];
+        v_intervals(i) = v_intervals_copy[i];
 
     // Initialize the number of intervals 
     n_intervals = size_intervals - 1;
@@ -84,16 +83,16 @@ T::CheckType TimeDomain::check_condition(const T::NumberType& size_int) const{
 };
 
 // Method for checking conditions for time bounds
-T::CheckType TimeDomain::check_condition(const T::VectorType & vector_intervals_) const{
+T::CheckType TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
     // If the entire vector is not provided, the first element will be NaN.
-    if(std::isnan(*(vector_intervals_.begin()))){
+    if(std::isnan(*(v_intervals_.begin()))){
         std::cerr << "List of time intervals is not provided" << std::endl;
         return false;
     }
 
     // If the vector is provided but with a different dimension from the one 
     // indicated, the programs aborts
-    for(const auto & t: vector_intervals_){
+    for(const auto & t: v_intervals_){
         if(std::isnan(t)){
             std::cerr << "Wrong information about the lenght of the time intervals vector" << std::endl;
             return false;

@@ -5,9 +5,9 @@
 
 #include <array>
 
+namespace QuadraturePoints{
 using T = TypeTraits;
 
-namespace QuadraturePoints{
     // QuadratureFormula with 9 points
     struct Points9{
         T::NumberType n = 9;
