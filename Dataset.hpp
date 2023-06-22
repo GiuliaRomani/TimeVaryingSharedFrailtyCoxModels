@@ -1,11 +1,17 @@
 #ifndef DATASET_HPP
 #define DATASET_HPP
 
-#include "TypeTraits.hpp"
+// Include header files
 #include "TimeDomain.hpp"
 
+// Include libraries
 #include <iostream>
 
+// Forward declaration of the models
+// class TVModel::ModelBase;
+// class TVModel::PowerParameterModel;
+
+// Class 
 namespace DatasetInfoClass{
 using T = TypeTraits;
 
@@ -25,6 +31,9 @@ public:
     T::NumberType& get_n_individuals() {return n_individuals;};
     T::NumberType& get_n_regressors() {return n_regressors;};
     T::MapType& get_map_groups() {return map_groups;};
+    T::MatrixXdr& get_dataset() {return dataset;};
+    T::MatrixXdr& get_e_time() {return e_time;};
+    T::MatrixXdr& get_dropout_intervals() {return dropout_intervals;};
 
     // Extract the uique pointer to the name in the map of groups
     std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
@@ -36,12 +45,11 @@ public:
     void print_dropout_intervals() const {std::cout << dropout_intervals << std::endl;};
     void print_map_groups() const;
     void print_individuals_group(const T::GroupNameType& name_group) const;
+    void print_e_time() const {std::cout << e_time << std::endl;};
 
 
 private:
     TimeDomainInfo::TimeDomain time;                // Class time 
-    T::NumberType& n_intervals = time.get_n_intervals();
-    T::VectorXdr& v_intervals = time.get_v_intervals();
 
     T::NumberType n_individuals;                    // Number of individuals 
     T::NumberType n_regressors;                     // Number of regressors
@@ -52,8 +60,8 @@ private:
     T::MatrixXdr e_time;
     T::MatrixXdr dropout_intervals;                 // Matrix of the dropout events
     T::VectorXdrGroupType dataset_group;            // Vector of the individual group
-
     T::MapType map_groups;                          // Map associating to each group the index of individuals belonging to that group
+
 
     // Method for reading data from file
     void read_from_file(const T::FileNameType& filename2);
@@ -66,11 +74,13 @@ private:
 
     // Initialize the e_time matrix and define the function to compute the e_time
     void initialize_e_time();
-    T::VariableType e_time_function(T::VariableType time_t, T::IndexType k);
+    T::VariableType e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk);
+
+
+    // Class TVModelBase declared friend to access this private components
+    // friend TVModel::ModelBase;
+    // friend TVModel::PowerParameterModel;
 };
 
 } // end namespace
-
-
-
 #endif // DATASET_HPP

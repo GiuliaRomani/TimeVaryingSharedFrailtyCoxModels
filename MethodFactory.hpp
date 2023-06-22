@@ -1,10 +1,14 @@
-/*
+
 #ifndef METHODFACTORY_HPP
 #define METHODFACTORY_HPP
 
-#include "TypeTraits.hpp"
+// Include header files
+#include "TVModelBase.hpp"
+#include "TVModelDerived.hpp"
 
+// Include libraries
 #include <memory>
+#include <iostream>
 
 
 using T = TypeTraits;
@@ -29,20 +33,22 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
     std::cout << std::endl;
 };
 
+
 // This function receives the id of the method the user wants to use and some parameter (through a variadic template)
 // and returns a unique pointer to the base class, but initialised with a derived class object with the arguments passed.
 // A valid id is controlled in the main() function. 
 template<class ... Args>
-std::unique_ptr<FindZeroBase> MakeZeroMethod(const T::IdType id, Args && ... args){
+std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
     switch(id){
-        case 1:  return std::make_unique<Paik>(std::forward<Args>(args) ...);
-        case 2:  return std::make_unique<PowerParameter>(std::forward<Args>(args) ...);
-        case 3:  return std::make_unique<StochasticFrailty>(std::forward<Args>(args) ...);            
+        //case 1:  return std::make_unique<Paik>(std::forward<Args>(args) ...);
+        case 2:  return std::make_unique<TVModel::PowerParameterModel>(std::forward<Args>(args) ...);
+        //case 3:  return std::make_unique<StochasticFrailty>(std::forward<Args>(args) ...);            
         default:  throw "Not existent id method!";
     };
-}
+};
+
 
 #endif // METHODFACTORY_HPP
 
-*/
+
 

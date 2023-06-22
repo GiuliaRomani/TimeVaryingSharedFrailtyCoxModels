@@ -1,10 +1,12 @@
-#include "QuadraturePoints.hpp"
-//#include "TimeDomain.hpp"
-#include "Parameters.hpp"
 #include "TypeTraits.hpp"
+#include "MethodFactory.hpp"
+//#include "QuadraturePoints.hpp"
+//#include "TimeDomain.hpp"
+//#include "Parameters.hpp"
 //#include "Results.hpp"
 //#include "Dataset.hpp"
-#include "TVModelBase.hpp"
+//#include "TVModelBase.hpp"
+//#include "TVModelDerived.hpp"
 
 #include <iostream>
 #include <utility>
@@ -57,16 +59,29 @@ int main(){
     database.print_map_groups();
     database.print_dropout_intervals();
     database.print_individuals_group("EngC");
+    database.print_e_time();
     */
 
-    
+    /*
     // Prova TVModelBase fo errors
     TVModel::ModelBase modelbase("DataToolFile.txt", "DataIndividualsFile.txt");
     modelbase.print_map_groups();
     modelbase.print_n_regressors();
     modelbase.print_n_intervals();
+    */
 
     
+    // Prove the PowerParameterModel
+    static T::FactoryType methods(RegisteredMethods());
+    PrintMethods(methods);
+    T::IdType id = 2;
+
+    std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
+    T::VariableType resultPP = ptrMethod -> compute_loglikelihood();
+    std::cout << resultPP << std::endl;
+   
+
+
 
     return 0;
 }

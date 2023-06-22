@@ -8,8 +8,8 @@
 [../]
 
 [Parameters]
-	range_min = '-5. 2. 2. 0'
-	range_max = '5. 10. 10. 1'
+	range_min = '-5. 2. 2. 0.'
+	range_max = '5. 10. 10. 1.'
 [../]
 
 [Method]

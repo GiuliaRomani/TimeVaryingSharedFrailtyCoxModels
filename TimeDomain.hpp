@@ -33,10 +33,10 @@ public:
 
 
 private:
-    T::TimeType time_begin;                     // Left bound of the time-domain
-    T::TimeType time_end;                       // Right bound of the time-domain
-    T::VectorXdr v_intervals;         // Subdivison of the time-domain
-    T::NumberType n_intervals;                   // Number of intervals in which the time-domain is splitted
+    T::TimeType time_begin;                                 // Left bound of the time-domain
+    T::TimeType time_end;                                   // Right bound of the time-domain
+    T::VectorXdr v_intervals;                               // Subdivison of the time-domain
+    T::NumberType n_intervals;                              // Number of intervals in which the time-domain is splitted
 
     // Method for reading data from file using GetPot
     void read_from_file(const T::FileNameType& filename);

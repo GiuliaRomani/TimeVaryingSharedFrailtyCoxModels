@@ -86,7 +86,7 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
 void DatasetInfo::initialize_dropout_intervals(){
     // Get the necessary variables as const reference
     const T::NumberType & n_intervals = time.get_n_intervals();
-    const T::VectorXdr & vector_intervals = time.get_v_intervals();
+    const T::VectorXdr & v_intervals = time.get_v_intervals();
 
     // Resize the matrix according to the right dimensions and fill it with null elements
     dropout_intervals.resize(n_individuals, n_intervals);
@@ -95,7 +95,7 @@ void DatasetInfo::initialize_dropout_intervals(){
     // Fill the matrix according to the condition
     for(T::NumberType i = 0; i < n_individuals; ++i){
         for(T::NumberType k = 0; k < n_intervals; ++k){
-            if((time_to_event(i) < vector_intervals(k+1)) & (time_to_event(i) >= vector_intervals(k)))
+            if((time_to_event(i) < v_intervals(k+1)) & (time_to_event(i) >= v_intervals(k)))
                 dropout_intervals(i,k) = 1;
         }
     } 
@@ -103,26 +103,32 @@ void DatasetInfo::initialize_dropout_intervals(){
 
 // Initialize the e_time matrix
 void DatasetInfo::initialize_e_time(){
+    // Extract the needed information from time class
+    const T::NumberType & n_intervals = time.get_n_intervals();
+    const T::VectorXdr & v_intervals = time.get_v_intervals();
+
     // Resize the matrix
     e_time.resize(n_individuals, n_intervals);
 
     // Fill the matrix
     for(T::IndexType i = 0; i < n_individuals; ++i){
-        T::VariableType time_individual = time_to_event(j);
+        T::VariableType time_individual = time_to_event(i);
         for(T::IndexType k = 0; k < n_intervals; ++k){
-            e_time(i,j) = e_time_function(time_individual, k);
+            T::VariableType v_k = v_intervals(k);
+            T::VariableType v_kk = v_intervals(k+1);
+            e_time(i,k) = e_time_function(time_individual, k, v_k, v_kk);
         }
     }
-}
+};
 
 // Define the function to compute the e_time value in the matrix
-T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::IndexType k){
-    if(time_t < v_intervals(k))
+T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk){
+    if(time_t < v_k)
         return 0.;
-    else if((time_t >= v_intervals(k)) & (time_t < v_intervals(k+1)))
-        return (time_t - v_intervals(k));
-    else if(time_t >= v_intervals(k+1))
-        return (v_intervals(k+1) - v_intervals(k));
+    else if((time_t >= v_k) & (time_t < v_kk))
+        return (time_t - v_k);
+    else if(time_t >= v_kk)
+        return (v_kk - v_k);
 };
 
 // Method for print the element of the map
@@ -146,7 +152,6 @@ void DatasetInfo::print_individuals_group(const T::GroupNameType& name_group) co
             std::cout << i << std::endl;
     }
 };
-
 
 // Extract the shared pointer to the name group in the map of groups
 std::shared_ptr<T::VectorIndexType> DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{

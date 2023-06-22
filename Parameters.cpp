@@ -10,13 +10,13 @@ namespace Params{
 
 // Constructor
 Parameters::Parameters(const T::FileNameType& filename, 
-            const T::NumberType& n_ranges_, const T::NumberType& n_parameters_,
-            const T::NumberType& n_intervals_, const T::NumberType& n_regressors_,
+            const T::NumberType& n_parameters_, const T::NumberType& n_intervals_, 
+            const T::NumberType& n_regressors_, const T::NumberType& n_ranges_,
             const T::VectorNumberType& all_n_parameters_):
-            n_ranges(n_ranges_),
             n_parameters(n_parameters_),
             n_intervals(n_intervals_),
-            n_regressors(n_regressors_){
+            n_regressors(n_regressors_),
+            n_ranges(n_ranges_){
                 // Read data from file
                 read_from_file(filename);
 

@@ -2,16 +2,15 @@
 #ifndef TIME_VARYING_MODEL_BASE
 #define TIME_VARYING_MODEL_BASE
 
-#include <iostream>
-
 // Include all necessary header files
 #include "TimeDomain.hpp"
 #include "Dataset.hpp"
-#include "TypeTraits.hpp"
-#include "Parameters.hpp"
-#include "Results.hpp"
+//#include "Results.hpp"
 
+// Include libraries
+#include <iostream>
 
+// Class
 namespace TVModel{
 using T = TypeTraits;
 
@@ -24,6 +23,10 @@ public:
     // Getter 
     T::VectorXdr get_sd_frailty() const {return sd_frailty;};
     T::VectorXdr get_variance_frailty() const {return variance_frailty;};
+
+    // Define and Compute the log-likelihood
+    // virtual ... build_loglikelihood() = 0;
+    virtual T::VariableType compute_loglikelihood() = 0;
 
     // Print 
     void print_map_groups() const {return database.print_map_groups();};
@@ -52,9 +55,8 @@ protected:
     T::VectorXdr sd_frailty;                                                // Vector for time-interval sd of the frailty
 
 
-
     // Virtual method to compute the number of parameters of each model
-    //virtual T::NumberType compute_n_parameters() = 0;
+    virtual T::NumberType compute_n_parameters() = 0;
 
     // Virtual method to derive the interval variance of the frailty
     //virtual void compute_sd_frailty() = 0;
