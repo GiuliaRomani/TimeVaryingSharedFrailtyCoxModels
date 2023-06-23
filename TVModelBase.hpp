@@ -56,9 +56,6 @@ protected:
     // Virtual method to compute the number of parameters of each model
     virtual T::NumberType compute_n_parameters() = 0;
 
-    // Virtual method for extracting the parameters from the vector
-    virtual T::TuplePPType extract_parameters(T::VectorXdr v_parameters_) = 0;
-
     // Method for building the log-likelihood
     virtual void build_loglikelihood() = 0;
 

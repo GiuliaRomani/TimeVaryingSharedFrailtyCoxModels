@@ -50,9 +50,12 @@ struct TypeTraits{
     using SharedPtrType = std::shared_ptr<VectorIndexType>;
     using MapType = std::map<GroupNameType, SharedPtrType>;
 
+    // Type used for the extraction of the parameters from the vector
     using TuplePPType = std::tuple<VectorXdr, VectorXdr, VectorXdr, VariableType>;
+    using TuplePaikType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VectorXdr>;
+    using TupleLFType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VariableType, VariableType>;
 
-
+    using TupleDropoutType = std::tuple<VectorXdr, VariableType>;
 
 };
 

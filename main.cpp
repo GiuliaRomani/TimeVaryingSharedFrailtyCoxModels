@@ -74,10 +74,11 @@ int main(){
     // Prove the PowerParameterModel
     static T::FactoryType methods(RegisteredMethods());
     PrintMethods(methods);
-    T::IdType id = 2;
+    T::IdType id = 1;
 
     std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
     ptrMethod -> optimize_loglikelihood();
+
     
    
 
