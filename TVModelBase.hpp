@@ -5,7 +5,7 @@
 // Include all necessary header files
 #include "TimeDomain.hpp"
 #include "Dataset.hpp"
-//#include "Results.hpp"
+#include "Results.hpp"
 
 // Include libraries
 #include <iostream>
@@ -25,8 +25,7 @@ public:
     T::VectorXdr get_variance_frailty() const {return variance_frailty;};
 
     // Define and Compute the log-likelihood
-    // virtual ... build_loglikelihood() = 0;
-    virtual T::VariableType compute_loglikelihood() = 0;
+    virtual void optimize_loglikelihood() = 0;
 
     // Print 
     void print_map_groups() const {return database.print_map_groups();};
@@ -42,8 +41,7 @@ protected:
     // Complex data structures
     DatasetInfoClass::DatasetInfo database;                                 // Dataset containing the individual covariates
     TimeDomainInfo::TimeDomain time;                                        // Class time 
-    //ResultsMethod::Results result;                                          // Class for the results
-
+    ResultsMethod::Results result;                                          // Class for the results
 
     // Simple variables
     T::NumberType& n_regressors = database.get_n_regressors();                          // Number of regressors
@@ -57,6 +55,12 @@ protected:
 
     // Virtual method to compute the number of parameters of each model
     virtual T::NumberType compute_n_parameters() = 0;
+
+    // Virtual method for extracting the parameters from the vector
+    virtual T::TuplePPType extract_parameters(T::VectorXdr v_parameters_) = 0;
+
+    // Method for building the log-likelihood
+    virtual void build_loglikelihood() = 0;
 
     // Virtual method to derive the interval variance of the frailty
     //virtual void compute_sd_frailty() = 0;

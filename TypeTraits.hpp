@@ -1,10 +1,12 @@
 #ifndef TYPETRAITS_HPP
 #define TYPETRAITS_HPP
 
+// Include libraries
 #include <string>
 #include <map>
 #include <vector>
 #include <memory>
+#include <tuple>
 
 #include <Eigen/Dense>
 
@@ -47,6 +49,8 @@ struct TypeTraits{
     // Type used for mapping the group name with the indexes of the individuals belonging to that group
     using SharedPtrType = std::shared_ptr<VectorIndexType>;
     using MapType = std::map<GroupNameType, SharedPtrType>;
+
+    using TuplePPType = std::tuple<VectorXdr, VectorXdr, VectorXdr, VariableType>;
 
 
 

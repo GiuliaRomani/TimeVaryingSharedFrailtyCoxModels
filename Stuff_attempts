@@ -8,4 +8,23 @@ QuadraturePoints::Points10 points9;
 }
 ----------------------------------------------------------------
 
+/*
+// Virtual method to derive the interval variance of the frailty
+void PowerParameterModel::compute_sd_frailty() {
+    // Extract the useful parameter from the vector of parameters (i.e. gamma vector and sigma)
+    T::VectorXdr& v_parameters = parameters.get_v_parameters();
+    T::VariableType sigma = v_parameters.tail(1);
+
+    T::IndexType begin_gamma = n_intervals + n_regressors;
+    T::IndexType end_gamma = 2 * n_intervals + n_regressors - 2;
+    T::VectorXdr v_gamma(n_intervals);
+    v_gamma(0) = 1;
+    v_gamma.block(1,0,n_intervals-1,1) = v_parameters.block(begin_gamma,0, n_intervals-1,1);
+
+    for(const auto& p: v_gamma){
+        variance_frailty(p) = (sigma * v_gamma(p)) * (sigma * v_gamma(p));
+        sd_frailty(p) = sigma * v_gamma(p);
+    };
+};
+*/
     

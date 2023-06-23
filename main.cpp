@@ -77,8 +77,8 @@ int main(){
     T::IdType id = 2;
 
     std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
-    T::VariableType resultPP = ptrMethod -> compute_loglikelihood();
-    std::cout << resultPP << std::endl;
+    ptrMethod -> optimize_loglikelihood();
+    
    
 
 

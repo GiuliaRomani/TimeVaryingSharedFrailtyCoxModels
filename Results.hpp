@@ -9,17 +9,14 @@ using T = TypeTraits;
 class Results{
 public:
     // Constructor
-    Results(const T::IdNameType& name_method_, const T::NumberType n_parameters_,  
-            const T::VectorXdr& optimal_parameters_, const T::VariableType optimal_loglikelihood_): 
-            name_method(name_method_), 
+    Results() = default;
+    Results(const T::NumberType n_parameters_,  const T::VectorXdr& optimal_parameters_, 
+            const T::VariableType optimal_loglikelihood_): 
             n_parameters(n_parameters_), 
             optimal_parameters(optimal_parameters_), 
             optimal_loglikelihood(optimal_loglikelihood_),
             AIC(compute_AIC()) 
             {};
-
-    // Default constructor
-    Results() = default;
 
     // Method for printing in a fine way the results
     void print_results() const;
@@ -28,8 +25,6 @@ public:
     void print_help() const;
 
 private:
-    T::IdNameType name_method;                          // Name of the applied method
-
     T::NumberType n_parameters;                         // Number of parameters of the method
     T::VectorXdr optimal_parameters;                    // Parameters obtained by the maximization procedure
 
