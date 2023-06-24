@@ -34,6 +34,7 @@ public:
     T::MatrixXdr& get_dataset() {return dataset;};
     T::MatrixXdr& get_e_time() {return e_time;};
     T::MatrixXdr& get_dropout_intervals() {return dropout_intervals;};
+    T::VectorXdr& get_time_to_event() {return time_to_event;};
 
     // Extract the uique pointer to the name in the map of groups
     std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;

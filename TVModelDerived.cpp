@@ -37,7 +37,7 @@ T::NumberType PowerParameterModel::compute_n_parameters() {
 };
 
 
-T::TuplePPType PowerParameterModel::extract_parameters(T::VectorXdr v_parameters_){
+T::TuplePPType PowerParameterModel::extract_parameters(T::VectorXdr& v_parameters_){
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(n_intervals, 0, n_regressors,1);
@@ -57,7 +57,7 @@ void PowerParameterModel::build_loglikelihood(){
 
     // Implement the function ll_pp
     // T::VariableType x, T::IndexType index, 
-    ll_pp = [this] (T::VectorXdr v_parameters_){
+    ll_pp = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
         T::MapType::iterator it_map = database.get_map_groups().begin();
         T::MapType::iterator it_map_end = database.get_map_groups().end();
@@ -80,12 +80,7 @@ void PowerParameterModel::build_loglikelihood(){
     
     // Implement the function ll_group_pp
     // T::VariableType x, T::IndexType index, 
-    ll_group_pp = [this] (T::VectorXdr v_parameters_, T::SharedPtrType indexes_group_){
-
-        // Extract the whole dataset as const reference
-        const auto dataset = database.get_dataset();
-        const auto dropout_intervals = database.get_dropout_intervals();
-        const auto e_time = database.get_e_time();
+    ll_group_pp = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType& indexes_group_){
 
         // Extract single parameters from the vector
         // v_parameters_(index) = x;
@@ -94,8 +89,9 @@ void PowerParameterModel::build_loglikelihood(){
         // Compute the necessary
         T::VariableType loglik1, partial1 = 0;
         for(const auto &i: *(indexes_group_)){
+            T::VariableType dataset_betar = dataset.row(i) * betar;
             for(T::IndexType k = 0; k < n_intervals; ++k){
-                loglik1 += (dataset.row(i) * betar + phi(k)) * dropout_intervals(i,k);
+                loglik1 += (dataset_betar + phi(k)) * dropout_intervals(i,k);
                 partial1 += dropout_intervals(i,k) * gammak(k);
             }
         }
@@ -129,7 +125,7 @@ void PowerParameterModel::optimize_loglikelihood(){
     result.print_results();
 };
 
-
+/*
 //-------------------------------------------------------------------------------------------------------
 // Implementations for the Paik Model
 // Constructor
@@ -157,7 +153,7 @@ T::NumberType PaikModel::compute_n_parameters() {
 };
 
 // Virtual method for extracting the parameters fromt the vector
-T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr v_parameters_){
+T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr& v_parameters_){
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(n_intervals, 0, n_regressors,1);
@@ -167,6 +163,48 @@ T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr v_parameters_){
     T::VectorXdr gammak = v_parameters_.tail(n_intervals);
 
     return std::make_tuple(phi, betar, mu1, mu2, nu, gammak);
+};
+
+T::TupleMatrixAType PaikModel::extract_matrixA_variables(T::SharedPtrType& indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_){
+    T::NumberType n_individuals_group = (*indexes_group_).size();
+    T::MatrixXdr A_ijk(n_individuals_group, n_intervals);
+    T::VectorXdr A_ik(n_intervals);
+    T::VariableType A_i;
+
+    T::IndexType index = 0;
+    for(const auto &i: *indexes_group_){
+        T::VariableType dataset_betar = dataset.row(i) * betar_;
+        for(T::IndexType k = 0; k < n_intervals; ++k){
+            A_ijk(index,k) = e_time(i,k) * exp(dataset_betar + phi_(k));
+        }
+        index += 1;
+    }
+
+    A_ik = A_ijk.colwise().sum();
+    A_i = A_ik.sum();
+
+    return std::make_tuple(A_ijk, A_ik, A_i);
+};
+
+T::TupleDropoutType PaikModel::extract_dropout_variables(T::SharedPtrType& indexes_group_){
+    // Define the variables 
+    T::NumberType n_individuals_group = (*indexes_group_).size();
+    T::MatrixXdr d_ijk(n_individuals_group, n_intervals);
+    T::VectorXdr d_ij(n_individuals_group);
+    T::VariableType d_i;
+
+    // Initialize them
+    T::IndexType index = 0;
+    for(const auto &i: (*indexes_group_)){
+    	for(T::IndexType k = 0; k < n_intervals; ++k){
+    		d_ijk(index,k) = dropout_intervals(i,k);
+    	}
+    	index += 1;
+    }    
+    d_ij = d_ijk.rowwise().sum();
+    d_i = d_ijk.sum();
+
+    return std::tuple(d_ijk, d_ij, d_i);
 };
 
 // Method for building the log-likelihood
@@ -194,39 +232,22 @@ void PaikModel::build_loglikelihood(){
 
     
     // Implement the function ll_group_pp
-    ll_group_paik = [this] (T::VectorXdr v_parameters_, T::SharedPtrType indexes_group_){     // T::VariableType x, T::IndexType index, 
-        // Extract the whole dataset as const reference
-        const auto dataset = database.get_dataset();
-        const auto dropout_intervals = database.get_dropout_intervals();
-        const auto e_time = database.get_e_time();
+    ll_group_paik = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType& indexes_group_){     // T::VariableType x, T::IndexType index, 
 
         // Extract single parameters from the vector
         // v_parameters_(index) = x;
         auto [phi, betar, mu1, mu2, nu, gammak] = extract_parameters(v_parameters_);
-
-        // Compute some necessary components
-        T::NumberType n_individuals = (*indexes_group_).size();
-        T::MatrixXdr A_ijk(n_individuals, n_intervals);
-        T::MatrixXdr d_ijk(n_individuals, n_intervals);
-        T::VectorXdr A_ik(n_intervals);
-        T::VariableType A_i;
-        T::VectorXdr d_ik(n_intervals);
+        auto [A_ijk, A_ik, A_i] = extract_matrixA_variables(indexes_group_, phi, betar);
+        auto [d_ijk, d_ik, d_i] = extract_dropout_variables(indexes_group_);
 
         // Compute the first component of the likelihood
         T::VariableType loglik1 = 0;
-        T::IndexType index = 0;
         for(const auto &i: *(indexes_group_)){
             T::VariableType dataset_betar = dataset.row(i) * betar;
             for(T::IndexType k = 0; k < n_intervals; ++k){
                 loglik1 += (dataset_betar + phi(k)) * dropout_intervals(i,k);
-                A_ijk(index,k) = e_time(i,k) * exp(dataset_betar + phi(k));
-                d_ijk(index,k) = dropout_intervals(i,k);
             }
-            index += 1;
         }
-        A_ik = A_ijk.colwise().sum();
-        d_ik = d_ijk.colwise().sum();
-        A_i = A_ik.sum();
         loglik1 -= (mu1/nu) * log(1 + nu * A_i);
 
         // Compute the second line of the formula
@@ -267,7 +288,9 @@ void PaikModel::optimize_loglikelihood(){
     result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_pp);
     result.print_results();
 };
+*/
 
+/*
 //-------------------------------------------------------------------------------------------------------------
 // Implementations for the LogFrailty model
 // Constructor
@@ -295,7 +318,7 @@ T::NumberType LogFrailtyModel::compute_n_parameters() {
 };
 
 
-T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr v_parameters_){
+T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(n_intervals, 0, n_regressors,1);
@@ -317,16 +340,40 @@ T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr v_parameters_){
     return std::make_tuple(phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r);
 };
 
-T::TupleDropoutType LogFrailtyModel::extract_dropout_variables(T::MatrixXdr d_ijk_){
+T::TupleDropoutType LogFrailtyModel::extract_dropout_variables(const T::SharedPtrType& indexes_group_) const{
     // Define the variables 
-    T::VectorXdr d_ij(d_ijk_.rows());
+    T::NumberType n_individuals_group = (*indexes_group_).size();
+    T::MatrixXdr d_ijk(n_individuals_group, n_intervals);
+    T::VectorXdr d_ij(n_individuals_group);
+
     T::VariableType d_i;
+    T::IndexType index = 0;
 
     // Initialize them
-    d_ij = d_ijk_.rowwise().sum();
-    d_i = d_ijk_.sum();
+    for(const auto &i: (*indexes_group_)){
+    	for(T::IndexType k = 0; k < n_intervals; ++k){
+    		d_ijk(index,k) = dropout_intervals(i,k);
+    	}
+    	index += 1;
+    }    
+    d_ij = d_ijk.rowwise().sum();
+    d_i = d_ijk.sum();
 
-    return std::tuple(d_ij, d_i);
+    return std::tuple(d_ijk, d_ij, d_i);
+};
+
+T::VectorXdr LogFrailtyModel::extract_time_to_event(const T::SharedPtrType& indexes_group_) const{
+    // Define the variables 
+    T::NumberType n_individuals_group = (*indexes_group_).size();
+    T::VectorXdr time_to_event_group(n_individuals_group);
+    T::IndexType index = 0;
+    
+    for(const auto& i: (*indexes_group_)){
+    	time_to_event_group(index) = time_to_event(i);
+        index += 1;
+    }
+    
+    return time_to_event_group;
 };
 
 // Method for building the log-likelihood
@@ -334,7 +381,7 @@ void LogFrailtyModel::build_loglikelihood(){
 
     // Implement the function ll_pp
     // T::VariableType x, T::IndexType index, 
-    ll_lf = [this] (T::VectorXdr v_parameters_){
+    ll_lf = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
         T::MapType::iterator it_map = database.get_map_groups().begin();
         T::MapType::iterator it_map_end = database.get_map_groups().end();
@@ -344,9 +391,9 @@ void LogFrailtyModel::build_loglikelihood(){
             // All the indexes in a group
             T::SharedPtrType indexes_group = it_map->second;
 
+            // Compute the log-likelihood related to a group
             T::VariableType log_likelihood_group = ll_group_lf(v_parameters_, indexes_group); //x, index, 
             log_likelihood += log_likelihood_group;
-            //log_likelihood += (*indexes_group)[0];
         }
 
         // Subtract the constant term
@@ -357,41 +404,31 @@ void LogFrailtyModel::build_loglikelihood(){
     
     // Implement the function ll_group_pp
     // T::VariableType x, T::IndexType index, 
-    ll_group_lf = [this] (T::VectorXdr v_parameters_, T::SharedPtrType indexes_group_){
-
-        // Extract the whole dataset as const reference
-        const auto dataset = database.get_dataset();
-        const auto dropout_intervals = database.get_dropout_intervals();
-        const auto e_time = database.get_e_time();
+    ll_group_lf = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType& indexes_group_){
 
         // Extract single parameters from the vector
         // v_parameters_(index) = x;
         auto [phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r] = extract_parameters(v_parameters_);
-
-        // Define a further variable
-        T::NumberType n_individuals = (*indexes_group_).size();
-        T::MatrixXdr d_ijk(n_individuals, n_intervals);
+        auto [d_ijk, d_ij, d_i] = extract_dropout_variables(indexes_group_);
+        auto time_to_event_group(extract_time_to_event(indexes_group_));
 
         // Compute the first component of the likelihood
         T::VariableType loglik1 = 0;
-        T::IndexType index = 0;
-        for(const auto &i: *(indexes_group_)){
+        for(const auto &i: (*indexes_group_)){
             T::VariableType dataset_betar = dataset.row(i) * betar;
             for(T::IndexType k = 0; k < n_intervals; ++k){
                 loglik1 += (dataset_betar + phi(k)) * dropout_intervals(i,k);
-                d_ijk(index,k) = dropout_intervals(i,k);
             }
-            index += 1;
         }
-        auto [d_ij, d_i] = extract_dropout_variables(d_ijk);
 
         // Compute the second line of the likelihood
         T::VariableType loglik2 = 0;
+        T::VariableType weight, node, exp1, G1;
         for(T::IndexType q = 0; q < n_nodes; ++q){
-            T::VariableType weight = weights[q];
-            T::VariableType node = nodes[q];
-            T::VariableType exp1 = exp(sqrt(2) * sqrt(sigma2r) * node * d_i);
-            T::VariableType G1 = G(node, indexes_group_, v_parameters_, d_ijk);
+            weight = weights[q];
+            node = nodes[q];
+            exp1 = exp(sqrt(2 * sigma2r) * node * d_i);
+            G1 = G(node, indexes_group_, v_parameters_);
             loglik2 += weight * exp1 * G1 * factor_c;
         }
         loglik2 = log(loglik2);
@@ -400,31 +437,81 @@ void LogFrailtyModel::build_loglikelihood(){
     };
 
     // Implement the function G
-    G = [this] (T::VariableType node_, T::SharedPtrType indexes_group_, T::VectorXdr v_parameters_, T::MatrixXdr d_ijk_){
+    G = [this] (T::VariableType z, const T::SharedPtrType& indexes_group_, T::VectorXdr& v_parameters_){
 
         // Extract parameters and variables from the vectors
         auto [phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r] = extract_parameters(v_parameters_);
-        auto [d_ij, d_i] = extract_dropout_variables(d_ijk_);
+        auto d_ij = std::get<1>(extract_dropout_variables(indexes_group_));
+        auto d_i = std::get<2>(extract_dropout_variables(indexes_group_));
+        auto time_to_event_group(extract_time_to_event(indexes_group_));
 
-        T::VariableType partial1 = gammas * d_i;
-        T::VariableType partial2 = d_ij * // TODO
+        // Define some useful variables
+        T::VariableType partial1, partial2, partial, partial3;
+        T::VariableType node, weight;
+        T::VariableType arg_f, res_f, arg_exp1, arg_exp2, arg_exp3, exp1;
+        T::VariableType time_to_event_i, dataset_betar;
 
-        return 0;
-    }
+        partial1 = gammas * d_i;
+        partial2 = d_ij.dot(time_to_event_group);
+        partial = 0;
+        for(T::IndexType u = 0; u < n_nodes; ++u){
+            node = nodes[u];
+            weight = weights[u];
+            partial3 = 0;
+            arg_f = sqrt(2 * sigma2b) * node;
+            for(const auto &i: *indexes_group_){
+                time_to_event_i = time_to_event(i);
+                dataset_betar = dataset.row(i) * betar;
+                for(T::IndexType kk = 0; kk < n_intervals; ++kk){
+                    res_f = f_ijk(arg_f, kk, time_to_event_i, v_parameters_);
+                    partial3 += res_f * exp(dataset_betar);
+                }
+            }
+            arg_exp1 = arg_f * (partial1 - partial2);
+            arg_exp2 = sqrt(2 * sigma2r) * z;
+            arg_exp3 = arg_f * gammas;
+            exp1 = exp(arg_exp2  + arg_exp3);
+            partial += weight * exp(arg_exp1 - partial3 * exp1 / arg_f);
+        }
+        return partial;
+    };
 
+    f_ijk = [this] (T::VariableType b, T::IndexType kkk, T::VariableType time_to_i, T::VectorXdr& v_parameters_){
+        // Extract the baseline components from the vector of parameters
+        T::VectorXdr phi = std::get<0>(extract_parameters(v_parameters_));
+        const auto& v_intervals = time.get_v_intervals();
 
+        // Define some useful variables
+        T::VariableType exp1, exp2, exp3;
+
+        // Check conditions
+        if(time_to_i < v_intervals[kkk])
+            return 0.;
+        else if((time_to_i >= v_intervals[kkk]) & (time_to_i < v_intervals[kkk+1])){
+            exp1 = exp(phi(kkk));
+            exp2 = exp(b * time_to_i);
+            exp3 = exp(b * v_intervals[kkk]);
+            return (exp1 * (exp2 - exp3));
+        }
+        else if(time_to_i >= v_intervals[kkk+1]){
+            exp1 = exp(phi(kkk));
+            exp2 = exp(b * v_intervals[kkk+1]);
+            exp3 = exp(b * v_intervals[kkk]);
+            return (exp1 * (exp2 - exp3));
+        }
+    };
 };
 
 // Method for executing the log-likelihood
-void PowerParameterModel::optimize_loglikelihood(){
+void LogFrailtyModel::optimize_loglikelihood(){
     T::VectorXdr& v_parameters = parameters.get_v_parameters();
-    T::VariableType optimal_ll_pp = ll_pp(v_parameters);
+    T::VariableType optimal_ll_lf = ll_lf(v_parameters);
 
     // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_pp);
+    result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_lf);
     result.print_results();
 };
-
+*/
 
 
 

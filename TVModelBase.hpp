@@ -43,10 +43,16 @@ protected:
     TimeDomainInfo::TimeDomain time;                                        // Class time 
     ResultsMethod::Results result;                                          // Class for the results
 
+    // Extract the whole dataset as const reference
+    const T::MatrixXdr& dataset = database.get_dataset();
+    const T::MatrixXdr& dropout_intervals = database.get_dropout_intervals();
+    const T::VectorXdr& e_time = database.get_e_time();
+    const T::VectorXdr& time_to_event = database.get_time_to_event();
+
     // Simple variables
-    T::NumberType& n_regressors = database.get_n_regressors();                          // Number of regressors
-    T::NumberType& n_groups = database.get_n_groups();                                  // Number of groups
-    T::NumberType& n_intervals = time.get_n_intervals();                                // Number of intervals
+    const T::NumberType& n_regressors = database.get_n_regressors();                          // Number of regressors
+    const T::NumberType& n_groups = database.get_n_groups();                                  // Number of groups
+    const T::NumberType& n_intervals = time.get_n_intervals();                                // Number of intervals
 
     // Simple data structures
     T::VectorXdr variance_frailty;                                          // Vector for time-interval variance of the frailty

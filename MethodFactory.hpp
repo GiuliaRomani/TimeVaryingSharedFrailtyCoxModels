@@ -42,7 +42,7 @@ std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Arg
     switch(id){
         case 1:  return std::make_unique<TVModel::PaikModel>(std::forward<Args>(args) ...);
         case 2:  return std::make_unique<TVModel::PowerParameterModel>(std::forward<Args>(args) ...);
-        //case 3:  return std::make_unique<StochasticFrailty>(std::forward<Args>(args) ...);            
+        //case 3:  return std::make_unique<TVModel::LogFrailtyModel>(std::forward<Args>(args) ...);            
         default:  throw "Not existent id method!";
     };
 };

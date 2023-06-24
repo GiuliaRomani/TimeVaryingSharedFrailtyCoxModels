@@ -31,7 +31,7 @@ struct TypeTraits{
 
     // Basic containers types
     using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                                        // Type used for any dynamic vector
-    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;         // Type used for any dynamic matrix
+    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic>;         // Type used for any dynamic matrix Eigen::RowMajor
     using VectorType = std::vector<VariableType>;                               // Type used for any vector of VariableType type
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
     using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
@@ -55,7 +55,8 @@ struct TypeTraits{
     using TuplePaikType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VectorXdr>;
     using TupleLFType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VariableType, VariableType>;
 
-    using TupleDropoutType = std::tuple<VectorXdr, VariableType>;
+    using TupleDropoutType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
+    using TupleMatrixAType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
 
 };
 
