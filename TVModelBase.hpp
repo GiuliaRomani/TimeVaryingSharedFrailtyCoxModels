@@ -13,24 +13,29 @@
 // Class
 namespace TVModel{
 using T = TypeTraits;
+using Dataset = DatasetInfoClass::DatasetInfo;
+using Time = TimeDomainInfo::TimeDomain;
 
-class ModelBase{
+class ModelBase: public Time,
+		            public Dataset{
 public:
     // Base constructor
     ModelBase() = default;
     ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
     // Getter 
-    T::VectorXdr get_sd_frailty() const {return sd_frailty;};
-    T::VectorXdr get_variance_frailty() const {return variance_frailty;};
+    // T::VectorXdr get_sd_frailty() const {return sd_frailty;};
+    // T::VectorXdr get_variance_frailty() const {return variance_frailty;};
 
     // Define and Compute the log-likelihood
     virtual void optimize_loglikelihood() = 0;
 
+    // virtual void print_extract_parameters() = 0;
+
     // Print 
-    void print_map_groups() const {return database.print_map_groups();};
-    void print_n_regressors() const {std::cout << n_regressors << std::endl;};
-    void print_n_intervals() const {std::cout << n_intervals << std::endl;};
+    void print_map_groups() const {return Dataset::print_map_groups();};
+    void print_n_regressors() const {std::cout << Dataset::n_regressors << std::endl;};
+    void print_n_intervals() const {std::cout << Time::n_intervals << std::endl;};
 
 
     // Destructor
@@ -39,25 +44,11 @@ public:
 
 protected:
     // Complex data structures
-    DatasetInfoClass::DatasetInfo database;                                 // Dataset containing the individual covariates
-    TimeDomainInfo::TimeDomain time;                                        // Class time 
     ResultsMethod::Results result;                                          // Class for the results
-
-    // Extract the whole dataset as const reference
-    const T::MatrixXdr& dataset = database.get_dataset();
-    const T::MatrixXdr& dropout_intervals = database.get_dropout_intervals();
-    const T::VectorXdr& e_time = database.get_e_time();
-    const T::VectorXdr& time_to_event = database.get_time_to_event();
-
-    // Simple variables
-    const T::NumberType& n_regressors = database.get_n_regressors();                          // Number of regressors
-    const T::NumberType& n_groups = database.get_n_groups();                                  // Number of groups
-    const T::NumberType& n_intervals = time.get_n_intervals();                                // Number of intervals
 
     // Simple data structures
     T::VectorXdr variance_frailty;                                          // Vector for time-interval variance of the frailty
     T::VectorXdr sd_frailty;                                                // Vector for time-interval sd of the frailty
-
 
     // Virtual method to compute the number of parameters of each model
     virtual T::NumberType compute_n_parameters() = 0;
@@ -68,11 +59,8 @@ protected:
     // Virtual method to derive the interval variance of the frailty
     //virtual void compute_sd_frailty() = 0;
 
-
 };
 
 } // end namespace
-
-
 #endif // TIME_VARYING_MODEL_BASE
 

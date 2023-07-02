@@ -7,9 +7,12 @@
 namespace DatasetInfoClass{
     
 // Constructor
-DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2){
-    // Initialize TimeDomain time object through its constructor
-    time = TimeDomainInfo::TimeDomain(filename1);
+DatasetInfo::DatasetInfo(const T::FileNameType& filename2, T::NumberType n_intervals_, const T::VectorXdr& v_intervals_){
+    // Initialize TimeDomain::elements through the constructor
+    n_intervals = n_intervals_;
+    v_intervals.resize(n_intervals+1);
+    for(T::IndexType i=0; i < (n_intervals+1); ++i)
+    	v_intervals(i) = v_intervals_(i);
 
     // Initialize the number of groups to zero
     n_groups = 0;
@@ -84,17 +87,13 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
 
 // Initialize the dropout_intervals variable
 void DatasetInfo::initialize_dropout_intervals(){
-    // Get the necessary variables as const reference
-    const T::NumberType & n_intervals = time.get_n_intervals();
-    const T::VectorXdr & v_intervals = time.get_v_intervals();
-
     // Resize the matrix according to the right dimensions and fill it with null elements
-    dropout_intervals.resize(n_individuals, n_intervals);
-    dropout_intervals.setZero();
+    // dropout_intervals.resize(n_individuals, n_intervals);
+    dropout_intervals.setZero(n_individuals, n_intervals);
 
     // Fill the matrix according to the condition
     for(T::NumberType i = 0; i < n_individuals; ++i){
-        for(T::NumberType k = 0; k < n_intervals; ++k){
+        for(T::NumberType k = 0; k < (n_intervals); ++k){
             if((time_to_event(i) < v_intervals(k+1)) & (time_to_event(i) >= v_intervals(k)))
                 dropout_intervals(i,k) = 1;
         }
@@ -103,17 +102,13 @@ void DatasetInfo::initialize_dropout_intervals(){
 
 // Initialize the e_time matrix
 void DatasetInfo::initialize_e_time(){
-    // Extract the needed information from time class
-    const T::NumberType & n_intervals = time.get_n_intervals();
-    const T::VectorXdr & v_intervals = time.get_v_intervals();
-
     // Resize the matrix
     e_time.resize(n_individuals, n_intervals);
 
     // Fill the matrix
     for(T::IndexType i = 0; i < n_individuals; ++i){
         T::VariableType time_individual = time_to_event(i);
-        for(T::IndexType k = 0; k < n_intervals; ++k){
+        for(T::IndexType k = 0; k < (n_intervals); ++k){
             T::VariableType v_k = v_intervals(k);
             T::VariableType v_kk = v_intervals(k+1);
             e_time(i,k) = e_time_function(time_individual, k, v_k, v_kk);
@@ -123,12 +118,15 @@ void DatasetInfo::initialize_e_time(){
 
 // Define the function to compute the e_time value in the matrix
 T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk){
+    T::VariableType result = 0.;
     if(time_t < v_k)
-        return 0.;
+        result = 0.;
     else if((time_t >= v_k) & (time_t < v_kk))
-        return (time_t - v_k);
+        result = time_t - v_k;
     else if(time_t >= v_kk)
-        return (v_kk - v_k);
+        result = v_kk - v_k;
+    
+    return result;
 };
 
 // Method for print the element of the map

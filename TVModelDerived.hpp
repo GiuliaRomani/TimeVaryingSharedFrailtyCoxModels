@@ -26,6 +26,8 @@ public:
     // Method for executing the log-likelihood
     void optimize_loglikelihood() override;
 
+    // void print_extract_parameters() override;
+
 private:
     // Complex data structure
     Params::Parameters parameters;                                          // Class for the parameters
@@ -41,7 +43,7 @@ private:
     // Functions for implementing the likelihood
     // std::function<T::VariableType()> ll_pp;
     std::function<T::VariableType(T::VectorXdr&)> ll_pp; // T::VariableType, T::IndexType, 
-    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType&)> ll_group_pp;     // T::VariableType, T::IndexType, 
+    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_pp;     // T::VariableType, T::IndexType, 
 
 
     // Quadrature nodes and weights
@@ -58,13 +60,13 @@ private:
     T::NumberType compute_n_parameters() override;
 
     // Method for extracting the parameters from the vector
-    T::TuplePPType extract_parameters(T::VectorXdr& v_parameters_);
+    T::TuplePPType extract_parameters(T::VectorXdr&);
 
     // Method for building the log-likelihood
     void build_loglikelihood() override;
 };
 
-/*
+
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
 class PaikModel final: public TVModel::ModelBase{
@@ -91,7 +93,7 @@ private:
     // Functions for implementing the likelihood
     // std::function<T::VariableType()> ll_pp;
     std::function<T::VariableType(T::VectorXdr&)> ll_paik; // T::VariableType, T::IndexType, 
-    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType&)> ll_group_paik;     // T::VariableType, T::IndexType, 
+    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_paik;     // T::VariableType, T::IndexType, 
 
     // Other tools
     ToolsLikelihood::Tools tool;
@@ -102,15 +104,14 @@ private:
     
     // Method for extracting the parameters from the vector
     T::TuplePaikType extract_parameters(T::VectorXdr&);
-    T::TupleMatrixAType extract_matrixA_variables(T::SharedPtrType&, T::VectorXdr&, T::VectorXdr&);
-    T::TupleDropoutType extract_dropout_variables(T::SharedPtrType&);
+    T::TupleMatrixAType extract_matrixA_variables(T::SharedPtrType, T::VectorXdr&, T::VectorXdr&);
+    T::TupleDropoutType extract_dropout_variables(T::SharedPtrType);
 
     // Method for building the log-likelihood
     void build_loglikelihood() override;
 };
-*/
 
-/*
+
 //-----------------------------------------------------------------------------------------
 // Class for implementing LOG FRAILTY Model
 class LogFrailtyModel final: public TVModel::ModelBase{
@@ -136,8 +137,8 @@ private:
 
     // Functions for implementing the likelihood
     std::function<T::VariableType(T::VectorXdr&)> ll_lf; // T::VariableType, T::IndexType, 
-    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType&)> ll_group_lf;     // T::VariableType, T::IndexType,
-    std::function<T::VariableType(T::VariableType, T::SharedPtrType&, T::VectorXdr&)> G; 
+    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_lf;     // T::VariableType, T::IndexType,
+    std::function<T::VariableType(T::VariableType, T::SharedPtrType, T::VectorXdr&)> G; 
     std::function<T::VariableType(T::VariableType, T::IndexType, T::VariableType, T::VectorXdr&)> f_ijk;
 
     // Quadrature weights and nodes
@@ -155,15 +156,16 @@ private:
     
     // Method for extracting the parameters from the vector
     T::TupleLFType extract_parameters(T::VectorXdr& v_parameters_) const;
-    T::TupleDropoutType extract_dropout_variables(const T::SharedPtrType&) const;
-    T::VectorXdr extract_time_to_event(const T::SharedPtrType&) const;
+    T::TupleDropoutType extract_dropout_variables(const T::SharedPtrType) const;
+    T::VectorXdr extract_time_to_event(const T::SharedPtrType) const;
 
     // Method for building the log-likelihood
     void build_loglikelihood() override;
 };
-*/
+
 
 }
 #endif // TIME_VARYING_MODEL_DERIVED
+
 
 

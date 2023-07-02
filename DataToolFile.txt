@@ -3,13 +3,15 @@
 #------------------------------------------------------------------
 
 [TimeDomain]
-	length_vector_intervals = 8 
-	vector_intervals = '0.0 1.0 1.5 2.0 3.0 4.0 5.0 6.1'
+	length_vector_intervals = 9 
+	vector_intervals = '1.0 1.7 2.2 3 3.5 4.2 5 5.5 6'
 [../]
 
 [Parameters]
-	range_min = '-5. 2. 2. 0. 2.'
-	range_max = '5. 10. 10. 1. 4.'
+	# range_min = '-8. -2. 1e-6 1e-6'		# PP
+	# range_max = '-1e-6. 2. 8 1.'
+	range_min = '-8. -2. 1e-10 1e-10 1e-10'			# PAIK
+	range_max = '-1e-6. 2. 1 15 10'
 [../]
 
 [Method]

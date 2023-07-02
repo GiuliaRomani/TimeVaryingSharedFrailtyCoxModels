@@ -29,11 +29,14 @@ int main(){
     std::cout << time.get_time_begin() << std::endl;
     std::cout << time.get_n_intervals() << std::endl;
     time.print_v_intervals();
+    */
 
+    /*
     std::cout << "Using a different initialization" << std::endl;
     TimeDomainInfo::TimeDomain time_alternative(TimeDomainInfo::TimeDomain("DataToolFile.txt"));
     time.print_v_intervals();
     */
+    
     
     /*
     // Prova Parameters class and Results class for errors 
@@ -53,7 +56,7 @@ int main(){
 
     /*
     // Prova Dataset class for errors
-    DatasetInfoClass::DatasetInfo database("DataToolFile.txt", "DataIndividualsFile.txt");
+    DatasetInfoClass::DatasetInfo database("DataIndividualsFile.txt", time.get_n_intervals(), time.get_v_intervals());
     database.print_dataset();
     database.print_dataset_group();
     database.print_map_groups();
@@ -61,6 +64,7 @@ int main(){
     database.print_individuals_group("EngC");
     database.print_e_time();
     */
+    
 
     /*
     // Prova TVModelBase fo errors
@@ -69,21 +73,19 @@ int main(){
     modelbase.print_n_regressors();
     modelbase.print_n_intervals();
     */
+    
 
     
     // Prove the PowerParameterModel
     static T::FactoryType methods(RegisteredMethods());
     PrintMethods(methods);
-    T::IdType id = 1;
+    T::IdType id = 3;
 
     std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
     ptrMethod -> optimize_loglikelihood();
-
+    // ptrMethod -> print_extract_parameters();
     
-   
-
-
-
+    
     return 0;
 }
 

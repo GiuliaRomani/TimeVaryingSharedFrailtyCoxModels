@@ -17,13 +17,6 @@ public:
             const T::NumberType& n_regressors_, const T::NumberType& n_ranges_, 
             const T::VectorNumberType& all_n_parameters_);
     
-    // Getter for the class variables
-    T::NumberType get_n_parameters() const {return n_parameters;};
-
-    T::VectorXdr get_v_parameters() const {return v_parameters;};
-    T::VectorType get_range_min_parameters() const {return range_min_parameters;};
-    T::VectorType get_range_max_parameters() const {return range_max_parameters;};
-
     // Overload the getter so that it can return a non-const l-value reference
     T::VectorXdr& get_v_parameters() {return v_parameters;};
     T::NumberType& get_n_parameters() {return n_parameters;};

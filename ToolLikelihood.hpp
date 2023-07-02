@@ -11,9 +11,9 @@ namespace ToolsLikelihood{
 using T = TypeTraits;
 
 struct Tools{
-    T::VariableType factor_c_pp = 1e+100;
-    T::VariableType factor_c_paik = 1e+100;
-    T::VariableType factor_c_lf = 1e+100;
+    T::VariableType factor_c_pp = 1;
+    T::VariableType factor_c_paik = 1;
+    T::VariableType factor_c_lf = 1;
 };
 
 }

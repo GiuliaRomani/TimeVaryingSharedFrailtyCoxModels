@@ -2,14 +2,11 @@
 #define DATASET_HPP
 
 // Include header files
-#include "TimeDomain.hpp"
+#include "TypeTraits.hpp"
 
 // Include libraries
 #include <iostream>
 
-// Forward declaration of the models
-// class TVModel::ModelBase;
-// class TVModel::PowerParameterModel;
 
 // Class 
 namespace DatasetInfoClass{
@@ -19,22 +16,7 @@ class DatasetInfo{
 public:
     // Constructor
     DatasetInfo() = default;
-    DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2);
-
-    // Getter
-    T::NumberType get_n_groups() const {return n_groups;};
-    T::NumberType get_n_individuals() const {return n_individuals;};
-    T::NumberType get_n_regressors() const {return n_regressors;};
-
-    // Overload the same operations
-    T::NumberType& get_n_groups() {return n_groups;};
-    T::NumberType& get_n_individuals() {return n_individuals;};
-    T::NumberType& get_n_regressors() {return n_regressors;};
-    T::MapType& get_map_groups() {return map_groups;};
-    T::MatrixXdr& get_dataset() {return dataset;};
-    T::MatrixXdr& get_e_time() {return e_time;};
-    T::MatrixXdr& get_dropout_intervals() {return dropout_intervals;};
-    T::VectorXdr& get_time_to_event() {return time_to_event;};
+    DatasetInfo(const T::FileNameType& filename2, T::NumberType n_intervals_, const T::VectorXdr& v_intervals_);
 
     // Extract the uique pointer to the name in the map of groups
     std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
@@ -49,8 +31,9 @@ public:
     void print_e_time() const {std::cout << e_time << std::endl;};
 
 
-private:
-    TimeDomainInfo::TimeDomain time;                // Class time 
+protected:
+    T::NumberType n_intervals;			            // Number of intervals
+    T::VectorXdr v_intervals;		                // Vector of intervals
 
     T::NumberType n_individuals;                    // Number of individuals 
     T::NumberType n_regressors;                     // Number of regressors
@@ -76,11 +59,6 @@ private:
     // Initialize the e_time matrix and define the function to compute the e_time
     void initialize_e_time();
     T::VariableType e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk);
-
-
-    // Class TVModelBase declared friend to access this private components
-    // friend TVModel::ModelBase;
-    // friend TVModel::PowerParameterModel;
 };
 
 } // end namespace

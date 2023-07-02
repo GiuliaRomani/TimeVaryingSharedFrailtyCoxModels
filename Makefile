@@ -10,7 +10,7 @@ export PACS_LIB_DIR=$(PACS_PATH)/lib
 export PACS_INC_DIR=$(PACS_PATH)/include
 
 XX      ?= g++
-CXXFLAGS ?= -std=c++20
+CXXFLAGS ?= -std=c++17
 CPPFLAGS ?= -O3 -Wall -pedantic -I. -I$(PACS_INC_DIR) -I${mkEigenInc}
 LDFLAGS  ?= -L$(PACS_LIB_DIR) -Wl,-rpath=$(PACS_LIB_DIR)
 LDLIBS	?= 
