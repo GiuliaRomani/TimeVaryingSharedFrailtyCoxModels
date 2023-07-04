@@ -19,6 +19,8 @@ struct Tools{
     T::VariableType tol_optim = 1e-4;
     
     T::NumberType n_extrarun = 10;
+    
+    T::VariableType h_dd = 1e-3;
 };
 
 }

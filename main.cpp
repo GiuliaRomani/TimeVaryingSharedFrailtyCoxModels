@@ -26,11 +26,11 @@ int main(){
     // Prove Time class for errors
     std::cout << "Direct initialization" << std::endl;
     TimeDomainInfo::TimeDomain time("DataToolFile.txt");
-    std::cout << time.get_time_begin() << std::endl;
-    std::cout << time.get_n_intervals() << std::endl;
     time.print_v_intervals();
+    time.print_n_intervals();
     */
-
+    
+    
     /*
     std::cout << "Using a different initialization" << std::endl;
     TimeDomainInfo::TimeDomain time_alternative(TimeDomainInfo::TimeDomain("DataToolFile.txt"));
@@ -57,13 +57,17 @@ int main(){
     /*
     // Prova Dataset class for errors
     DatasetInfoClass::DatasetInfo database("DataIndividualsFile.txt", time.get_n_intervals(), time.get_v_intervals());
-    database.print_dataset();
-    database.print_dataset_group();
+    // DatasetInfoClass::DatasetInfo database("DatasetYear2018.txt", time.get_n_intervals(), time.get_v_intervals());
+    //database.print_dataset();
+    database.print_n_regressors();
+    database.print_n_individuals();
+    //database.print_dataset_group();
     database.print_map_groups();
-    database.print_dropout_intervals();
-    database.print_individuals_group("EngC");
-    database.print_e_time();
+    //database.print_dropout_intervals();
+    //database.print_individuals_group("EngC");
+    //database.print_e_time();
     */
+    
     
 
     /*
@@ -79,11 +83,13 @@ int main(){
     // Prove the PowerParameterModel
     static T::FactoryType methods(RegisteredMethods());
     PrintMethods(methods);
-    T::IdType id = 2;
+    T::IdType id = 1;
 
-    std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
+    //std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
+    std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DatasetYear2018.txt");
     ptrMethod -> optimize_loglikelihood();
     // ptrMethod -> print_extract_parameters();
+    
     
     
     return 0;

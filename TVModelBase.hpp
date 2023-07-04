@@ -50,9 +50,10 @@ protected:
     
     // Base variables for optimization method
     ToolsLikelihood::Tools tool;
-    T::VariableType tol_ll = tool.tol_ll;
-    T::VariableType tol_optim = tool.tol_ll;
-    T::NumberType n_extrarun = tool.n_extrarun;
+    // T::VariableType tol_ll = tool.tol_ll;
+    // T::VariableType tol_optim = tool.tol_ll;
+    // T::NumberType n_extrarun = tool.n_extrarun;
+    T::VariableType h_dd = tool.h_dd;
 
     // Simple data structures
     T::VectorXdr variance_frailty;                                          // Vector for time-interval variance of the frailty
@@ -62,10 +63,9 @@ protected:
     virtual T::NumberType compute_n_parameters() = 0;
 
     // Method for building the log-likelihood
-    virtual void build_loglikelihood_eval() = 0;
     virtual void build_loglikelihood() = 0;
+    virtual void build_dd_loglikelihood() = 0;
     
-    // virtual void build_RunIndexes(T::MatrixXdrInt&) = 0;
 
     // Virtual method to derive the interval variance of the frailty
     //virtual void compute_sd_frailty() = 0;

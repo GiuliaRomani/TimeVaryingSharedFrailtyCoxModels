@@ -111,20 +111,20 @@ void DatasetInfo::initialize_e_time(){
         for(T::IndexType k = 0; k < (n_intervals); ++k){
             T::VariableType v_k = v_intervals(k);
             T::VariableType v_kk = v_intervals(k+1);
-            e_time(i,k) = e_time_function(time_individual, k, v_k, v_kk);
+            e_time(i,k) = e_time_function(time_individual, v_k, v_kk);
         }
     }
 };
 
 // Define the function to compute the e_time value in the matrix
-T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk){
+T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk){
     T::VariableType result = 0.;
     if(time_t < v_k)
         result = 0.;
     else if((time_t >= v_k) & (time_t < v_kk))
-        result = time_t - v_k;
+        result = (time_t - v_k);
     else if(time_t >= v_kk)
-        result = v_kk - v_k;
+        result = (v_kk - v_k);
     
     return result;
 };

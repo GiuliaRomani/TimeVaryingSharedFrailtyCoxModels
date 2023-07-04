@@ -29,6 +29,8 @@ public:
     void print_map_groups() const;
     void print_individuals_group(const T::GroupNameType& name_group) const;
     void print_e_time() const {std::cout << e_time << std::endl;};
+    void print_n_individuals() const {std::cout << n_individuals << std::endl;};
+    void print_n_regressors() const {std::cout << n_regressors << std::endl;};
 
 
 protected:
@@ -58,7 +60,7 @@ protected:
 
     // Initialize the e_time matrix and define the function to compute the e_time
     void initialize_e_time();
-    T::VariableType e_time_function(T::VariableType time_t, T::IndexType k, T::VariableType v_k, T::VariableType v_kk);
+    T::VariableType e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk);
 };
 
 } // end namespace

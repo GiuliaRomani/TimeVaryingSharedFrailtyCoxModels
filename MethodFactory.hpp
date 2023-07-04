@@ -40,7 +40,7 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
 template<class ... Args>
 std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
     switch(id){
-        // case 1:  return std::make_unique<TVModel::PaikModel>(std::forward<Args>(args) ...);
+        case 1:  return std::make_unique<TVModel::PaikModel>(std::forward<Args>(args) ...);
         case 2:  return std::make_unique<TVModel::PowerParameterModel>(std::forward<Args>(args) ...);
         // case 3:  return std::make_unique<TVModel::LogFrailtyModel>(std::forward<Args>(args) ...);            
         default:  throw "Not existent id method!";

@@ -20,6 +20,10 @@ public:
 
     // Print vector of intervals
     void print_v_intervals() const {std::cout << v_intervals << std::endl;};
+    void print_n_intervals() const {std::cout << n_intervals << std::endl;};
+
+    T::NumberType get_n_intervals() const {return n_intervals;};
+    T::VectorXdr get_v_intervals() const {return v_intervals;};
 
 
 protected:
