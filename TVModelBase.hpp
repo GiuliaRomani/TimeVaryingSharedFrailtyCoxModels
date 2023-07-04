@@ -6,6 +6,7 @@
 #include "TimeDomain.hpp"
 #include "Dataset.hpp"
 #include "Results.hpp"
+#include "ToolLikelihood.hpp"
 
 // Include libraries
 #include <iostream>
@@ -29,6 +30,7 @@ public:
 
     // Define and Compute the log-likelihood
     virtual void optimize_loglikelihood() = 0;
+    virtual void evaluate_loglikelihood(T::VectorXdr&) = 0;
 
     // virtual void print_extract_parameters() = 0;
 
@@ -45,6 +47,12 @@ public:
 protected:
     // Complex data structures
     ResultsMethod::Results result;                                          // Class for the results
+    
+    // Base variables for optimization method
+    ToolsLikelihood::Tools tool;
+    T::VariableType tol_ll = tool.tol_ll;
+    T::VariableType tol_optim = tool.tol_ll;
+    T::NumberType n_extrarun = tool.n_extrarun;
 
     // Simple data structures
     T::VectorXdr variance_frailty;                                          // Vector for time-interval variance of the frailty
@@ -54,7 +62,10 @@ protected:
     virtual T::NumberType compute_n_parameters() = 0;
 
     // Method for building the log-likelihood
+    virtual void build_loglikelihood_eval() = 0;
     virtual void build_loglikelihood() = 0;
+    
+    // virtual void build_RunIndexes(T::MatrixXdrInt&) = 0;
 
     // Virtual method to derive the interval variance of the frailty
     //virtual void compute_sd_frailty() = 0;

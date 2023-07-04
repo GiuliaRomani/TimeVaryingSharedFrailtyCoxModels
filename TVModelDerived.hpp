@@ -5,7 +5,6 @@
 // Include header files
 #include "TVModelBase.hpp"
 #include "QuadraturePoints.hpp"
-#include "ToolLikelihood.hpp"
 #include "Parameters.hpp"
 
 // Include libraries
@@ -25,6 +24,7 @@ public:
 
     // Method for executing the log-likelihood
     void optimize_loglikelihood() override;
+    void evaluate_loglikelihood(T::VectorXdr&) override;
 
     // void print_extract_parameters() override;
 
@@ -41,9 +41,11 @@ private:
     T::IdNameType name_method = "PowerParameter";                           // Name of this method
 
     // Functions for implementing the likelihood
-    // std::function<T::VariableType()> ll_pp;
-    std::function<T::VariableType(T::VectorXdr&)> ll_pp; // T::VariableType, T::IndexType, 
-    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_pp;     // T::VariableType, T::IndexType, 
+    std::function<T::VariableType(T::VariableType, T::IndexType, T::VectorXdr&)> ll_pp; 
+    std::function<T::VariableType(T::VariableType, T::IndexType, T::VectorXdr&, T::SharedPtrType)> ll_group_pp;      
+    
+    std::function<T::VariableType(T::VectorXdr&)> ll_pp_eval;  
+    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_pp_eval;     
 
 
     // Quadrature nodes and weights
@@ -53,7 +55,6 @@ private:
     std::array<T::VariableType, 9>& weights = points9.weights;
 
     // Other tools
-    ToolsLikelihood::Tools tool;
     T::VariableType factor_c = tool.factor_c_pp;
 
     // Virtual method for computing the number of parameters
@@ -61,12 +62,17 @@ private:
 
     // Method for extracting the parameters from the vector
     T::TuplePPType extract_parameters(T::VectorXdr&);
+    T::TuplePPType extract_parameters(T::VariableType, T::IndexType, T::VectorXdr&);
+    
+    // Build the matrix for the order of optimized directions
+    void build_RunIndexes(T::MatrixXdrInt&);
 
     // Method for building the log-likelihood
+    void build_loglikelihood_eval() override;
     void build_loglikelihood() override;
 };
 
-
+/*
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
 class PaikModel final: public TVModel::ModelBase{
@@ -162,6 +168,7 @@ private:
     // Method for building the log-likelihood
     void build_loglikelihood() override;
 };
+*/
 
 
 }

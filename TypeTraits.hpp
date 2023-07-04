@@ -36,6 +36,9 @@ struct TypeTraits{
     using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
     using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
     using VectorNumberType = std::vector<NumberType>;                               // Type used for storing integers
+    using MatrixXdrInt = Eigen::Matrix<IndexType, Eigen::Dynamic, Eigen::Dynamic>;
+    using VectorXdrInt = Eigen::Matrix<IndexType, Eigen::Dynamic, 1>;
+    using MappedType = Eigen::Map<VectorXdrInt>;
 
     // Type for time variables
     using TimeType = double;                        // Type used for the time variables

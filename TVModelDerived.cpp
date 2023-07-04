@@ -6,6 +6,8 @@
 // Include libraries
 #include <cmath>
 #include <tuple>
+#include <algorithm>
+#include <random>
 
 namespace TVModel{
 using T = TypeTraits;
@@ -28,8 +30,8 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
                                             n_ranges_parameters, all_n_parameters);
 
             // Build the log-likelihood
+            build_loglikelihood_eval();
             build_loglikelihood();
-
 };
         
 // Virtual method for computing the number of parameters
@@ -51,13 +53,19 @@ T::TuplePPType PowerParameterModel::extract_parameters(T::VectorXdr& v_parameter
     return std::make_tuple(phi, betar, gammak, sigma);
 };
 
+T::TuplePPType PowerParameterModel::extract_parameters(T::VariableType value_, T::IndexType index_, T::VectorXdr& v_parameters_){
+    // Assign value_ to the index_ element
+    v_parameters_(index_) = value_;
+    return extract_parameters(v_parameters_);
+};
+
 
 // Method for building the log-likelihood
-void PowerParameterModel::build_loglikelihood(){
+void PowerParameterModel::build_loglikelihood_eval(){
 
     // Implement the function ll_pp
     // T::VariableType x, T::IndexType index, 
-    ll_pp = [this] (T::VectorXdr& v_parameters_){
+    ll_pp_eval = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood_group, log_likelihood = 0;
         T::SharedPtrType indexes_group = nullptr;
 
@@ -68,7 +76,7 @@ void PowerParameterModel::build_loglikelihood(){
             // All the indexes in a group
             indexes_group = it_map->second;
 
-            log_likelihood_group = ll_group_pp(v_parameters_, indexes_group); //x, index, 
+            log_likelihood_group = ll_group_pp_eval(v_parameters_, indexes_group); //x, index, 
             log_likelihood += log_likelihood_group;
             //log_likelihood += (*indexes_group)[0];
         }
@@ -81,10 +89,9 @@ void PowerParameterModel::build_loglikelihood(){
     
     // Implement the function ll_group_pp
     // T::VariableType x, T::IndexType index, 
-    ll_group_pp = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType indexes_group_){
+    ll_group_pp_eval = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType indexes_group_){
 
         // Extract single parameters from the vector
-        // v_parameters_(index) = x;
         auto [phi, betar, gammak, sigma ] = extract_parameters(v_parameters_);
 
         // Compute the necessary
@@ -120,17 +127,139 @@ void PowerParameterModel::build_loglikelihood(){
     };
 };
 
-// Method for executing the log-likelihood
-void PowerParameterModel::optimize_loglikelihood(){
-    T::VectorXdr& v_parameters = parameters.get_v_parameters();
-    T::VariableType optimal_ll_pp = ll_pp(v_parameters);
 
+// Method for building the log-likelihood
+void PowerParameterModel::build_loglikelihood(){
+
+    // Implement the function ll_pp
+    ll_pp = [this] (T::VariableType value_, T::IndexType index_, T::VectorXdr& v_parameters_){
+        T::VariableType log_likelihood_group, log_likelihood = 0;
+        T::SharedPtrType indexes_group = nullptr;
+
+        // For each group, compute the likelihood and then sum them
+        T::MapType::iterator it_map = Dataset::map_groups.begin();
+        T::MapType::iterator it_map_end = Dataset::map_groups.end();
+        for(; it_map != it_map_end; ++it_map){
+            // All the indexes in a group
+            indexes_group = it_map->second;
+
+            log_likelihood_group = ll_group_pp(value_, index_, v_parameters_, indexes_group); 
+            log_likelihood += log_likelihood_group;
+        }
+
+        // Subtract the constant term
+        log_likelihood -= (Dataset::n_groups/2)*log(M_PI);
+        return log_likelihood;
+    };
+
+    
+    // Implement the function ll_group_pp
+    // T::VariableType x, T::IndexType index, 
+    ll_group_pp = [this] (T::VariableType value_, T::IndexType index_, T::VectorXdr& v_parameters_, T::SharedPtrType indexes_group_){
+
+        // Extract single parameters from the vector
+        auto [phi, betar, gammak, sigma ] = extract_parameters(value_, index_, v_parameters_);
+
+        // Compute the necessary
+        T::VariableType loglik1 = 0;
+        T::VariableType partial1 = 0;
+        T::VariableType dataset_betar = 0;
+        for(const auto &i: *(indexes_group_)){
+            dataset_betar = Dataset::dataset.row(i) * betar;
+            for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+                loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
+                partial1 += Dataset::dropout_intervals(i,k) * gammak(k);
+            }
+        }
+
+        T::VariableType loglik2 = 0;
+        T::VariableType partial2 = 0;
+        T::VariableType node, weight = 0;
+        for(T::IndexType q = 0; q < n_nodes; ++q){
+            node = nodes[q];
+            weight = weights[q];
+            partial2 = 0;
+
+            for(const auto &i: *(indexes_group_)){
+                dataset_betar = Dataset::dataset.row(i) * betar;
+                for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+                    partial2 += exp(dataset_betar + phi(k) + sqrt(2) * sigma * gammak(k) * node) * Dataset::e_time(i,k);
+                }
+            }
+            loglik2 += factor_c * weight * exp(sqrt(2) * sigma * node * partial1 - partial2);
+        }
+        loglik2 = log(loglik2);
+        return (loglik1 + loglik2);
+    };
+};
+
+// Method for executing the log-likelihood
+void PowerParameterModel::evaluate_loglikelihood(T::VectorXdr& v_parameters_){
+    T::VariableType optimal_ll_pp = ll_pp_eval(v_parameters);
+       
     // Store the results in the class
     result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_pp);
     result.print_results();
 };
 
+void PowerParameterModel::build_RunIndexes(T::MatrixXdrInt& matrix){
+    T::NumberType n_run = matrix.rows();
+    T::NumberType n_col = matrix.cols();
+    T::IndexType actual_p = 0;
+    
+    T::MatrixXdrInt all_ones(n_run, n_col);
+    all_ones.setOnes();
+    
+    std::vector<T::IndexType> elements(n_col);
+    for(T::IndexType i = 1; i <= n_col; ++i){
+    	elements[i-1] = i;
+    }
+    
+    for(T::IndexType i = 1; i <= n_run; ++i){
+    	if(i <= n_col){
+    	    actual_p = i - 1;
+    	    for(T::IndexType j = 1; j <= n_col; ++j){
+    	       actual_p = actual_p + 1;
+    	       if(actual_p > n_col)
+    	           actual_p = 1;
+ 
+    	       matrix(i-1,j-1) = actual_p;
+    	    }
+    	}
+    	else{
+    	    std::shuffle(elements.begin(), elements.end(), std::mt19937 {std::random_device{}()});
+    	    T::MappedType mappedV(elements.data(), n_col);
+    	    matrix.row(i-1) = mappedV;
+    	}
+    }
+    matrix = matrix - all_ones; 
+    std::cout << matrix << std::endl; 
+};
 
+
+// Method for executing the log-likelihood
+void PowerParameterModel::optimize_loglikelihood(){
+    T::VectorXdr& v_parameters = parameters.get_v_parameters();
+    
+    T::NumberType n_run = n_parameters + n_extrarun;
+    T::MatrixXdrInt RunIndexes(n_run, n_parameters);
+    build_RunIndexes(RunIndexes);
+    
+
+    
+    //T::IndexType index = 2;
+    //T::VariableType value = v_parameters(index) + 0.01;
+    //T::VariableType optimal_ll_pp_index = ll_pp(value, index, v_parameters);
+    //std::cout << optimal_ll_pp_index << std::endl;
+    
+    
+    // Store the results in the class
+    // result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_pp);
+    // result.print_results();
+};
+
+
+/*
 //-------------------------------------------------------------------------------------------------------
 // Implementations for the Paik Model
 // Constructor
@@ -524,7 +653,7 @@ void LogFrailtyModel::optimize_loglikelihood(){
     result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_lf);
     result.print_results();
 };
-
+*/
 
 } // end namespace
 
