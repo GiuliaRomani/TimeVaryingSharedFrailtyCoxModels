@@ -24,9 +24,7 @@ public:
 
     // Method for executing the log-likelihood
     void optimize_loglikelihood() override;
-    void evaluate_loglikelihood(T::VectorXdr&) override;
-
-    // void print_extract_parameters() override;
+    void evaluate_loglikelihood(const T::VectorXdr&) override;
 
 private:
     // Complex data structure
@@ -39,15 +37,13 @@ private:
     T::VectorXdr & v_parameters = parameters.get_v_parameters();
 
     T::IdNameType name_method = "PowerParameter";                           // Name of this method
-    
-    T::VectorXdr hessian_diag;
-    T::VectorXdr se;
 
     // Functions for implementing the likelihood
     std::function<T::VariableType(T::VectorXdr&)> ll_pp;  
     std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_pp;     
     
-    std::function<T::VariableType(T::IndexType, T::VectorXdr&)> dd_ll_pp;	// Function for computing the second derivative wrt one dimension
+    // Function for computing the second derivative wrt one dimension
+    std::function<T::VariableType(T::IndexType, T::VectorXdr&)> dd_ll_pp;	
 
 
     // Quadrature nodes and weights
@@ -60,20 +56,21 @@ private:
     T::VariableType factor_c = tool.factor_c_pp;
 
     // Virtual method for computing the number of parameters
-    T::NumberType compute_n_parameters() override;
+    void compute_n_parameters() override;
 
     // Method for extracting the parameters from the vector
-    T::TuplePPType extract_parameters(T::VectorXdr&);
+    T::TuplePPType extract_parameters(const T::VectorXdr&) const ;
     
-    T::VectorXdr compute_hessian_diagonal(T::VectorXdr&);
-    T::VectorXdr compute_se(T::VectorXdr&);
+    // Method for initializing the hessian diagonal and standard error
+    void compute_hessian_diagonal(T::VectorXdr&) override;
+    void compute_se(T::VectorXdr&) override;
 
     // Method for building the log-likelihood
     void build_loglikelihood() override;
     void build_dd_loglikelihood() override;
 };
 
-
+/*
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
 class PaikModel final: public TVModel::ModelBase{
@@ -127,7 +124,7 @@ private:
     void build_dd_loglikelihood() override;
 };
 
-/*
+
 //-----------------------------------------------------------------------------------------
 // Class for implementing LOG FRAILTY Model
 class LogFrailtyModel final: public TVModel::ModelBase{
@@ -138,6 +135,7 @@ public:
 
     // Method for executing the log-likelihood
     void optimize_loglikelihood() override;
+    void evaluate_loglikelihood(T::VectorXdr&) override;
 
 private:
     // Complex data structure
@@ -149,13 +147,19 @@ private:
     T::VectorNumberType all_n_parameters;                        
     T::VectorXdr& v_parameters = parameters.get_v_parameters();
 
+    T::VectorXdr hessian_diag;
+    T::VectorXdr se;
+
     T::IdNameType name_method = "LogFrailty";                                     // Name of this method
 
     // Functions for implementing the likelihood
-    std::function<T::VariableType(T::VectorXdr&)> ll_lf; // T::VariableType, T::IndexType, 
-    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_lf;     // T::VariableType, T::IndexType,
+    std::function<T::VariableType(T::VectorXdr&)> ll_lf; 
+    std::function<T::VariableType(T::VectorXdr&, T::SharedPtrType)> ll_group_lf;     
     std::function<T::VariableType(T::VariableType, T::SharedPtrType, T::VectorXdr&)> G; 
     std::function<T::VariableType(T::VariableType, T::IndexType, T::VariableType, T::VectorXdr&)> f_ijk;
+    
+    // Function for computing the second derivative wrt one dimension
+    std::function<T::VariableType(T::IndexType, T::VectorXdr&)> dd_ll_lf;
 
     // Quadrature weights and nodes
     QuadraturePoints::Points10 points10;
@@ -164,11 +168,13 @@ private:
     std::array<T::VariableType, 10>& weights = points10.weights;
 
     // Other tools
-    ToolsLikelihood::Tools tool;
     T::VariableType factor_c = tool.factor_c_lf;
 
     // Virtual method for computing the number of parameters
     T::NumberType compute_n_parameters() override;
+    
+    T::VectorXdr compute_hessian_diagonal(T::VectorXdr&);
+    T::VectorXdr compute_se(T::VectorXdr&);
     
     // Method for extracting the parameters from the vector
     T::TupleLFType extract_parameters(T::VectorXdr& v_parameters_) const;
@@ -177,9 +183,10 @@ private:
 
     // Method for building the log-likelihood
     void build_loglikelihood() override;
+    void build_dd_loglikelihood() override;
 };
-*/
 
+*/
 
 }
 #endif // TIME_VARYING_MODEL_DERIVED

@@ -16,10 +16,14 @@ using T = TypeTraits;
 
 // Constructor
 PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
-        // Base constructor for base class
+        // Constructor for base class
         ModelBase(filename1, filename2) {
+            // Constructor for current class
+            
             // Initialize the number of parameters
-            n_parameters = compute_n_parameters();
+            compute_n_parameters();
+            
+            // Resize standard error vector and hessian diagonal according to the number of parameters
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
@@ -36,11 +40,12 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
 };
         
 // Virtual method for computing the number of parameters
-T::NumberType PowerParameterModel::compute_n_parameters() {
-    return (2 * Time::n_intervals + Dataset::n_regressors);
+void PowerParameterModel::compute_n_parameters() {
+    n_parameters = (2 * Time::n_intervals + Dataset::n_regressors);
 };
 
-T::TuplePPType PowerParameterModel::extract_parameters(T::VectorXdr& v_parameters_){
+// Method for extracting the parameters from the vector of parameters
+T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(Time::n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(Time::n_intervals, 0, Dataset::n_regressors, 1);
@@ -57,9 +62,8 @@ T::TuplePPType PowerParameterModel::extract_parameters(T::VectorXdr& v_parameter
 
 // Method for building the log-likelihood
 void PowerParameterModel::build_loglikelihood(){
-
     // Implement the function ll_pp
-    // T::VariableType x, T::IndexType index, 
+
     ll_pp = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood_group, log_likelihood = 0;
         T::SharedPtrType indexes_group = nullptr;
@@ -68,13 +72,13 @@ void PowerParameterModel::build_loglikelihood(){
         T::MapType::iterator it_map = Dataset::map_groups.begin();
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
         for(; it_map != it_map_end; ++it_map){
-            // All the indexes in a group
+            // All the indexes of a group
             indexes_group = it_map->second;
 
             log_likelihood_group = ll_group_pp(v_parameters_, indexes_group); 
             log_likelihood += log_likelihood_group;
 
-            //indexes_group = nullptr;
+            indexes_group = nullptr;
         }
 
         // Subtract the constant term
@@ -90,9 +94,8 @@ void PowerParameterModel::build_loglikelihood(){
         auto [phi, betar, gammak, sigma ] = extract_parameters(v_parameters_);
 
         // Compute the necessary
-        T::VariableType loglik1 = 0;
+        T::VariableType dataset_betar, loglik1 = 0;
         T::VariableType partial1 = 0;
-        T::VariableType dataset_betar = 0;
         for(const auto &i: *(indexes_group_)){
             dataset_betar = Dataset::dataset.row(i) * betar;
             for(T::IndexType k = 0; k < Time::n_intervals; ++k){
@@ -101,9 +104,8 @@ void PowerParameterModel::build_loglikelihood(){
             }
         }
 
-        T::VariableType loglik2 = 0;
+        T::VariableType node, weight, loglik2 = 0;
         T::VariableType partial2 = 0;
-        T::VariableType node, weight = 0;
         for(T::IndexType q = 0; q < n_nodes; ++q){
             node = nodes[q];
             weight = weights[q];
@@ -141,38 +143,36 @@ void PowerParameterModel::build_dd_loglikelihood(){
 };
 
 // Method for computing the second derivtaive of the log-likelihood
-T::VectorXdr PowerParameterModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
-    T::VectorXdr hessian_diag(n_parameters);
-    
+void PowerParameterModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){  
+    // Initialize the hessian diagonal matrix 
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_pp(i, v_parameters_);
     }
-    
-    return hessian_diag;
 };
 
 // compute the standard error of the parameters
-T::VectorXdr PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
-     T::VectorXdr hessian_diag = compute_hessian_diagonal(v_parameters_);
-     T::VectorXdr se(n_parameters);
+void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
+     // Initialize the diagonal of the hessian matrix
+     compute_hessian_diagonal(v_parameters_);
+     
+     // Define an element that stores the information element
      T::VariableType information_element;
      
+     // Initialize the standard error vector
      for(T::IndexType i = 0; i < n_parameters; ++i){
          information_element = -hessian_diag(i);
          se(i) = 1/(sqrt(information_element));
      }
-     
-     std::cout << se << std::endl;
-     return se;
 };
 
 
-// Method for executing the log-likelihood
-void PowerParameterModel::evaluate_loglikelihood(T::VectorXdr& v_parameters_){
+
+// Method for builfing the result, provided the optimal vector
+void PowerParameterModel::evaluate_loglikelihood(const T::VectorXdr& v_parameters_){
     T::VariableType optimal_ll_pp = ll_pp(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_pp);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se);
     result.print_results();
 };
 
@@ -184,8 +184,8 @@ void PowerParameterModel::optimize_loglikelihood(){
                                         -3.8260, -0.1499, -0.1106, 0.1307,
                                         -0.0490, -1.3909, 4.3153, 8.2398, 1.0167, 6.3769,
                                          8.7448, 1.9151, 3.320, 0.104};
-    using MappedVectorType = Eigen::Map<T::VectorXdr>; 
-    MappedVectorType v_parameters(optimal_parameters.data(), n_parameters); 
+
+    T::MappedVectorType v_parameters(optimal_parameters.data(), n_parameters); 
     T::VectorXdr v_opt_parameters = v_parameters;                              
 
     compute_se(v_opt_parameters);
@@ -193,7 +193,7 @@ void PowerParameterModel::optimize_loglikelihood(){
     T::VariableType optimal_ll_pp = ll_pp(v_opt_parameters);
     
     // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_opt_parameters, optimal_ll_pp);
+    result = ResultsMethod::Results(name_method, n_parameters, v_opt_parameters, optimal_ll_pp, se);
     result.print_results();
 };
 

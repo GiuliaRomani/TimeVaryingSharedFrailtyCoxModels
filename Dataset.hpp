@@ -31,6 +31,7 @@ public:
     void print_e_time() const {std::cout << e_time << std::endl;};
     void print_n_individuals() const {std::cout << n_individuals << std::endl;};
     void print_n_regressors() const {std::cout << n_regressors << std::endl;};
+    void print_n_groups() const {std::cout << n_groups << std::endl;};
 
 
 protected:

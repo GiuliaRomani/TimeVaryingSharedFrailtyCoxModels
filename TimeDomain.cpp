@@ -10,7 +10,7 @@
 namespace TimeDomainInfo{
 
 // Default constructor
-TimeDomain::TimeDomain(): time_begin(0), time_end(0), n_intervals(0) {
+TimeDomain::TimeDomain(): n_intervals(0) {
     v_intervals.resize(n_intervals);
 };
 
@@ -24,14 +24,14 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
     GetPot datafile(filename.c_str());
 
     // Read number of subdivision of time domain and check correctness
-    const T::NumberType size_intervals = datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::IntType>::quiet_NaN());
+    const T::NumberType size_intervals = static_cast<T::NumberType>(datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN()));
     if(!check_condition(size_intervals))
         std::exit(1);
 
     // To check if the vector of time intervals is sorted, to load it into a normal vector
     T::VectorType v_intervals_copy(size_intervals, 0.);
     for(T::NumberType i = 0; i < size_intervals; ++i){
-        v_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::TimeType>::quiet_NaN(), i);
+        v_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
     std::sort(v_intervals_copy.begin(), v_intervals_copy.end());
 
@@ -39,17 +39,10 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
         std::exit(1);
     }
 
-    // Initialize the time bounds
-    //time_begin = *(v_intervals_copy.begin());
-    //time_end = *(v_intervals_copy.end() - 1);
-
-    time_begin = v_intervals_copy[0];
-    time_end = v_intervals_copy[size_intervals - 1];
-
     // Initialize the vector of the time domain subdivision and check correctness
     v_intervals.resize(size_intervals);
-    for(T::NumberType i = 0; i < size_intervals; ++i)
-        v_intervals(i) = v_intervals_copy[i];
+    T::MappedVectorType vv_intervals(v_intervals_copy.data(), size_intervals); 
+    v_intervals = vv_intervals;  
 
     // Initialize the number of intervals 
     n_intervals = size_intervals - 1;

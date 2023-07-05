@@ -18,27 +18,15 @@ using Dataset = DatasetInfoClass::DatasetInfo;
 using Time = TimeDomainInfo::TimeDomain;
 
 class ModelBase: public Time,
-		            public Dataset{
+		         public Dataset{
 public:
     // Base constructor
     ModelBase() = default;
     ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
-    // Getter 
-    // T::VectorXdr get_sd_frailty() const {return sd_frailty;};
-    // T::VectorXdr get_variance_frailty() const {return variance_frailty;};
-
     // Define and Compute the log-likelihood
     virtual void optimize_loglikelihood() = 0;
-    virtual void evaluate_loglikelihood(T::VectorXdr&) = 0;
-
-    // virtual void print_extract_parameters() = 0;
-
-    // Print 
-    void print_map_groups() const {return Dataset::print_map_groups();};
-    void print_n_regressors() const {std::cout << Dataset::n_regressors << std::endl;};
-    void print_n_intervals() const {std::cout << Time::n_intervals << std::endl;};
-
+    virtual void evaluate_loglikelihood(const T::VectorXdr&) = 0;
 
     // Destructor
     ~ ModelBase() = default;
@@ -58,13 +46,20 @@ protected:
     // Simple data structures
     T::VectorXdr variance_frailty;                                          // Vector for time-interval variance of the frailty
     T::VectorXdr sd_frailty;                                                // Vector for time-interval sd of the frailty
+    
+    // Simple data structure for the estimate of the standard error
+    T::VectorXdr hessian_diag;
+    T::VectorXdr se;
 
     // Virtual method to compute the number of parameters of each model
-    virtual T::NumberType compute_n_parameters() = 0;
+    virtual void compute_n_parameters() = 0;
 
     // Method for building the log-likelihood
     virtual void build_loglikelihood() = 0;
     virtual void build_dd_loglikelihood() = 0;
+    
+    virtual void compute_hessian_diagonal(T::VectorXdr&) = 0;
+    virtual void compute_se(T::VectorXdr&) = 0;
     
 
     // Virtual method to derive the interval variance of the frailty

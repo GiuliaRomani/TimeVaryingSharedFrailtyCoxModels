@@ -10,6 +10,10 @@ ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& fi
     // Initialize the other simple data structire
     variance_frailty.resize(TimeDomainInfo::TimeDomain::n_intervals);
     sd_frailty.resize(TimeDomainInfo::TimeDomain::n_intervals);
+    
+    // Correct dimension will be set up for each method
+    hessian_diag.resize(0);
+    se.resize(0);
 };
 
 
