@@ -1,4 +1,4 @@
-/*
+
 // Include header files
 #include "TVModelDerived.hpp"
 
@@ -18,7 +18,7 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
         // Base constructor for base class
         ModelBase(filename1, filename2) {
             // Initialize the number of parameters
-            n_parameters = compute_n_parameters();
+            compute_n_parameters();
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
@@ -36,8 +36,8 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
 };
         
 // Virtual method for computing the number of parameters
-T::NumberType LogFrailtyModel::compute_n_parameters() {
-    return (Time::n_intervals + Dataset::n_regressors + 3);
+void LogFrailtyModel::compute_n_parameters() {
+    n_parameters = (Time::n_intervals + Dataset::n_regressors + 3);
 };
 
 
@@ -130,7 +130,6 @@ void LogFrailtyModel::build_loglikelihood(){
         // v_parameters_(index) = x;
         auto [phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r] = extract_parameters(v_parameters_);
         auto [d_ijk, d_ij, d_i] = extract_dropout_variables(indexes_group_);
-        // auto time_to_event_group(extract_time_to_event(indexes_group_));
 
         // Compute the first component of the likelihood
         T::VariableType dataset_betar, loglik1 = 0;
@@ -144,16 +143,19 @@ void LogFrailtyModel::build_loglikelihood(){
         // Compute the second line of the likelihood
         T::VariableType loglik2 = 0;
         T::VariableType weight, node, exp1, G1;
+        T::VariableType sigmar2 = sqrt(2*sigma2r);
         for(T::IndexType q = 0; q < n_nodes; ++q){
             weight = weights[q];
             node = nodes[q];
-            exp1 = exp(node * d_i * sqrt(2 * sigma2r));
+
+            exp1 = exp(node * d_i * sigmar2);
             G1 = G(node, indexes_group_, v_parameters_);
             loglik2 += weight * exp1 * G1;
         }
         loglik2 = log(loglik2);
 
-        return (loglik1 + loglik2);
+        T::VariableType result = loglik1 + loglik2;
+        return result;
     };
 
     // Implement the function G
@@ -166,31 +168,29 @@ void LogFrailtyModel::build_loglikelihood(){
         auto time_to_event_group(extract_time_to_event(indexes_group_));
 
         // Define some useful variables
-        T::VariableType partial1, partial2, partial3, partial = 0;
-        T::VariableType node, weight;
-        T::VariableType arg_f, res_f, arg_exp1, arg_exp2, arg_exp3, exp1;
-        T::VariableType time_to_event_i, dataset_betar;
+        T::VariableType partial1, partial = 0.;
+        T::VariableType weight, node;
+        T::VariableType dataset_betar, time_to_event_i;
+        T::VariableType arg1, arg2, arg3, arg4, arg5, res_f;
 
-        partial1 = gammas * d_i;
-        partial2 = d_ij.dot(time_to_event_group);
-        for(T::IndexType u = 0; u < n_nodes; ++u){
+        arg1 = gammas * d_i;
+        arg2 = d_ij.dot(time_to_event_group);
+        for(T::NumberType u = 0; u < n_nodes; ++u ){
+            partial1 = 0.;
             node = nodes[u];
             weight = weights[u];
-            partial3 = 0;
-            arg_f = node * sqrt(2 * sigma2b);
+            arg3 = sqrt(2 * sigma2b) * node;
             for(const auto &i: *indexes_group_){
-                time_to_event_i = Dataset::time_to_event(i);
                 dataset_betar = Dataset::dataset.row(i) * betar;
-                for(T::IndexType kk = 0; kk < Time::n_intervals; ++kk){
-                    res_f = f_ijk(arg_f, kk, time_to_event_i, v_parameters_);
-                    partial3 += res_f * exp(dataset_betar);
+                time_to_event_i = Dataset::time_to_event(i);
+                for (T::NumberType k = 0; k < Time::n_intervals; ++k){
+                    res_f = f_ijk(arg3, k, time_to_event_i, v_parameters_);
+                    partial1 += exp(dataset_betar) * res_f;
                 }
             }
-            arg_exp1 = arg_f * (partial1 - partial2);
-            arg_exp2 = sqrt(2 * sigma2r) * z;
-            arg_exp3 = arg_f * gammas;
-            exp1 = exp(arg_exp2  + arg_exp3);
-            partial += weight * exp(arg_exp1 - partial3 * exp1 / arg_f);
+            arg4 = sqrt(2 * sigma2r) * z + arg3 * gammas;
+            arg5 = arg3 * (arg1 + arg2) - partial1 * (exp(arg4)) / arg3;
+            partial += weight * exp(arg5); 
         }
         return partial;
     };
@@ -242,33 +242,28 @@ void LogFrailtyModel::build_dd_loglikelihood(){
 };
 
 // Method for computing the second derivtaive of the log-likelihood
-T::VectorXdr LogFrailtyModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
+void LogFrailtyModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_lf(i, v_parameters_);
     }
-    
-    return hessian_diag;
 };
 
 // compute the standard error of the parameters
-T::VectorXdr LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
-     hessian_diag = compute_hessian_diagonal(v_parameters_);
+void LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
+     compute_hessian_diagonal(v_parameters_);
      T::VariableType information_element;
      
      for(T::IndexType i = 0; i < n_parameters; ++i){
          information_element = -hessian_diag(i);
          se(i) = 1/(sqrt(information_element));
      }
-     
-     std::cout << se << std::endl;
-     return se;
 };
 
 // Method for executing the log-likelihood
 void LogFrailtyModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_lf = ll_lf(v_parameters);
 
-    compute_se(v_opt_parameters);
+    compute_se(v_parameters);
        
     // Store the results in the class
     result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se);
@@ -277,5 +272,5 @@ void LogFrailtyModel::evaluate_loglikelihood(){
 
 
 } // end namespace
-*/
+
 

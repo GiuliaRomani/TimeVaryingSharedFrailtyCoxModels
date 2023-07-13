@@ -95,7 +95,7 @@ void DatasetInfo::initialize_dropout_intervals(){
     for(T::NumberType i = 0; i < n_individuals; ++i){
         for(T::NumberType k = 0; k < (n_intervals); ++k){
             if((time_to_event(i) < v_intervals(k+1)) & (time_to_event(i) >= v_intervals(k)))
-                dropout_intervals(i,k) = 1;
+                dropout_intervals(i,k) = 1.;
         }
     } 
 };

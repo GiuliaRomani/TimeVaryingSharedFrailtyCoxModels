@@ -130,50 +130,57 @@ void PaikModel::build_loglikelihood(){
         auto [d_ijk, d_ik, d_i] = extract_dropout_variables(indexes_group_);
 
         // Compute the first component of the likelihood
-        T::VariableType loglik1 = 0;
-        T::VariableType dataset_betar = 0;
-        for(const auto &i: *(indexes_group_)){
-            dataset_betar = Dataset::dataset.row(i) * betar;
-            for(T::IndexType k = 0; k < Time::n_intervals; ++k){
-                loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
-            }
-        }
-        loglik1 -= (mu1/nu) * log(1 + nu * A_i);
+	    T::VariableType  dataset_betar, loglik1 = 0.;
+	    for(const auto &i: *indexes_group_){
+	        dataset_betar = Dataset::dataset.row(i) * betar;
+	        for(T::NumberType k = 0; k < Time::n_intervals; ++k){
+	            loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
+	        }
+	    }
+	    loglik1 -= (mu1/nu) * log(1 + nu * A_i);
 
         // Compute the second line of the formula
-        T::VariableType loglik2 = 0;
-        for(T::IndexType k = 0; k < Time::n_intervals; ++k){
-            loglik2 -= (mu2/gammak(k)) * log(1 + gammak(k) * A_ik(k));
-        }
-
+	    T::VariableType loglik2 = 0.;
+	    for(T::NumberType k = 0; k < Time::n_intervals; ++k){
+	        loglik2 -= (mu2/gammak(k)) * log(1 + gammak(k) * A_ik(k));
+	    }
+	
         // Compute the third line of the formula
-        T::VariableType loglik4, loglik3 = 0.;
-        T::VariableType coeff_bin, tgamma1, tgamma2, tgamma3, tgamma4, tgamma5, tgamma6, tgamma7, pow1, pow2, exp_pow1 = 0.;
-        T::NumberType d_ik_size = 0;
-
-        tgamma4 = tgamma(mu1/nu);
-        tgamma5 = (A_i + 1/nu);
-        for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+        T::VariableType result, loglik4, loglik3 = 0.;
+        T::VariableType gamma_res1, gamma_res2, gamma_res3, gamma_res4 = 0.;
+        T::VariableType arg1, arg2, arg3 = 0.;
+        T::VariableType exp1 = 0.;
+        T::VariableType pow1, pow2 = 0.;
+        T::NumberType d_ik_size, coeff_binom = 0;
+        T::VariableType actual_gammak = 0.;
+        T::VariableType ll, d_ik_sizel = 0.;
+        
+        gamma_res1 = tgamma(mu1/nu);
+        arg1 = (A_i + 1/nu);
+        for(T::NumberType k = 0; k < Time::n_intervals; ++k){
             loglik4 = 0.;
             d_ik_size = d_ik(k);
-            tgamma3 = tgamma(mu2/gammak(k));
-            tgamma6 = (d_ik_size + mu2/gammak(k));
-            tgamma7 = (A_ik(k) + 1/gammak(k));
+            actual_gammak = gammak(k);
+            gamma_res2 = tgamma(mu2/actual_gammak);
+            arg2 = (d_ik_size + mu2/actual_gammak);
+            arg3 = (A_ik(k) + 1/actual_gammak);
+            for(T::NumberType l = 0; l <= d_ik_size; ++l){
+                coeff_binom = binom(static_cast<T::NumberType>(d_ik_size), l);
+                gamma_res3 = tgamma(arg2 - l);
+                gamma_res4 = tgamma(mu1/nu + l);
 
-            for(T::IndexType l = 0; l <= d_ik_size; ++l){
-                coeff_bin = binom(d_ik_size, l);
-                tgamma1 = tgamma(tgamma6 - l);
-                tgamma2 = tgamma(mu1/nu + l);
-                exp_pow1 = l - d_ik_size;
-                pow1 = pow(tgamma7, exp_pow1);
-                pow2 = pow(tgamma5, l);
-                loglik4 += coeff_bin * tgamma1 * tgamma2 * pow1 / (tgamma3 * tgamma4 * pow2);                 
+                // Cast for negative power
+                ll = static_cast<T::VariableType>(l);
+                d_ik_sizel = static_cast<T::VariableType>(d_ik_size);
+                exp1 = ll - d_ik_sizel;
+                pow1 = pow(arg3, exp1);
+                pow2 = pow(arg1, ll);
+                loglik4 += coeff_binom * gamma_res3 * gamma_res4 * pow1 / (gamma_res2 * gamma_res1 * pow2);
             }
-            loglik3 += log(loglik4);
+            loglik3 += log(loglik4);           
         }
-
-    T::VariableType result = loglik1 + loglik2 + loglik3;
-    return (result);
+    	result = loglik1 + loglik2 + loglik3;
+    	return (result);
     };
 };
 
@@ -211,15 +218,13 @@ void PaikModel::compute_se(T::VectorXdr& v_parameters_){
          information_element = -hessian_diag(i);
          se(i) = 1/(sqrt(information_element));
      }
-     
-     std::cout << se << std::endl;
 };
 
 // Method for executing the log-likelihood
 void PaikModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_paik = ll_paik(v_parameters);
 
-    // compute_se(v_opt_parameters);
+    compute_se(v_parameters);
        
     // Store the results in the class
     result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se);

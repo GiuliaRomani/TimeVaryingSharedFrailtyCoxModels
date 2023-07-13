@@ -114,7 +114,7 @@ private:
     void build_dd_loglikelihood() override;
 };
 
-/*
+
 //-----------------------------------------------------------------------------------------
 // Class for implementing LOG FRAILTY Model
 class LogFrailtyModel final: public TVModel::ModelBase{
@@ -154,10 +154,10 @@ private:
     std::array<T::VariableType, 10>& weights = points10.weights;
 
     // Virtual method for computing the number of parameters
-    T::NumberType compute_n_parameters() override;
+    void compute_n_parameters() override;
     
-    T::VectorXdr compute_hessian_diagonal(T::VectorXdr&);
-    T::VectorXdr compute_se(T::VectorXdr&);
+    void compute_hessian_diagonal(T::VectorXdr&);
+    void compute_se(T::VectorXdr&);
     
     // Method for extracting the parameters from the vector
     T::TupleLFType extract_parameters(T::VectorXdr& v_parameters_) const;
@@ -169,7 +169,6 @@ private:
     void build_dd_loglikelihood() override;
 };
 
-*/
 
 }
 #endif // TIME_VARYING_MODEL_DERIVED
