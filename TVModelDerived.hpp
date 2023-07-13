@@ -23,8 +23,7 @@ public:
     PowerParameterModel(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
     // Method for executing the log-likelihood
-    void optimize_loglikelihood() override;
-    void evaluate_loglikelihood(const T::VectorXdr&) override;
+    void evaluate_loglikelihood() override;
 
 private:
     // Complex data structure
@@ -52,8 +51,6 @@ private:
     std::array<T::VariableType, 9>& nodes = points9.nodes;
     std::array<T::VariableType, 9>& weights = points9.weights;
 
-    // Other tools
-    T::VariableType factor_c = tool.factor_c_pp;
 
     // Virtual method for computing the number of parameters
     void compute_n_parameters() override;
@@ -70,7 +67,7 @@ private:
     void build_dd_loglikelihood() override;
 };
 
-/*
+
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
 class PaikModel final: public TVModel::ModelBase{
@@ -80,8 +77,7 @@ public:
     PaikModel(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
     // Method for executing the log-likelihood
-    void optimize_loglikelihood() override;
-    void evaluate_loglikelihood(T::VectorXdr&) override;
+    void evaluate_loglikelihood() override;
 
 private:
     // Complex data structure
@@ -94,12 +90,6 @@ private:
     T::VectorXdr& v_parameters = parameters.get_v_parameters();
 
     T::IdNameType name_method = "Paik";                                     // Name of this method
-    
-    T::VectorXdr hessian_diag;
-    T::VectorXdr se;
-
-    // Other tools
-    T::VariableType factor_c = tool.factor_c_paik;
 
     // Functions for implementing the likelihood
     std::function<T::VariableType(T::VectorXdr&)> ll_paik; 
@@ -109,10 +99,10 @@ private:
     std::function<T::VariableType(T::IndexType, T::VectorXdr&)> dd_ll_paik;	
 
     // Virtual method for computing the number of parameters
-    T::NumberType compute_n_parameters() override;
+    void compute_n_parameters() override;
 
-    T::VectorXdr compute_hessian_diagonal(T::VectorXdr&);
-    T::VectorXdr compute_se(T::VectorXdr&);
+    void compute_hessian_diagonal(T::VectorXdr&);
+    void compute_se(T::VectorXdr&);
     
     // Method for extracting the parameters from the vector
     T::TuplePaikType extract_parameters(T::VectorXdr&);
@@ -124,7 +114,7 @@ private:
     void build_dd_loglikelihood() override;
 };
 
-
+/*
 //-----------------------------------------------------------------------------------------
 // Class for implementing LOG FRAILTY Model
 class LogFrailtyModel final: public TVModel::ModelBase{
@@ -134,8 +124,7 @@ public:
     LogFrailtyModel(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
     // Method for executing the log-likelihood
-    void optimize_loglikelihood() override;
-    void evaluate_loglikelihood(T::VectorXdr&) override;
+    void evaluate_loglikelihood() override;
 
 private:
     // Complex data structure
@@ -146,9 +135,6 @@ private:
     T::NumberType n_parameters;                                             // Number of parameter of the model
     T::VectorNumberType all_n_parameters;                        
     T::VectorXdr& v_parameters = parameters.get_v_parameters();
-
-    T::VectorXdr hessian_diag;
-    T::VectorXdr se;
 
     T::IdNameType name_method = "LogFrailty";                                     // Name of this method
 
@@ -166,9 +152,6 @@ private:
     T::NumberType n_nodes = 10;
     std::array<T::VariableType, 10>& nodes = points10.nodes;
     std::array<T::VariableType, 10>& weights = points10.weights;
-
-    // Other tools
-    T::VariableType factor_c = tool.factor_c_lf;
 
     // Virtual method for computing the number of parameters
     T::NumberType compute_n_parameters() override;

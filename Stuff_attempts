@@ -27,4 +27,32 @@ void PowerParameterModel::compute_sd_frailty() {
     };
 };
 */
+
+
+/*
+// Method for initializing the vector of parameters
+void Parameters::initialize_v_parameters() {
+    // Resize the vector of parameters to the right dimension
+    v_parameters.resize(n_parameters);
+
+    // Define the index for storing the elements in the dynamic vector
+    T::NumberType j_actual = 0;
+
+    // Defie the engine and the distribution for the pseudo-random-number generator
+    std::default_random_engine generator;
+    for(T::NumberType i = 0; i < n_ranges; ++i){
+        T::NumberType & n = all_n_parameters[i];
+        T::VariableType & a = range_min_parameters[i];
+        T::VariableType & b = range_max_parameters[i];
+
+        std::uniform_real_distribution<> distribution(a, b);
+        for(T::NumberType j = 0; j < n; ++j){
+            v_parameters(j_actual) = distribution(generator);
+            j_actual += 1;
+        }   
+    }
+};
+                // Initialize the vector of parameters
+                // initialize_v_parameters();   
+*/
     

@@ -40,14 +40,16 @@ int main(){
     
     /*
     // Prova Parameters class and Results class for errors 
-    T::VectorNumberType all_n_parameters{3,4,2,1};
-    Params::Parameters params("DataToolFile.txt", 4, 10, 3, 4, all_n_parameters);
+    // T::VectorNumberType all_n_parameters{8,5,7,1};
+    T::VectorNumberType all_n_parameters{8, 5, 1, 1, 8};
+    Params::Parameters params("DataToolFile.txt", 23, 8, 5, 5, all_n_parameters);
     T::VectorXdr & v_params = params.get_v_parameters();
     T::NumberType & n_params = params.get_n_parameters();
-    T::VariableType opt_likelihoood = -10.0;
     std::cout << "Number of parameters: "<< n_params << std::endl;
     std::cout << v_params << std::endl;
     */
+    
+    
 
     /*
     ResultsMethod::Results results("Paik", n_params, v_params, opt_likelihoood);
@@ -84,12 +86,13 @@ int main(){
     // Prove the PowerParameterModel
     static T::FactoryType methods(RegisteredMethods());
     PrintMethods(methods);
-    T::IdType id = 2;
+    T::IdType id = 1;
 
     //std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
     std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DatasetYear2018.txt");
-    ptrMethod -> optimize_loglikelihood();
+    ptrMethod -> evaluate_loglikelihood();
     // ptrMethod -> print_extract_parameters();
+    
     
     
     

@@ -53,8 +53,9 @@ private:
     // Method for checking the correctness and existence of the filename provided
     T::CheckType check_filename(const T::FileNameType& filename_) const;
 
-    // Method for checking conditions for time bounds
+    // Method for checking conditions for ranges bounds
     T::CheckType check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const;
+    T::CheckType check_condition(const T::VectorXdr& v_parameters_) const;
 
 };
 } // end namespace

@@ -1,4 +1,4 @@
-/*
+
 // Include header files
 #include "TVModelDerived.hpp"
 #include "SupportFunctions.cpp"
@@ -19,7 +19,7 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
         // Base constructor for base class
         ModelBase(filename1, filename2) {
             // Initialize the number of parameters
-            n_parameters = compute_n_parameters();
+            compute_n_parameters();
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
@@ -37,8 +37,8 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
 };
         
 // Virtual method for computing the number of parameters
-T::NumberType PaikModel::compute_n_parameters() {
-    return (2 * Time::n_intervals + Dataset::n_regressors + 2);
+void PaikModel::compute_n_parameters() {
+    n_parameters = (2 * Time::n_intervals + Dataset::n_regressors + 2);
 };
 
 // Virtual method for extracting the parameters fromt the vector
@@ -101,7 +101,7 @@ T::TupleDropoutType PaikModel::extract_dropout_variables(T::SharedPtrType indexe
 // Method for building the log-likelihood
 void PaikModel::build_loglikelihood(){
     // Implement the function ll_paik
-    ll_paik = [this] (T::VectorXdr& v_parameters_){              // T::VariableType x, T::IndexType index, 
+    ll_paik = [this] (T::VectorXdr& v_parameters_){              
         T::VariableType log_likelihood_group, log_likelihood = 0;
         T::SharedPtrType indexes_group = nullptr;
 
@@ -148,7 +148,7 @@ void PaikModel::build_loglikelihood(){
 
         // Compute the third line of the formula
         T::VariableType loglik4, loglik3 = 0.;
-        T::VariableType coeff_bin, tgamma1, tgamma2, tgamma3, tgamma4, tgamma5, tgamma6, tgamma7, pow1, pow2 = 0.;
+        T::VariableType coeff_bin, tgamma1, tgamma2, tgamma3, tgamma4, tgamma5, tgamma6, tgamma7, pow1, pow2, exp_pow1 = 0.;
         T::NumberType d_ik_size = 0;
 
         tgamma4 = tgamma(mu1/nu);
@@ -164,14 +164,16 @@ void PaikModel::build_loglikelihood(){
                 coeff_bin = binom(d_ik_size, l);
                 tgamma1 = tgamma(tgamma6 - l);
                 tgamma2 = tgamma(mu1/nu + l);
-                pow1 = pow(tgamma7, l - d_ik_size);
+                exp_pow1 = l - d_ik_size;
+                pow1 = pow(tgamma7, exp_pow1);
                 pow2 = pow(tgamma5, l);
-                loglik4 += coeff_bin * tgamma1 * tgamma2 * pow1 * factor_c/ (tgamma3 * tgamma4 * pow2);                 
+                loglik4 += coeff_bin * tgamma1 * tgamma2 * pow1 / (tgamma3 * tgamma4 * pow2);                 
             }
             loglik3 += log(loglik4);
         }
 
-    return (loglik1 + loglik2 + loglik3);
+    T::VariableType result = loglik1 + loglik2 + loglik3;
+    return (result);
     };
 };
 
@@ -194,18 +196,16 @@ void PaikModel::build_dd_loglikelihood(){
 };
 
 // Method for computing the second derivtaive of the log-likelihood
-T::VectorXdr PaikModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){    
+void PaikModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){    
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_paik(i, v_parameters_);
     }
-    
-    return hessian_diag;
 };
 
 // compute the standard error of the parameters
-T::VectorXdr PaikModel::compute_se(T::VectorXdr& v_parameters_){
-     hessian_diag = compute_hessian_diagonal(v_parameters_);
-     T::VariableType information_element;
+void PaikModel::compute_se(T::VectorXdr& v_parameters_){
+    compute_hessian_diagonal(v_parameters_);
+    T::VariableType information_element;
      
      for(T::IndexType i = 0; i < n_parameters; ++i){
          information_element = -hessian_diag(i);
@@ -213,40 +213,17 @@ T::VectorXdr PaikModel::compute_se(T::VectorXdr& v_parameters_){
      }
      
      std::cout << se << std::endl;
-     return se;
 };
 
 // Method for executing the log-likelihood
-void PaikModel::evaluate_loglikelihood(T::VectorXdr& v_parameters_){
+void PaikModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_paik = ll_paik(v_parameters);
-       
-    // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_paik);
-    result.print_results();
-};
-
-
-// Method for executing the log-likelihood
-void PaikModel::optimize_loglikelihood(){
-    // T::VectorXdr& v_parameters = parameters.get_v_parameters();
-    T::VectorType optimal_parameters{-5.099, -3.33, -4.8521, -6.962, -4.017, -5.315, -3.916, -4.913, 
-                                        -1.386e-1, -1.134e-1, 1.37e-1, -4.661e-2, -1.385, 1.974e-6,
-                                        2.00, 6.413e-3, 7.6376e-3, 3.507e-2, 1.145, 1.299e-2, 2.767e-1, 
-                                        1.65761e-1, 1.5344e-1 };
-    using MappedVectorType = Eigen::Map<T::VectorXdr>; 
-    MappedVectorType v_parameters(optimal_parameters.data(), n_parameters); 
-    T::VectorXdr v_opt_parameters = v_parameters;                              
 
     // compute_se(v_opt_parameters);
-
-    T::VariableType optimal_ll_paik = ll_paik(v_opt_parameters);
-    // Ideal value = -2153.992
-    
+       
     // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_opt_parameters, optimal_ll_paik);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se);
     result.print_results();
 };
 
-
 } // end namespace
-*/

@@ -17,14 +17,14 @@ Parameters::Parameters(const T::FileNameType& filename,
             n_intervals(n_intervals_),
             n_regressors(n_regressors_),
             n_ranges(n_ranges_){
+            	// Resize the vector of parameters
+            	v_parameters.resize(n_parameters);	
+            	
+            	// Initialize the vector of the number of parameters
+                initialize_all_n_parameters(all_n_parameters_);
+                
                 // Read data from file
                 read_from_file(filename);
-
-                // Initialize the vector of the number of parameters
-                initialize_all_n_parameters(all_n_parameters_);
-
-                // Initialize the vector of parameters
-                initialize_v_parameters();   
 };
 
 // Method for reading data from file
@@ -40,10 +40,18 @@ void Parameters::read_from_file(const T::FileNameType& filename){
 
     // Read the min and max range of parameters and then check they are provided
     for(T::NumberType i = 0; i < n_ranges; ++i){
-        range_min_parameters.push_back(datafile("Parameters/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
-        range_max_parameters.push_back(datafile("Parameters/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
+        range_min_parameters.push_back(datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
+        range_max_parameters.push_back(datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
     }
     if(!check_condition(range_min_parameters, range_max_parameters)){
+        std::exit(1);
+    }
+    
+    // Read the parameters from the input file
+    for(T::NumberType i = 0; i < n_parameters; ++i){
+    	v_parameters(i) = datafile("Parameters/Values/params", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
+    }
+    if(!check_condition(v_parameters)){
         std::exit(1);
     }
 };
@@ -60,35 +68,20 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
         std::exit(1);
     }
 
+    T::NumberType n_parameters_check = 0;
+
     // If the dimension is correct, fill the vector
     for(T::IndexType p = 0; p < n_ranges; p++){
         all_n_parameters[p] = all_n_parameters_[p];
+        n_parameters_check += all_n_parameters[p];
+    }
+
+    // Check the sum of the element in this vector coincides with the n_parameters
+    if(n_parameters_check != n_parameters){
+        std::cerr << "Error in all_n_parameters. Too many or not enough values." << std::endl;
+        std::exit(1);
     }
 };
-
-// Method for initializing the vector of parameters
-void Parameters::initialize_v_parameters() {
-    // Resize the vector of parameters to the right dimension
-    v_parameters.resize(n_parameters);
-
-    // Define the index for storing the elements in the dynamic vector
-    T::NumberType j_actual = 0;
-
-    // Defie the engine and the distribution for the pseudo-random-number generator
-    std::default_random_engine generator;
-    for(T::NumberType i = 0; i < n_ranges; ++i){
-        T::NumberType & n = all_n_parameters[i];
-        T::VariableType & a = range_min_parameters[i];
-        T::VariableType & b = range_max_parameters[i];
-
-        std::uniform_real_distribution<> distribution(a, b);
-        for(T::NumberType j = 0; j < n; ++j){
-            v_parameters(j_actual) = distribution(generator);
-            j_actual += 1;
-        }   
-    }
-};
-
 
 // Method for checking the filename is correct and exits
 T::CheckType Parameters::check_filename(const T::FileNameType& filename_) const{
@@ -102,7 +95,7 @@ T::CheckType Parameters::check_filename(const T::FileNameType& filename_) const{
     return true;
 };
 
-// Method for checking conditions for time bounds
+// Method for checking conditions for range bound
 T::CheckType Parameters::check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const{
     const T::NumberType& n = range_min_.size();
     
@@ -119,6 +112,31 @@ T::CheckType Parameters::check_condition(const T::VectorType& range_min_, const 
     }
 
     // All the parameters ranges are provided
+    return true;
+};
+
+// Method for checking conditions for parameters values
+T::CheckType Parameters::check_condition(const T::VectorXdr& v_parameters_) const{    
+    // Check that each single value of the parameter vector is properly defined
+    T::NumberType n, actual_j = 0;
+    T::VariableType a,b = 0.;
+    
+    for(T::NumberType i = 0; i < n_ranges; ++i){
+    	n = all_n_parameters[i];
+	    a = range_min_parameters[i];
+	    b = range_max_parameters[i];
+	
+	    for(T::NumberType j = 0; j < n; ++j){
+	        if((v_parameters(actual_j) < a) || (v_parameters(actual_j) > b)){
+	     	    std::cerr << "Value of parameter in position " << actual_j << " not in the ranges" << std::endl;
+		        return false;
+	        }
+	        actual_j += 1;
+	    }
+    }
+
+    // All the parameter values are in the correct ranges
+    std::cout << "All parameter values have correct assignment" << std::endl;
     return true;
 };
 

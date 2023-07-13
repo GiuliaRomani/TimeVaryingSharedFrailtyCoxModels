@@ -149,7 +149,7 @@ void LogFrailtyModel::build_loglikelihood(){
             node = nodes[q];
             exp1 = exp(node * d_i * sqrt(2 * sigma2r));
             G1 = G(node, indexes_group_, v_parameters_);
-            loglik2 += weight * exp1 * G1 * factor_c;
+            loglik2 += weight * exp1 * G1;
         }
         loglik2 = log(loglik2);
 
@@ -265,33 +265,15 @@ T::VectorXdr LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
 };
 
 // Method for executing the log-likelihood
-void LogFrailtyModel::evaluate_loglikelihood(T::VectorXdr& v_parameters_){
+void LogFrailtyModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_lf = ll_lf(v_parameters);
-       
-    // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_parameters, optimal_ll_lf);
-    result.print_results();
-};
-
-
-// Method for executing the log-likelihood
-void LogFrailtyModel::optimize_loglikelihood(){
-    // T::VectorXdr& v_parameters = parameters.get_v_parameters();
-    T::VectorType optimal_parameters{-4.0398, -1.9629, -3.1393, -4.7005, -1.6311, -2.5084, -0.7593, -1.54224, -0.15867,
-    					-0.115667, 0.11885, -0.04098, -1.38687, 0.0227, 1.76800, 2.51956};
-    using MappedVectorType = Eigen::Map<T::VectorXdr>; 
-    MappedVectorType v_parameters(optimal_parameters.data(), n_parameters); 
-    T::VectorXdr v_opt_parameters = v_parameters;                              
 
     compute_se(v_opt_parameters);
-
-    T::VariableType optimal_ll_lf = ll_lf(v_opt_parameters);
-    
+       
     // Store the results in the class
-    result = ResultsMethod::Results(n_parameters, v_opt_parameters, optimal_ll_lf);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se);
     result.print_results();
 };
-
 
 
 } // end namespace

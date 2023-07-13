@@ -25,8 +25,7 @@ public:
     ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
     // Define and Compute the log-likelihood
-    virtual void optimize_loglikelihood() = 0;
-    virtual void evaluate_loglikelihood(const T::VectorXdr&) = 0;
+    virtual void evaluate_loglikelihood() = 0;
 
     // Destructor
     ~ ModelBase() = default;
@@ -38,9 +37,6 @@ protected:
     
     // Base variables for optimization method
     ToolsLikelihood::Tools tool;
-    // T::VariableType tol_ll = tool.tol_ll;
-    // T::VariableType tol_optim = tool.tol_ll;
-    // T::NumberType n_extrarun = tool.n_extrarun;
     T::VariableType h_dd = tool.h_dd;
 
     // Simple data structures

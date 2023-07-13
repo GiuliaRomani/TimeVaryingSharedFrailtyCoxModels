@@ -117,7 +117,7 @@ void PowerParameterModel::build_loglikelihood(){
                     partial2 += (exp(dataset_betar + phi(k) + sqrt(2) * sigma * gammak(k) * node)) * Dataset::e_time(i,k);
                 }
             }
-            loglik2 += factor_c * weight * exp(sqrt(2) * sigma * node * partial1 - partial2);
+            loglik2 += weight * exp(sqrt(2) * sigma * node * partial1 - partial2);
         }
         loglik2 = log(loglik2);
         return (loglik1 + loglik2);
@@ -166,37 +166,17 @@ void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
 };
 
 
-
 // Method for builfing the result, provided the optimal vector
-void PowerParameterModel::evaluate_loglikelihood(const T::VectorXdr& v_parameters_){
+void PowerParameterModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_pp = ll_pp(v_parameters);
-       
+
+    // Initialize the standard error of the parameters
+    compute_se(v_parameters);
+
     // Store the results in the class
     result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se);
     result.print_results();
 };
-
-
-// Method for executing the log-likelihood
-void PowerParameterModel::optimize_loglikelihood(){
-    // T::VectorXdr& v_parameters = parameters.get_v_parameters();
-    T::VectorType optimal_parameters{-4.767, -1.904, -2.113, -6.430, -1.891, -2.384, -3.2470,
-                                        -3.8260, -0.1499, -0.1106, 0.1307,
-                                        -0.0490, -1.3909, 4.3153, 8.2398, 1.0167, 6.3769,
-                                         8.7448, 1.9151, 3.320, 0.104};
-
-    T::MappedVectorType v_parameters(optimal_parameters.data(), n_parameters); 
-    T::VectorXdr v_opt_parameters = v_parameters;                              
-
-    compute_se(v_opt_parameters);
-
-    T::VariableType optimal_ll_pp = ll_pp(v_opt_parameters);
-    
-    // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_opt_parameters, optimal_ll_pp, se);
-    result.print_results();
-};
-
 
 } // end namespace
 
