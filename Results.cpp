@@ -35,8 +35,8 @@ void Results::print_results() const {
     std::cout << "------------------- Printing results -----------------------" << std::endl;
     std::cout << name_model << " model" << std::endl;
     std::cout << "Number of parameters " << n_parameters << std::endl;
-    std::cout << "Log-likelihood = " << std::setprecision(3) << optimal_loglikelihood << std::endl;
-    std::cout << "AIC = " << std::setprecision(3) << AIC << std::endl;
+    std::cout << "Log-likelihood = " << std::setprecision(5) << optimal_loglikelihood << std::endl;
+    std::cout << "AIC = " << std::setprecision(5) << AIC << std::endl;
     std::cout << "Standard Error of the parameters: \n" << se << std::endl;
 };
 
