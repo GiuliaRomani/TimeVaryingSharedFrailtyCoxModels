@@ -7,13 +7,7 @@
 namespace DatasetInfoClass{
     
 // Constructor
-DatasetInfo::DatasetInfo(const T::FileNameType& filename2, T::NumberType n_intervals_, const T::VectorXdr& v_intervals_){
-    // Initialize TimeDomain::elements through the constructor
-    n_intervals = n_intervals_;
-    v_intervals.resize(n_intervals+1);
-    for(T::IndexType i=0; i < (n_intervals+1); ++i)
-    	v_intervals(i) = v_intervals_(i);
-
+DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2): Time(filename1) {
     // Initialize the number of groups to zero
     n_groups = 0;
 
@@ -89,12 +83,12 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
 void DatasetInfo::initialize_dropout_intervals(){
     // Resize the matrix according to the right dimensions and fill it with null elements
     // dropout_intervals.resize(n_individuals, n_intervals);
-    dropout_intervals.setZero(n_individuals, n_intervals);
+    dropout_intervals.setZero(n_individuals, Time::n_intervals);
 
     // Fill the matrix according to the condition
     for(T::NumberType i = 0; i < n_individuals; ++i){
-        for(T::NumberType k = 0; k < (n_intervals); ++k){
-            if((time_to_event(i) < v_intervals(k+1)) & (time_to_event(i) >= v_intervals(k)))
+        for(T::NumberType k = 0; k < (Time::n_intervals); ++k){
+            if((time_to_event(i) < Time::v_intervals(k+1)) & (time_to_event(i) >= Time::v_intervals(k)))
                 dropout_intervals(i,k) = 1.;
         }
     } 
@@ -103,14 +97,14 @@ void DatasetInfo::initialize_dropout_intervals(){
 // Initialize the e_time matrix
 void DatasetInfo::initialize_e_time(){
     // Resize the matrix
-    e_time.resize(n_individuals, n_intervals);
+    e_time.resize(n_individuals, Time::n_intervals);
 
     // Fill the matrix
     for(T::IndexType i = 0; i < n_individuals; ++i){
         T::VariableType time_individual = time_to_event(i);
-        for(T::IndexType k = 0; k < (n_intervals); ++k){
-            T::VariableType v_k = v_intervals(k);
-            T::VariableType v_kk = v_intervals(k+1);
+        for(T::IndexType k = 0; k < (Time::n_intervals); ++k){
+            T::VariableType v_k = Time::v_intervals(k);
+            T::VariableType v_kk = Time::v_intervals(k+1);
             e_time(i,k) = e_time_function(time_individual, v_k, v_kk);
         }
     }
@@ -139,7 +133,7 @@ void DatasetInfo::print_map_groups() const{
     }
 };
 
-// Method for ptinting the element of a single group
+// Method for ptinting the element of a single group 
 void DatasetInfo::print_individuals_group(const T::GroupNameType& name_group) const{
     std::shared_ptr<T::VectorIndexType> individuals_group = extract_individuals_group(name_group);
     if(individuals_group == nullptr)

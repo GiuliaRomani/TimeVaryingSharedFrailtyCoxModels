@@ -23,10 +23,10 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
             se.resize(n_parameters);
 
             // Initialize the vector of number of parameters
-            all_n_parameters = {Time::n_intervals, Dataset::n_regressors, 1, 1, 1};
+            all_n_parameters = {Dataset::n_intervals, Dataset::n_regressors, 1, 1, 1};
 
             // Construct the class parameters
-            parameters = Params::Parameters(filename1, n_parameters, Time::n_intervals, Dataset::n_regressors, 
+            parameters = Params::Parameters(filename1, n_parameters, Dataset::n_intervals, Dataset::n_regressors, 
                                             n_ranges_parameters, all_n_parameters);
 
             // Build the log-likelihood
@@ -37,17 +37,17 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
         
 // Virtual method for computing the number of parameters
 void LogFrailtyModel::compute_n_parameters() {
-    n_parameters = (Time::n_intervals + Dataset::n_regressors + 3);
+    n_parameters = (Dataset::n_intervals + Dataset::n_regressors + 3);
 };
 
 
 T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Time::n_intervals);                 // block(0,0,n_intervals,1);  
-    T::VectorXdr betar = v_parameters_.block(Time::n_intervals, 0, Dataset::n_regressors,1);
-    T::VariableType lambda1 = v_parameters_(Time::n_intervals + Dataset::n_regressors);
-    T::VariableType lambda2 = v_parameters_(Time::n_intervals + Dataset::n_regressors+1);
-    T::VariableType angle_alpha = v_parameters_(Time::n_intervals + Dataset::n_regressors+2);
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
+    T::VariableType lambda1 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors);
+    T::VariableType lambda2 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors+1);
+    T::VariableType angle_alpha = v_parameters_(Dataset::n_intervals + Dataset::n_regressors+2);
 
     // Compute the original variable 
     T::VariableType cos_angle = cos(angle_alpha);
@@ -66,14 +66,14 @@ T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr& v_parameters_) 
 T::TupleDropoutType LogFrailtyModel::extract_dropout_variables(const T::SharedPtrType indexes_group_) const{
     // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
-    T::MatrixXdr d_ijk(n_individuals_group, Time::n_intervals);
+    T::MatrixXdr d_ijk(n_individuals_group, Dataset::n_intervals);
     T::VectorXdr d_ij(n_individuals_group);
     T::VariableType d_i;
 
     T::IndexType index = 0;
     // Initialize them
     for(const auto &i: *indexes_group_){
-    	for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+    	for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
     		d_ijk(index,k) = Dataset::dropout_intervals(i,k);
     	}
     	index += 1;
@@ -135,7 +135,7 @@ void LogFrailtyModel::build_loglikelihood(){
         T::VariableType dataset_betar, loglik1 = 0;
         for(const auto &i: *indexes_group_){
             dataset_betar = Dataset::dataset.row(i) * betar;
-            for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+            for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
                 loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
             }
         }
@@ -183,7 +183,7 @@ void LogFrailtyModel::build_loglikelihood(){
             for(const auto &i: *indexes_group_){
                 dataset_betar = Dataset::dataset.row(i) * betar;
                 time_to_event_i = Dataset::time_to_event(i);
-                for (T::NumberType k = 0; k < Time::n_intervals; ++k){
+                for (T::NumberType k = 0; k < Dataset::n_intervals; ++k){
                     res_f = f_ijk(arg3, k, time_to_event_i, v_parameters_);
                     partial1 += exp(dataset_betar) * res_f;
                 }
@@ -198,7 +198,7 @@ void LogFrailtyModel::build_loglikelihood(){
     f_ijk = [this] (T::VariableType b, T::IndexType kkk, T::VariableType time_to_i, T::VectorXdr& v_parameters_){
         // Extract the baseline components from the vector of parameters
         T::VectorXdr phi = std::get<0>(extract_parameters(v_parameters_));
-        const auto& v_intervals = Time::v_intervals;
+        const auto& v_intervals = Dataset::v_intervals;
 
         // Define some useful variables
         T::VariableType exp1, exp2, exp3;

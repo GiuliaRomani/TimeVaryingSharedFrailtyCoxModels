@@ -13,7 +13,11 @@
 
 using T = TypeTraits;
 
-// This function simply inserts the available methods in a FactoryType objet and return the object created
+/**
+ * This method insert in a FactoryType object the available time-varying models, each represented by a couple composed of (numerical_id, name) of the model itself. 
+ * 
+ * @return Initialized FactoryType object
+*/
 T::FactoryType RegisteredMethods() {
     T::FactoryType mapMethod;
 
@@ -24,7 +28,12 @@ T::FactoryType RegisteredMethods() {
     return mapMethod;
 };
 
-// For each method available in the FactoryType object, its id and name are printed.
+
+/**
+ * This method print the numerical id and the name of the time-vaying model stored in the FactoryType object
+ * 
+ * @param FactoryMethods reference to const FactoryType object
+*/
 void PrintMethods(const T::FactoryType & FactoryMethods){
     std::cout << "Registered methods in the factory:" << std::endl;
     for (const auto & [id, name]: FactoryMethods){
@@ -37,6 +46,15 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
 // This function receives the id of the method the user wants to use and some parameter (through a variadic template)
 // and returns a unique pointer to the base class, but initialised with a derived class object with the arguments passed.
 // A valid id is controlled in the main() function. 
+/**
+ * This method return a unique pointer to one of the time-varying model present in the FactoryType object.
+ * 
+ * @param id Numeric id of the model the user want to apply. If the correct id is not provided, an exception is thrown.
+ * @param args Variadic template for the arguments of the model call.
+ * 
+ * @return Unique pointer to base class TVModel::ModelBase, initialized with an object of the derived class, that could be TVModel::PaikModel, 
+ * TVModel::PowerParameterModel, TVModel::LogFrailtyModel
+*/
 template<class ... Args>
 std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
     switch(id){

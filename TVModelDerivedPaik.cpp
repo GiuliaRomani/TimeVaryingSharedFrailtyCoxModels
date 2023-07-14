@@ -24,10 +24,10 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
             se.resize(n_parameters);
 
             // Initialize the vector of number of parameters
-            all_n_parameters = {Time::n_intervals, Dataset::n_regressors, 1, 1, Time::n_intervals};
+            all_n_parameters = {Dataset::n_intervals, Dataset::n_regressors, 1, 1, Dataset::n_intervals};
 
             // Construct the class parameters
-            parameters = Params::Parameters(filename1, n_parameters, Time::n_intervals, Dataset::n_regressors, 
+            parameters = Params::Parameters(filename1, n_parameters, Dataset::n_intervals, Dataset::n_regressors, 
                                             n_ranges_parameters, all_n_parameters);
 
             // Build the log-likelihood
@@ -38,33 +38,33 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
         
 // Virtual method for computing the number of parameters
 void PaikModel::compute_n_parameters() {
-    n_parameters = (2 * Time::n_intervals + Dataset::n_regressors + 2);
+    n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors + 2);
 };
 
 // Virtual method for extracting the parameters fromt the vector
 T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr& v_parameters_){
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Time::n_intervals);                 // block(0,0,n_intervals,1);  
-    T::VectorXdr betar = v_parameters_.block(Time::n_intervals, 0, Dataset::n_regressors,1);
-    T::VariableType mu1 = v_parameters_(Time::n_intervals + Dataset::n_regressors);
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
+    T::VariableType mu1 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors);
     T::VariableType mu2 = 1 - mu1;
-    T::VariableType nu = v_parameters_(Time::n_intervals + Dataset::n_regressors + 1);
-    T::VectorXdr gammak = v_parameters_.tail(Time::n_intervals);
+    T::VariableType nu = v_parameters_(Dataset::n_intervals + Dataset::n_regressors + 1);
+    T::VectorXdr gammak = v_parameters_.tail(Dataset::n_intervals);
 
     return std::make_tuple(phi, betar, mu1, mu2, nu, gammak);
 };
 
 T::TupleMatrixAType PaikModel::extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_){
     T::NumberType n_individuals_group = (*indexes_group_).size();
-    T::MatrixXdr A_ijk(n_individuals_group, Time::n_intervals);
-    T::VectorXdr A_ik(Time::n_intervals);
+    T::MatrixXdr A_ijk(n_individuals_group, Dataset::n_intervals);
+    T::VectorXdr A_ik(Dataset::n_intervals);
     T::VariableType A_i;
 
     T::IndexType index = 0;
     T::VariableType dataset_betar = 0;
     for(const auto &i: *(indexes_group_)){
         dataset_betar = Dataset::dataset.row(i) * betar_;
-        for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+        for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
             A_ijk(index,k) = Dataset::e_time(i,k) * exp(dataset_betar + phi_(k));
         }
         index += 1;
@@ -79,14 +79,14 @@ T::TupleMatrixAType PaikModel::extract_matrixA_variables(T::SharedPtrType indexe
 T::TupleDropoutType PaikModel::extract_dropout_variables(T::SharedPtrType indexes_group_){
     // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
-    T::MatrixXdr d_ijk(n_individuals_group, Time::n_intervals);
-    T::VectorXdr d_ik(Time::n_intervals);
+    T::MatrixXdr d_ijk(n_individuals_group, Dataset::n_intervals);
+    T::VectorXdr d_ik(Dataset::n_intervals);
     T::VariableType d_i;
 
     // Initialize them
     T::IndexType index = 0;
     for(const auto &i: (*indexes_group_)){
-    	for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+    	for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
     		d_ijk(index,k) = Dataset::dropout_intervals(i,k);
     	}
     	index += 1;
@@ -133,7 +133,7 @@ void PaikModel::build_loglikelihood(){
 	    T::VariableType  dataset_betar, loglik1 = 0.;
 	    for(const auto &i: *indexes_group_){
 	        dataset_betar = Dataset::dataset.row(i) * betar;
-	        for(T::NumberType k = 0; k < Time::n_intervals; ++k){
+	        for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
 	            loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
 	        }
 	    }
@@ -141,7 +141,7 @@ void PaikModel::build_loglikelihood(){
 
         // Compute the second line of the formula
 	    T::VariableType loglik2 = 0.;
-	    for(T::NumberType k = 0; k < Time::n_intervals; ++k){
+	    for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
 	        loglik2 -= (mu2/gammak(k)) * log(1 + gammak(k) * A_ik(k));
 	    }
 	
@@ -157,7 +157,7 @@ void PaikModel::build_loglikelihood(){
         
         gamma_res1 = tgamma(mu1/nu);
         arg1 = (A_i + 1/nu);
-        for(T::NumberType k = 0; k < Time::n_intervals; ++k){
+        for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
             loglik4 = 0.;
             d_ik_size = d_ik(k);
             actual_gammak = gammak(k);

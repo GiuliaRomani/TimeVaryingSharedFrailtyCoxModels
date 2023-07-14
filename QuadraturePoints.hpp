@@ -8,7 +8,13 @@
 namespace QuadraturePoints{
 using T = TypeTraits;
 
-    // QuadratureFormula with 9 points
+/**
+ * Two structs containing eah one a predefined number of nodes and weights, for the application
+ * of the Gauss-Hermite quadrature formula.
+ * Each one is composed of two arrays, one for the nodes and the other for the weights, and the number of points.
+*/
+
+    //! QuadratureFormula with 9 points
     struct Points9{
         T::NumberType n = 9;
         std::array<T::VariableType, 9> nodes{0., -0.723551018752838, 0.723551018752838, 
@@ -19,7 +25,7 @@ using T = TypeTraits;
                                                 0.004943624275537,3.960697726326e-05,3.960697726326e-05};
     };
 
-    // QuadratureFormula with 10 points
+    //! QuadratureFormula with 10 points
     struct Points10{
         T::NumberType n = 10;
         std::array<T::VariableType, 10> nodes{0.342901327223705,-0.342901327223705,1.03661082978951,

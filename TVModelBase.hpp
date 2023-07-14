@@ -3,7 +3,6 @@
 #define TIME_VARYING_MODEL_BASE
 
 // Include all necessary header files
-#include "TimeDomain.hpp"
 #include "Dataset.hpp"
 #include "Results.hpp"
 #include "ToolLikelihood.hpp"
@@ -15,10 +14,8 @@
 namespace TVModel{
 using T = TypeTraits;
 using Dataset = DatasetInfoClass::DatasetInfo;
-using Time = TimeDomainInfo::TimeDomain;
 
-class ModelBase: public Time,
-		         public Dataset{
+class ModelBase: public Dataset{
 public:
     // Base constructor
     ModelBase() = default;

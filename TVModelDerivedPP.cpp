@@ -28,10 +28,10 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
             se.resize(n_parameters);
 
             // Initialize the vector of number of parameters
-            all_n_parameters = {Time::n_intervals, Dataset::n_regressors, Time::n_intervals - 1, 1};
+            all_n_parameters = {Dataset::n_intervals, Dataset::n_regressors, Dataset::n_intervals - 1, 1};
 
             // Construct the class parameters
-            parameters = Params::Parameters(filename1, n_parameters, Time::n_intervals, Dataset::n_regressors, 
+            parameters = Params::Parameters(filename1, n_parameters, Dataset::n_intervals, Dataset::n_regressors, 
                                             n_ranges_parameters, all_n_parameters);
 
             // Build the log-likelihood and the one-directional second derivative
@@ -41,17 +41,17 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
         
 // Virtual method for computing the number of parameters
 void PowerParameterModel::compute_n_parameters() {
-    n_parameters = (2 * Time::n_intervals + Dataset::n_regressors);
+    n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors);
 };
 
 // Method for extracting the parameters from the vector of parameters
 T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Time::n_intervals);                 // block(0,0,n_intervals,1);  
-    T::VectorXdr betar = v_parameters_.block(Time::n_intervals, 0, Dataset::n_regressors, 1);
-    T::VectorXdr gammak(Time::n_intervals);
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors, 1);
+    T::VectorXdr gammak(Dataset::n_intervals);
     gammak(0) = 1.;
-    gammak.block(1,0,Time::n_intervals-1,1) = v_parameters_.block(Time::n_intervals + Dataset::n_regressors, 0, Time::n_intervals - 1, 1);
+    gammak.block(1,0,Dataset::n_intervals-1,1) = v_parameters_.block(Dataset::n_intervals + Dataset::n_regressors, 0, Dataset::n_intervals - 1, 1);
 
     T::VariableType sigma = v_parameters_(n_parameters - 1);
     sigma = sqrt(sigma);
@@ -98,7 +98,7 @@ void PowerParameterModel::build_loglikelihood(){
         T::VariableType partial1 = 0;
         for(const auto &i: *(indexes_group_)){
             dataset_betar = Dataset::dataset.row(i) * betar;
-            for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+            for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
                 loglik1 += (dataset_betar + phi(k)) * Dataset::dropout_intervals(i,k);
                 partial1 += Dataset::dropout_intervals(i,k) * gammak(k);
             }
@@ -113,7 +113,7 @@ void PowerParameterModel::build_loglikelihood(){
 
             for(const auto &i: *indexes_group_){
                 dataset_betar = Dataset::dataset.row(i) * betar;
-                for(T::IndexType k = 0; k < Time::n_intervals; ++k){
+                for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
                     partial2 += (exp(dataset_betar + phi(k) + sqrt(2) * sigma * gammak(k) * node)) * Dataset::e_time(i,k);
                 }
             }
