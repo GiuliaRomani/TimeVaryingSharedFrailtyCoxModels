@@ -31,6 +31,10 @@ public:
     T::VectorXdr get_v_intervals() const {return v_intervals;};
     */
 
+    /**
+     * Default destructor 
+    */
+    ~ TimeDomain() = default;
 
 protected:
     T::VectorXdr v_intervals;                               // Subdivison of the time-domain

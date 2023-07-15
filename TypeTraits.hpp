@@ -11,47 +11,70 @@
 #include <Eigen/Dense>
 
 struct TypeTraits{
-    // Basic types
-    using VariableType = double;                    // Type used to indicate the basic type variables
-    using NumberType = unsigned int;                // Type used to indicate a positive integer number of elements
-    using IndexType = unsigned int;                 // Type used to indicate any index of a matrix or of a vector
-    using CheckType = bool;                         // Type used to indicate any check condition
+    using VariableType = double;                    //! Type used to indicate the basic variable
+    using NumberType = unsigned int;                //! Type used to indicate a positive integer number of elements
+    using IndexType = unsigned int;                 //! Type used to indicate any index of a matrix or of a vector
+    using CheckType = bool;                         //! Type used to indicate any status condition 
 
-    // Type for file name
-    using FileNameType = std::string;               // Type used to indicate the name of the file passed to constructors
+    using FileNameType = std::string;               //! Type used to indicate the name of the file passed to constructors
 
-    // Types for methods
-    using IdType = unsigned int;                    // Type for the numeric Id of a method
-    using IdNameType = std::string;                 // Type for the name of a method
+    using IdType = unsigned int;                    //! Type of the numeric Id of a method
+    using IdNameType = std::string;                 //! Type of the name of a method
     
-    // Type for groups
-    using GroupNameType = std::string;              // Type used to indicate the name of the group an individual belongs to
+    using GroupNameType = std::string;              //! Type used to indicate the name of the clusters/groups in which the individuals are divided
 
-    // Basic containers types
-    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                                        // Type used for any dynamic vector
-    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic>;         // Type used for any dynamic matrix Eigen::RowMajor
-    using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;    // Type used for collecting all the group belonging
+    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                      //! Type used for any dynamic vector
+    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic>;         //! Type used for any dynamic matrix Eigen::RowMajor
+    using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;            //! Type used for collecting all the groups
     using MappedVectorType = Eigen::Map<VectorXdr>; 
 
-    using VectorType = std::vector<VariableType>;                               // Type used for any vector of VariableType type
-    using VectorIndexType = std::vector<IndexType>;                             // Type used to for any vector of IndexType type
-    using VectorNumberType = std::vector<NumberType>;                               // Type used for storing integers
+    using VectorType = std::vector<VariableType>;                                           //! Type used for any vector of VariableType type
+    using VectorIndexType = std::vector<IndexType>;                                         //! Type used to for any vector of IndexType type
+    using VectorNumberType = std::vector<NumberType>;                                       //! Type used for storing integers
 
-    // Other containers types
-    // Type of the factory used. It is a map, where the first element indicates the numeric id of the method and the second element
-    // is a string indicating the name of the method
+    /**
+     * Tye of the factory. It is a map, where the first element indicates the numeric id of one model and the second element its name. 
+    */
     using FactoryType = std::map<IdType, IdNameType>;     
 
-    // Type used for mapping the group name with the indexes of the individuals belonging to that group
+    /**
+     * Type used to indicate a shared pointed to a vector of indexes, where this vector containes
+     * the indexes of the dataset, of the individuals belonging to a cluster.
+    */
     using SharedPtrType = std::shared_ptr<VectorIndexType>;
+
+    /**
+     * Type used to define a map, where the first element is the name of the group and the second 
+     * element is a shared pointer to the individuals belonging to that cluster
+    */
     using MapType = std::map<GroupNameType, SharedPtrType>;
 
-    // Type used for the extraction of the parameters from the vector
+    /**
+     * Type used to indicate a tuple associated to the "CSFM with Power Parameter". It contains the type of the different 
+     * categories that constitutes the vector of parameters.
+    */
     using TuplePPType = std::tuple<VectorXdr, VectorXdr, VectorXdr, VariableType>;
+
+    /**
+     * Type used to indicate a tuple associated to the "Adapted Paik et al.'s model". It contains the type of the different 
+     * categories that constitutes the vector of parameters.
+    */
     using TuplePaikType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VectorXdr>;
+
+    /**
+     * Type used to indicate a tuple associated to the "Stochastic Time-Dependent CSFM ". It contains the type of the different 
+     * categories that constitutes the vector of parameters.
+    */
     using TupleLFType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VariableType, VariableType>;
 
+    /**
+     * Type used to indicate the tuple for the dropout variables
+    */
     using TupleDropoutType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
+
+    /**
+     * Type used to indicate the tuple for the variables of the dataset
+    */
     using TupleMatrixAType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
 
 };

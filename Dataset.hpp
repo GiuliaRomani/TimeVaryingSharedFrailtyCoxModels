@@ -52,7 +52,10 @@ public:
     void print_n_regressors() const {std::cout << n_regressors << std::endl;};
     void print_n_groups() const {std::cout << n_groups << std::endl;};
     
-
+    /**
+     * Default destructor 
+    */
+    ~ DatasetInfo() = default;
 
 protected:
     T::NumberType n_individuals;                    // Number of individuals 
