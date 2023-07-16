@@ -55,8 +55,13 @@ public:
     // Print hthe vector of parameters
     // void print_v_parameters() const {std::cout << v_parameters << std::endl;};
 
+    /**
+     * Default desctructor
+    */
+   ~ Parameters() = default;
 
-private:
+
+protected:
     T::NumberType n_parameters;                             // Number of parameters of the method
     T::NumberType n_intervals;                              // Number of intervals of the time domain
     T::NumberType n_regressors;                             // Number of regressors of the dataset

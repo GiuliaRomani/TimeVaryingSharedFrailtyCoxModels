@@ -32,13 +32,6 @@ public:
     */
     DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
-    /**
-     * Extract the vector of indexes of all individuals of the dataset belonging to a predefined cluster
-     * @param name_group group/cluster, whose individuals must be extracted
-     * @return shared pointer to the vector of indexes
-    */
-    std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
-
     
     // Print methods
     void print_dataset() const {std::cout << dataset << std::endl;};
@@ -82,6 +75,13 @@ protected:
      * @param index_individual index (of the dataset) of the individual
     */
     void add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual);
+
+    /**
+     * Extract the vector of indexes of all individuals of the dataset belonging to a predefined cluster
+     * @param name_group group/cluster, whose individuals must be extracted
+     * @return shared pointer to the vector of indexes
+    */
+    std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
 
     /**
      * Initialize the protected variable, dropout interval 

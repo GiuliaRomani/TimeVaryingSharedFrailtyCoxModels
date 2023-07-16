@@ -22,9 +22,11 @@
 
 namespace TVModel{
 using T = TypeTraits;
+using Parameters = Params::Parameters;
 
 // Class for implementing PowerParameter Model
-class PowerParameterModel final: public TVModel::ModelBase{
+class PowerParameterModel final: public TVModel::ModelBase,
+                                 public Parameters{
 public:
     /**
      * Deafult constructor
@@ -46,12 +48,8 @@ public:
     void evaluate_loglikelihood() override;
 
 private:
-    Params::Parameters parameters;                                          //! Class for the parameters
-
-    T::NumberType n_ranges_parameters = 4;                                  //! Number of different type of model parameters
-    T::NumberType n_parameters;                                             //! Number of model parameters
-    T::VectorNumberType all_n_parameters;                                   //! Vector containing the ordered number type of parameters
-    T::VectorXdr & v_parameters = parameters.get_v_parameters();            //! Vector of parameters
+    T::NumberType n_parameters;                                             //! Number of model parameters         
+    T::VectorXdr & v_parameters = Parameters::v_parameters;                 //! Vector of parameters
 
     T::IdNameType name_method = "PowerParameter";                           //! Name of this method
 
@@ -133,7 +131,8 @@ private:
 
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
-class PaikModel final: public TVModel::ModelBase{
+class PaikModel final: public TVModel::ModelBase, 
+                       public Parameters{
 public:
     /**
      * Default Constructor
@@ -155,12 +154,8 @@ public:
     void evaluate_loglikelihood() override;
 
 private:
-    Params::Parameters parameters;                                          //! Class for the parameters
-
-    T::NumberType n_ranges_parameters = 5;                                  //! Number of different types of parameters
-    T::NumberType n_parameters;                                             //! Number of parameter of the model
-    T::VectorNumberType all_n_parameters;                                   //! Vector containing the ordered number of parameter for each type        
-    T::VectorXdr& v_parameters = parameters.get_v_parameters();             //! Vector of parameters
+    T::NumberType n_parameters;                                             //! Number of parameter of the model       
+    T::VectorXdr& v_parameters = Parameters::v_parameters;                  //! Vector of parameters
 
     T::IdNameType name_method = "Paik";                                     //! Name of this method
 
@@ -250,7 +245,8 @@ private:
 
 //-----------------------------------------------------------------------------------------
 // Class for implementing LOG FRAILTY Model
-class LogFrailtyModel final: public TVModel::ModelBase{
+class LogFrailtyModel final: public TVModel::ModelBase,
+                             public Parameters{
 public:
     /**
      * Default constructor
@@ -272,14 +268,8 @@ public:
     void evaluate_loglikelihood() override;
 
 private:
-    // Complex data structure
-    Params::Parameters parameters;                                          //! Class for the parameters
-
-    // Simple data structure
-    T::NumberType n_ranges_parameters = 5;                                  //! Number of different types of model parameters
-    T::NumberType n_parameters;                                             //! Number of parameter of the model
-    T::VectorNumberType all_n_parameters;                                   // Vector of the ordered number of different type of model parameters  
-    T::VectorXdr& v_parameters = parameters.get_v_parameters();             //! Vector of parameters
+    T::NumberType n_parameters;                                             //! Number of parameter of the model 
+    T::VectorXdr& v_parameters = Parameters::v_parameters;                  //! Vector of parameters
 
     T::IdNameType name_method = "LogFrailty";                               //! Name of this method
 
@@ -336,8 +326,8 @@ private:
 
     QuadraturePoints::Points10 points10;                                    //! Struct for the ten points of the quadrature rule
     T::NumberType n_nodes = 10;                                             //! Number of points
-    std::array<T::VariableType, 10>& nodes = points10.nodes;                // Array of nodes
-    std::array<T::VariableType, 10>& weights = points10.weights;            // Array of weights
+    std::array<T::VariableType, 10>& nodes = points10.nodes;                //! Array of nodes
+    std::array<T::VariableType, 10>& weights = points10.weights;            //! Array of weights
 
     /**
      * Method for computing thr number of parameters of this model. It initalizes the private variable n_parameters

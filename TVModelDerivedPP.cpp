@@ -16,24 +16,19 @@ using T = TypeTraits;
 
 // Constructor
 PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
-        // Constructor for base class
-        ModelBase(filename1, filename2) {
-            // Constructor for current class
-            
+        // Constructor for base classes
+        ModelBase(filename1, filename2),
+        Parameters(filename1, 2 * Dataset::n_intervals + Dataset::n_regressors, 
+                    Dataset::n_intervals, Dataset::n_regressors, 4, 
+                    {Dataset::n_intervals, Dataset::n_regressors, Dataset::n_intervals - 1, 1}){
+           
             // Initialize the number of parameters
             compute_n_parameters();
             
             // Resize standard error vector and hessian diagonal according to the number of parameters
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
-
-            // Initialize the vector of number of parameters
-            all_n_parameters = {Dataset::n_intervals, Dataset::n_regressors, Dataset::n_intervals - 1, 1};
-
-            // Construct the class parameters
-            parameters = Params::Parameters(filename1, n_parameters, Dataset::n_intervals, Dataset::n_regressors, 
-                                            n_ranges_parameters, all_n_parameters);
-
+            
             // Build the log-likelihood and the one-directional second derivative
             build_loglikelihood();
             build_dd_loglikelihood();
@@ -44,10 +39,11 @@ void PowerParameterModel::compute_n_parameters() {
     n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors);
 };
 
+
 // Method for extracting the parameters from the vector of parameters
 T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors, 1);
     T::VectorXdr gammak(Dataset::n_intervals);
     gammak(0) = 1.;

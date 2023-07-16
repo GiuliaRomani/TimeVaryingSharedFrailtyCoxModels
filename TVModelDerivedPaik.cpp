@@ -16,19 +16,18 @@ using T = TypeTraits;
 // Implementations for the Paik Model
 // Constructor
 PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
-        // Base constructor for base class
-        ModelBase(filename1, filename2) {
+        // Constructor for base classes
+        ModelBase(filename1, filename2),
+        Parameters(filename1, 2 * Dataset::n_intervals + Dataset::n_regressors + 2, 
+                    Dataset::n_intervals, Dataset::n_regressors, 5, 
+                    {Dataset::n_intervals, Dataset::n_regressors, 1, 1, Dataset::n_intervals}){
+            
             // Initialize the number of parameters
             compute_n_parameters();
+
+            // Resize standard error vector and hessian diagonal according to the number of parameters
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
-
-            // Initialize the vector of number of parameters
-            all_n_parameters = {Dataset::n_intervals, Dataset::n_regressors, 1, 1, Dataset::n_intervals};
-
-            // Construct the class parameters
-            parameters = Params::Parameters(filename1, n_parameters, Dataset::n_intervals, Dataset::n_regressors, 
-                                            n_ranges_parameters, all_n_parameters);
 
             // Build the log-likelihood
             build_loglikelihood();
