@@ -136,7 +136,7 @@ T::CheckType Parameters::check_condition(const T::VectorXdr& v_parameters_) cons
     }
 
     // All the parameter values are in the correct ranges
-    std::cout << "All parameter values have correct assignment" << std::endl;
+    std::cout << "All parameter values have correct assignment." << std::endl;
     return true;
 };
 

@@ -40,20 +40,6 @@ public:
             const T::NumberType& n_regressors_, const T::NumberType& n_ranges_, 
             const T::VectorNumberType& all_n_parameters_);
     
-    /**
-     * Getter for the vector of parameters 
-     * @return Reference to the vector of parameters
-    */
-    T::VectorXdr& get_v_parameters() {return v_parameters;};
-
-    /**
-     * Getter for the number of parameters
-     * @return Reference to the number of parameters
-    */
-    T::NumberType& get_n_parameters() {return n_parameters;};
-
-    // Print hthe vector of parameters
-    // void print_v_parameters() const {std::cout << v_parameters << std::endl;};
 
     /**
      * Default desctructor
@@ -62,16 +48,16 @@ public:
 
 
 protected:
-    T::NumberType n_parameters;                             // Number of parameters of the method
-    T::NumberType n_intervals;                              // Number of intervals of the time domain
-    T::NumberType n_regressors;                             // Number of regressors of the dataset
+    T::NumberType n_parameters;                             //! Number of parameters of the method
+    T::NumberType n_intervals;                              //! Number of intervals of the time domain
+    T::NumberType n_regressors;                             //! Number of regressors of the dataset
 
-    T::VectorXdr v_parameters;                              // Vector of parameters
-    T::NumberType n_ranges;                                 // Number of ranges to be provided
-    T::VectorType range_min_parameters;                     // Vector containing the range of the parameters
-    T::VectorType range_max_parameters;                     // Vector containing the range of the parameters
-    T::VectorNumberType all_n_parameters;                   // Subdivision of the parameters
-    
+    T::VectorXdr v_parameters;                              //! Vector of parameters
+    T::NumberType n_ranges;                                 //! Number of ranges to be provided
+    T::VectorType range_min_parameters;                     //! Vector containing the range of the parameters
+    T::VectorType range_max_parameters;                     //! Vector containing the range of the parameters
+    T::VectorNumberType all_n_parameters;                   //! Subdivision of the parameters
+ 
 
     /**
      * Method for reading the range of the parameters and the optimized vector of parameters from an input file.

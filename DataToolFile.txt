@@ -24,6 +24,6 @@
 	[../]
 [../]
 
-[Method]
-	id_method = 1
+[Model]
+	id_model = 3
 [../]

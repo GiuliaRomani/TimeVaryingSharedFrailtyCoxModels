@@ -1,5 +1,6 @@
 #include "TypeTraits.hpp"
 #include "MethodFactory.hpp"
+#include "GetPot"
 //#include "QuadraturePoints.hpp"
 //#include "TimeDomain.hpp"
 //#include "Parameters.hpp"
@@ -10,6 +11,7 @@
 
 #include <iostream>
 #include <utility>
+#include <chrono>
 
 int main(){
     using T = TypeTraits;
@@ -70,8 +72,6 @@ int main(){
     //database.print_individuals_group("EngC");
     //database.print_e_time();
     */
-    
-    
 
     /*
     // Prova TVModelBase fo errors
@@ -81,17 +81,30 @@ int main(){
     modelbase.print_n_intervals();
     */
     
+    // Time-Varying Shared Frailty Cox Model
+    GetPot datafile("DataToolFile.txt");
+    T::IdType id = datafile("Model/id_model",2);
 
-    
-    // Prove the PowerParameterModel
     static T::FactoryType methods(RegisteredMethods());
     PrintMethods(methods);
-    T::IdType id = 3;
 
+    try{
     //std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DataIndividualsFile.txt");
     std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, "DataToolFile.txt", "DatasetYear2018.txt");
+
+    // Measure time elapsed
+    const auto start = std::chrono::steady_clock::now();
+
     ptrMethod -> evaluate_loglikelihood();
-    // ptrMethod -> print_extract_parameters();
+
+    const auto end = std::chrono::steady_clock::now();
+    const std::chrono::duration<T::VariableType> elapsed_seconds = end - start;
+    std::cout << "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl; 
+    }
+    catch(const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+    };
+    
     
     
     

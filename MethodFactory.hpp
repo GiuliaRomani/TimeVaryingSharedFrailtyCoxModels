@@ -9,6 +9,7 @@
 // Include libraries
 #include <memory>
 #include <iostream>
+#include <exception>
 
 
 using T = TypeTraits;
@@ -53,7 +54,7 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
  * @param args Variadic template for the arguments of the model call.
  * 
  * @return Unique pointer to base class TVModel::ModelBase, initialized with an object of the derived class, that could be TVModel::PaikModel, 
- * TVModel::PowerParameterModel, TVModel::LogFrailtyModel
+ * TVModel::PowerParameterModel, TVModel::LogFrailtyModel. If a wrong numeric id is provided, it throws an exception.
 */
 template<class ... Args>
 std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
@@ -61,7 +62,7 @@ std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Arg
         case 1:  return std::make_unique<TVModel::PaikModel>(std::forward<Args>(args) ...);
         case 2:  return std::make_unique<TVModel::PowerParameterModel>(std::forward<Args>(args) ...);
         case 3:  return std::make_unique<TVModel::LogFrailtyModel>(std::forward<Args>(args) ...);            
-        default:  throw "Not existent id method!";
+        default:  throw std::runtime_error("Not existent id method!");
     };
 };
 
