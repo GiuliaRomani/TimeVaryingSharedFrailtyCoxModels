@@ -5,7 +5,6 @@
 // Include all necessary header files
 #include "Dataset.hpp"
 #include "Results.hpp"
-#include "ToolLikelihood.hpp"
 
 // Include libraries
 #include <iostream>
@@ -53,20 +52,26 @@ public:
     /**
      * Default destructor
     */
-    ~ ModelBase() = default;
+    virtual ~ ModelBase() = default;
 
 
 protected:
     ResultsMethod::Results result;                                          //! Results of the model application
-    
-    ToolsLikelihood::Tools tool;                                            
-    T::VariableType h_dd = tool.h_dd;                                       //! Discretization step of the second derivative
+                                              
+    T::VariableType h_dd;                                                   //! Discretization step of the second derivative
 
     T::VectorXdr variance_frailty;                                          //! Vector for time-interval variance of the frailty
     T::VectorXdr sd_frailty;                                                //! Vector for time-interval sd of the frailty
     
     T::VectorXdr hessian_diag;                                              //! Diagonal of the Hessian matrix of the log-likelihood function
     T::VectorXdr se;                                                        //! Standard error of the parameters
+
+    /**
+     * Method for checking that the file from which we read the time variables really exists.
+     * Otherwise, it throws an exception.
+     * @param filename Name of the file .txt containing time variables
+    */
+    void check_filename(const T::FileNameType& filename) const;
 
     /** 
      * Virtual pure method for computing the model number of parameters

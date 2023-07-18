@@ -1,11 +1,18 @@
 #ifndef TIMEDOMAIN_HPP
 #define TIMEDOMAIN_HPP
 
-#include <iostream>
-
 // Include header files
 #include "TypeTraits.hpp"
 
+// Include libraries
+#include <iostream>
+
+/**
+ * Class for the temporal domain. 
+ * 
+ * It reads the variables from the input file using GetPot and controls everything has been defined correctly, 
+ * with no mistakes. Otherwise an exception is thrown for each occurred error.
+*/
 
 namespace TimeDomainInfo{
 using T = TypeTraits;
@@ -19,17 +26,9 @@ public:
 
     /**
      * Constructor for the initialization of the protected components of the class.
-     * @param filename name of the .txt file in which the time variables are kept
+     * @param filename Name of the .txt file in which the time variables are kept
     */
     TimeDomain(const T::FileNameType& filename) {read_from_file(filename);};
-
-    /*
-    // Print vector of intervals
-    void print_v_intervals() const {std::cout << v_intervals << std::endl;};
-    void print_n_intervals() const {std::cout << n_intervals << std::endl;};
-    T::NumberType get_n_intervals() const {return n_intervals;};
-    T::VectorXdr get_v_intervals() const {return v_intervals;};
-    */
 
     /**
      * Default destructor 
@@ -37,36 +36,35 @@ public:
     ~ TimeDomain() = default;
 
 protected:
-    T::VectorXdr v_intervals;                               // Subdivison of the time-domain
-    T::NumberType n_intervals;                              // Number of intervals in which the time-domain is splitted
+    T::VectorXdr v_intervals;                               //! Vector of time instants, that constitute the intervals of the time domain
+    T::NumberType n_intervals;                              //! Number of intervals of the time domain
 
     /**
      * Method for reading time variables from a file, using GetPot
-     * @param filename name of a .txt file containing time variables
+     * @param filename Name of a .txt file containing time variables
     */
     void read_from_file(const T::FileNameType& filename);
 
     /**
-     * Method for checking the file from which we read the time variables really exists.
-     * @param filename name of the file .txt containing time variables
-     * return boolean variable for the status of the checking operation
+     * Method for checking that the file from which we read the time variables really exists.
+     * Otherwise, it throws an exception.
+     * @param filename Name of the file .txt containing time variables
     */
-    T::CheckType check_filename(const T::FileNameType& filename) const;
+    void check_filename(const T::FileNameType& filename) const;
 
     /**
-     * Method for checking that the vector of time intervals is provided and has not null dimension.
-     * @param size dimension of the vector of time intervals
-     * return boolean variable for the status of the checking operation
+     * Method for checking that the dimension of the vector of time intervals is provided and has not null dimension.
+     * Otherwise, it throws an exception.
+     * @param Size dimension of the vector of time intervals
     */
-    T::CheckType check_condition(const T::NumberType& size) const;
+    void check_condition(const T::NumberType& size) const;
 
-    // Method for checking conditions for time bounds
     /**
-     * Method for checking the right initialization of the vector of time intervals
-     * @param v_intervals_ vector of time intervals
-     * return boolean variable for the status of the checking operation
+     * Method for checking that all the elements of the vector are really provided.
+     * Otherwise, it throws an exception.
+     * @param v_intervals_ Vector of time intervals
     */
-    T::CheckType check_condition(const T::VectorType& v_intervals_) const;
+    void check_condition(const T::VectorType& v_intervals_) const;
 
 };
 

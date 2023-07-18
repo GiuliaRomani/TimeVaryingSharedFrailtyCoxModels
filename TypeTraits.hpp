@@ -14,9 +14,10 @@ struct TypeTraits{
     using VariableType = double;                    //! Type used to indicate the basic variable
     using NumberType = unsigned int;                //! Type used to indicate a positive integer number of elements
     using IndexType = unsigned int;                 //! Type used to indicate any index of a matrix or of a vector
-    using CheckType = bool;                         //! Type used to indicate any status condition 
 
     using FileNameType = std::string;               //! Type used to indicate the name of the file passed to constructors
+
+    using ExceptionType = std::string;              //! Type of the content of an exception
 
     using IdType = unsigned int;                    //! Type of the numeric Id of a method
     using IdNameType = std::string;                 //! Type of the name of a method

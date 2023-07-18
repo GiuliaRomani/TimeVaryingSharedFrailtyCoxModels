@@ -101,7 +101,7 @@ int main(){
     const std::chrono::duration<T::VariableType> elapsed_seconds = end - start;
     std::cout << "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl; 
     }
-    catch(const std::runtime_error& e) {
+    catch(const std::exception& e) {
         std::cout << e.what() << std::endl;
     };
     

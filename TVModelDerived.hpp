@@ -47,6 +47,8 @@ public:
     */
     void evaluate_loglikelihood() override;
 
+    ~ PowerParameterModel() override = default;
+
 private:
     T::NumberType n_parameters;                                             //! Number of model parameters         
     T::VectorXdr & v_parameters = Parameters::v_parameters;                 //! Vector of parameters
@@ -152,6 +154,8 @@ public:
      * Eventually, it initializes the result class.
     */
     void evaluate_loglikelihood() override;
+
+    ~ PaikModel() override = default;
 
 private:
     T::NumberType n_parameters;                                             //! Number of parameter of the model       
@@ -266,6 +270,8 @@ public:
      * Eventually, it initializes the result class.
     */
     void evaluate_loglikelihood() override;
+
+    ~ LogFrailtyModel() override = default;
 
 private:
     T::NumberType n_parameters;                                             //! Number of parameter of the model 

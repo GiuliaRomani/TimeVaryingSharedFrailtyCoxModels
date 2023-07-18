@@ -1,10 +1,14 @@
+// Include header files
 #include "Parameters.hpp"
 #include "GetPot"
+#include "MyException.hpp"
 
+// Include libraries
 #include <limits>
 #include <cmath>
 #include <random>
 #include <fstream>
+#include <string>
 
 namespace Params{
 
@@ -29,31 +33,26 @@ Parameters::Parameters(const T::FileNameType& filename,
 
 // Method for reading data from file
 void Parameters::read_from_file(const T::FileNameType& filename){
-    if(!check_filename(filename))
-        std::exit(1);
+    check_filename(filename);
 
     GetPot datafile(filename.c_str());
 
     // Reserve some space for the vectors
-    range_min_parameters.reserve(n_ranges);
-    range_max_parameters.reserve(n_ranges);
+    range_min_parameters.resize(n_ranges);
+    range_max_parameters.resize(n_ranges);
 
     // Read the min and max range of parameters and then check they are provided
     for(T::NumberType i = 0; i < n_ranges; ++i){
-        range_min_parameters.push_back(datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
-        range_max_parameters.push_back(datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i));
+        range_min_parameters(i) = datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
+        range_max_parameters(i) = datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
-    if(!check_condition(range_min_parameters, range_max_parameters)){
-        std::exit(1);
-    }
-    
+    check_condition(range_min_parameters, range_max_parameters);
+
     // Read the parameters from the input file
     for(T::NumberType i = 0; i < n_parameters; ++i){
     	v_parameters(i) = datafile("Parameters/Values/params", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
-    if(!check_condition(v_parameters)){
-        std::exit(1);
-    }
+    check_condition(v_parameters);
 };
 
 // Method for initializing the vector containing the number of all parameters
@@ -64,8 +63,7 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
     // Check that the actual dimension coincides with the one provided
     T::NumberType n_ranges_input = all_n_parameters_.size();
     if((n_ranges != n_ranges_input)){
-        std::cerr << "Wrong dimension!" << std::endl;
-        std::exit(1);
+        throw MyException("Wrong value of number of ranges.");
     }
 
     T::NumberType n_parameters_check = 0;
@@ -78,45 +76,44 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
 
     // Check the sum of the element in this vector coincides with the n_parameters
     if(n_parameters_check != n_parameters){
-        std::cerr << "Error in all_n_parameters. Too many or not enough values." << std::endl;
-        std::exit(1);
+        throw MyException("Error in all_n_parameters. Too many or not enough values.");
     }
 };
 
 // Method for checking the filename is correct and exits
-T::CheckType Parameters::check_filename(const T::FileNameType& filename_) const{
+void Parameters::check_filename(const T::FileNameType& filename_) const{
     std::ifstream check(filename_);
     if(check.fail()){
-        std::cerr << "File called " << filename_ << " does not exist." << std::endl;
-        return false;
+        T::ExceptionType msg1 = "File ";
+        T::ExceptionType msg2 = msg1.append((filename_).c_str());
+        T::ExceptionType msg3 = msg2.append(" does not exist.");
+        throw MyException(msg3);
     }
-
-    // The filename is correctly provided
-    return true;
 };
 
 // Method for checking conditions for range bound
-T::CheckType Parameters::check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const{
+void Parameters::check_condition(const T::VectorXdr& range_min_, const T::VectorXdr& range_max_) const{
     const T::NumberType& n = range_min_.size();
     
     for(T::NumberType i = 0; i < n; ++i){
         if(std::isnan(range_min_[i]) || std::isnan(range_max_[i])){
-            std::cerr << "A parameter range is not provided." << std::endl;
-            return false;
+            T::ExceptionType msg1 = "Either the minimum or maximum range for parameter ";
+            T::ExceptionType msg2 = msg1.append(std::to_string(i));
+            T::ExceptionType msg3 = msg2.append(" is not provided.");
+            throw MyException(msg3);
         }
 
         if(range_min_[i] > range_max_[i]){
-            std::cerr << "For a parameter, min range is greater than max range" << std::endl;
-            return false;
+            T::ExceptionType msg1 = "For parameter ";
+            T::ExceptionType msg2 = msg1.append(std::to_string(i));
+            T::ExceptionType msg3 = msg2.append(", min range is greater than max range.");
+            throw MyException(msg3);
         }
     }
-
-    // All the parameters ranges are provided
-    return true;
 };
 
 // Method for checking conditions for parameters values
-T::CheckType Parameters::check_condition(const T::VectorXdr& v_parameters_) const{    
+void Parameters::check_condition(const T::VectorXdr& v_parameters_) const{    
     // Check that each single value of the parameter vector is properly defined
     T::NumberType n, actual_j = 0;
     T::VariableType a,b = 0.;
@@ -128,16 +125,14 @@ T::CheckType Parameters::check_condition(const T::VectorXdr& v_parameters_) cons
 	
 	    for(T::NumberType j = 0; j < n; ++j){
 	        if((v_parameters(actual_j) < a) || (v_parameters(actual_j) > b)){
-	     	    std::cerr << "Value of parameter in position " << actual_j << " not in the ranges" << std::endl;
-		        return false;
+                T::ExceptionType msg1 = "Value of parameter in position ";
+                T::ExceptionType msg2 = msg1.append(std::to_string(actual_j));
+                T::ExceptionType msg3 = msg2.append(" not in the range.");
+                throw MyException(msg3);
 	        }
 	        actual_j += 1;
 	    }
     }
-
-    // All the parameter values are in the correct ranges
-    std::cout << "All parameter values have correct assignment." << std::endl;
-    return true;
 };
 
 } // end namespace

@@ -9,7 +9,7 @@ namespace QuadraturePoints{
 using T = TypeTraits;
 
 /**
- * Two structs containing eah one a predefined number of nodes and weights, for the application
+ * Two structs containing each one a predefined number of nodes and weights, for the application
  * of the Gauss-Hermite quadrature formula.
  * Each one is composed of two arrays, one for the nodes and the other for the weights, and the number of points.
 */

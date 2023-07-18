@@ -1,6 +1,9 @@
+// Include header files
 #include "TimeDomain.hpp"
 #include "GetPot"
+#include "MyException.hpp"
 
+// Include libraries
 #include <limits>
 #include <cmath>
 #include <vector>
@@ -17,16 +20,14 @@ TimeDomain::TimeDomain(): n_intervals(0) {
 // Method for reading data from file using GetPot
 void TimeDomain::read_from_file(const T::FileNameType& filename){
     // Check filename is correctly provided
-    if(!check_filename(filename))
-        std::exit(1);
+    check_filename(filename);
 
     // If the filename is correctly provided
     GetPot datafile(filename.c_str());
 
     // Read number of subdivision of time domain and check correctness
     const T::NumberType size_intervals = static_cast<T::NumberType>(datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN()));
-    if(!check_condition(size_intervals))
-        std::exit(1);
+    check_condition(size_intervals);
 
     // To check if the vector of time intervals is sorted, to load it into a normal vector
     T::VectorType v_intervals_copy(size_intervals, 0.);
@@ -35,11 +36,10 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
     }
     std::sort(v_intervals_copy.begin(), v_intervals_copy.end());
 
-    if(!check_condition(v_intervals_copy)){
-        std::exit(1);
-    }
+    // Check correctness of the initialization
+    check_condition(v_intervals_copy);
 
-    // Initialize the vector of the time domain subdivision and check correctness
+    // Initialize the vector of the time domain subdivision using an Eigen trick
     v_intervals.resize(size_intervals);
     T::MappedVectorType vv_intervals(v_intervals_copy.data(), size_intervals); 
     v_intervals = vv_intervals;  
@@ -48,52 +48,42 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
     n_intervals = size_intervals - 1;
 };
 
-// Method for checking the filname is correct
-T::CheckType TimeDomain::check_filename(const T::FileNameType& filename_) const{
+// Method for checking the filename is correct and exists
+void TimeDomain::check_filename(const T::FileNameType& filename_) const{
     std::ifstream check(filename_);
     if(check.fail()){
-        std::cerr << "File called " << filename_ << " does not exist." << std::endl;
-        return false;
+        T::ExceptionType msg1 = "File ";
+        T::ExceptionType msg2 = msg1.append((filename_).c_str());
+        T::ExceptionType msg3 = msg2.append(" does not exist.");
+        //throw MyException("File provided does not exist.");
+        throw MyException(msg3);
     }
+};
 
-    // The filename is correctly provided
-    return true;
-}
-
-// Method for checking condition for the number of intervals
-T::CheckType TimeDomain::check_condition(const T::NumberType& size_int) const{
+// Method for checking that the number of elements of the time vector is not null and is really provided
+void TimeDomain::check_condition(const T::NumberType& size_int) const{
     if(size_int == 0){
-        std::cerr << "Null number of subdivisions of time domain." << std::endl;
-        return false; 
+        throw MyException("Null number of subdivisions of time domain.");
     }
     if(std::isnan(size_int)){
-        std::cerr << "Number of subdivision of the time domain not provided." << std::endl;
-        return false;
+        throw MyException("Number of subdivision of the time domain not provided.");
     }
-
-    // If number of subdivision of time domain is correctly provided
-    return true;
 };
 
 // Method for checking conditions for time bounds
-T::CheckType TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
+void TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
     // If the entire vector is not provided, the first element will be NaN.
     if(std::isnan(*(v_intervals_.begin()))){
-        std::cerr << "List of time intervals is not provided" << std::endl;
-        return false;
+        throw MyException("Vector of time intervals is not provided.");
     }
 
     // If the vector is provided but with a different dimension from the one 
-    // indicated, the programs aborts
+    // indicated, the programs thorws an exception
     for(const auto & t: v_intervals_){
         if(std::isnan(t)){
-            std::cerr << "Wrong information about the lenght of the time intervals vector" << std::endl;
-            return false;
+            throw MyException("Wrong information about the lenght of the time intervals vector");
         }
     }
-
-    // If both time bounds are correctly provided
-    return true;
 };
 
 

@@ -9,7 +9,7 @@
 #include <iostream>
 
 /**
- * DatasetInfo class contains the dataset and other basic variables necessary to the execution of the time-varying model.
+ * DatasetInfo class contains the dataset and other basic variables necessary to the execution of the time-varying models.
 */
 
 
@@ -26,25 +26,12 @@ public:
     DatasetInfo() = default;
 
     /**
-     * Constructor for the class. Initializes all the protected variables
+     * Constructor for the class. It initializes the variables starting from two input files
      * @param filename1 file .txt containing time-variables
      * @param filename2 file .txt containing the dataset
     */
     DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2);
-
-    
-    // Print methods
-    void print_dataset() const {std::cout << dataset << std::endl;};
-    void print_dataset_group() const {std::cout << dataset_group << std::endl;};
-    void print_time_to_event() const {std::cout << time_to_event << std::endl;};
-    void print_dropout_intervals() const {std::cout << dropout_intervals << std::endl;};
-    void print_map_groups() const;
-    void print_individuals_group(const T::GroupNameType& name_group) const;
-    void print_e_time() const {std::cout << e_time << std::endl;};
-    void print_n_individuals() const {std::cout << n_individuals << std::endl;};
-    void print_n_regressors() const {std::cout << n_regressors << std::endl;};
-    void print_n_groups() const {std::cout << n_groups << std::endl;};
-    
+  
     /**
      * Default destructor 
     */
@@ -65,36 +52,36 @@ protected:
 
     /**
      * Method for reading data from file and initializing the protected data structure 
-     * @param filename2 name of the .txt file containing the dataset
+     * @param filename2 Name of the .txt file containing the dataset
     */
     void read_from_file(const T::FileNameType& filename2);
 
     /**
      * Add the index (of the dataset) of an individual belonging to a precise group, to the vector containing all the individuals of the same group
-     * @param name_group name of the group the individual belong to
-     * @param index_individual index (of the dataset) of the individual
+     * @param name_group Name of the group the individual belong to
+     * @param index_individual Index (of the dataset) of the individual
     */
     void add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual);
 
     /**
-     * Extract the vector of indexes of all individuals of the dataset belonging to a predefined cluster
-     * @param name_group group/cluster, whose individuals must be extracted
-     * @return shared pointer to the vector of indexes
+     * Extract the vector of dataset indexes of all individuals belonging to a predefined cluster
+     * @param name_group Group/cluster, whose individuals must be extracted
+     * @return Shared pointer to the vector of indexes
     */
     std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
 
     /**
-     * Initialize the protected variable, dropout interval 
+     * Initialize the temporal dropout variable d_ijk
     */
     void initialize_dropout_intervals();
 
     /**
-     * Initialize the protected variable, e_time using the method e_time_function(...)
+     * Initialize the temporal variable e_time using the method e_time_function(...)
     */
     void initialize_e_time();
 
     /**
-     * Method for defining the individual and interval e_time variable, according to its definition provided in the references
+     * Method for defining the individual and interval e_time variable, according to its definition provided in the reference
      * @param time_t individual time-to-event
      * @param v_k left boundary of the k-th interval
      * @param v_kk right boundary of the k-th interval

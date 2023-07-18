@@ -20,7 +20,6 @@ public:
 
     /**
     * Constructor: It initializes the private components of the Results class
-    * 
     * @param name_model_ The name of the used time-varying model
     * @param n_parameters_ The number of parameters 
     * @param optimal_parameters_ The vector formed by the optimal parameters, with dimension equal to n_parameters_

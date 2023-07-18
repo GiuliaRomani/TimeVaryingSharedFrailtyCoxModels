@@ -123,28 +123,6 @@ T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::Variable
     return result;
 };
 
-// Method for print the element of the map
-void DatasetInfo::print_map_groups() const{
-    for(auto& [name_group, ptr_vector_index]: map_groups){
-        std::cout << "In group " << name_group << " individuals with index:"<<std::endl;
-        for(auto& index: *ptr_vector_index){
-            std::cout << index << std::endl;
-        }
-    }
-};
-
-// Method for ptinting the element of a single group 
-void DatasetInfo::print_individuals_group(const T::GroupNameType& name_group) const{
-    std::shared_ptr<T::VectorIndexType> individuals_group = extract_individuals_group(name_group);
-    if(individuals_group == nullptr)
-        std::cerr << "No group with this name!" << std::endl;
-    else{
-        std::cout << "Indexes in group " << name_group << std::endl;
-        for(const auto i: *individuals_group)
-            std::cout << i << std::endl;
-    }
-};
-
 // Extract the shared pointer to the name group in the map of groups
 std::shared_ptr<T::VectorIndexType> DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{
     T::MapType::const_iterator group_position = map_groups.find(name_group);
