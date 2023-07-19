@@ -98,14 +98,11 @@ void Parameters::check_condition(const T::VectorXdr& range_min_, const T::Vector
     
     for(T::NumberType i = 0; i < n; ++i){
         if(std::isnan(range_min_[i]) || std::isnan(range_max_[i])){
-            T::ExceptionType msg1 = "Either the minimum or maximum range for parameter ";
-            T::ExceptionType msg2 = msg1.append(std::to_string(i));
-            T::ExceptionType msg3 = msg2.append(" is not provided.");
-            throw MyException(msg3);
+            throw MyException("Either the minimum or maximum range at least a category is not provided ");
         }
 
         if(range_min_[i] > range_max_[i]){
-            T::ExceptionType msg1 = "For parameter ";
+            T::ExceptionType msg1 = "For category ";
             T::ExceptionType msg2 = msg1.append(std::to_string(i));
             T::ExceptionType msg3 = msg2.append(", min range is greater than max range.");
             throw MyException(msg3);
@@ -125,7 +122,10 @@ void Parameters::check_condition(const T::VectorXdr& v_parameters_) const{
 	    b = range_max_parameters[i];
 	
 	    for(T::NumberType j = 0; j < n; ++j){
-	        if((v_parameters(actual_j) < a) || (v_parameters(actual_j) > b)){
+	    	if(std::isnan(v_parameters(actual_j))){
+                throw MyException("At least one parameter is not provided ");
+	    	}
+	        else if((v_parameters(actual_j) < a) || (v_parameters(actual_j) > b)){
                 T::ExceptionType msg1 = "Value of parameter in position ";
                 T::ExceptionType msg2 = msg1.append(std::to_string(actual_j));
                 T::ExceptionType msg3 = msg2.append(" not in the range.");
