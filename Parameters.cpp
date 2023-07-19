@@ -13,7 +13,7 @@
 namespace Params{
 
 // Constructor
-Parameters::Parameters(const T::FileNameType& filename, 
+Parameters::Parameters(const T::FileNameType& filename1_, 
             const T::NumberType& n_parameters_, const T::NumberType& n_intervals_, 
             const T::NumberType& n_regressors_, const T::NumberType& n_ranges_,
             const T::VectorNumberType& all_n_parameters_):
@@ -21,6 +21,9 @@ Parameters::Parameters(const T::FileNameType& filename,
             n_intervals(n_intervals_),
             n_regressors(n_regressors_),
             n_ranges(n_ranges_){
+                // Check the input file really exists
+                check_filename(filename1_);
+
             	// Resize the vector of parameters
             	v_parameters.resize(n_parameters);	
             	
@@ -28,14 +31,23 @@ Parameters::Parameters(const T::FileNameType& filename,
                 initialize_all_n_parameters(all_n_parameters_);
                 
                 // Read data from file
-                read_from_file(filename);
+                read_from_file(filename1_);
+};
+
+// Method for checking the filename is correct and exits
+void Parameters::check_filename(const T::FileNameType& filename1_) const{
+    std::ifstream check(filename1_);
+    if(check.fail()){
+        T::ExceptionType msg1 = "File ";
+        T::ExceptionType msg2 = msg1.append((filename1_).c_str());
+        T::ExceptionType msg3 = msg2.append(" does not exist.");
+        throw MyException(msg3);
+    }
 };
 
 // Method for reading data from file
-void Parameters::read_from_file(const T::FileNameType& filename){
-    check_filename(filename);
-
-    GetPot datafile(filename.c_str());
+void Parameters::read_from_file(const T::FileNameType& filename1_){
+    GetPot datafile(filename1_.c_str());
 
     // Reserve some space for the vectors
     range_min_parameters.resize(n_ranges);
@@ -77,17 +89,6 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
     // Check the sum of the element in this vector coincides with the n_parameters
     if(n_parameters_check != n_parameters){
         throw MyException("Error in all_n_parameters. Too many or not enough values.");
-    }
-};
-
-// Method for checking the filename is correct and exits
-void Parameters::check_filename(const T::FileNameType& filename_) const{
-    std::ifstream check(filename_);
-    if(check.fail()){
-        T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename_).c_str());
-        T::ExceptionType msg3 = msg2.append(" does not exist.");
-        throw MyException(msg3);
     }
 };
 

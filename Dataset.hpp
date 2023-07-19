@@ -52,9 +52,15 @@ protected:
 
     /**
      * Method for reading data from file and initializing the protected data structure 
-     * @param filename2 Name of the .txt file containing the dataset
+     * @param filename2_ Name of the .txt file containing the dataset
     */
-    void read_from_file(const T::FileNameType& filename2);
+    void read_from_file(const T::FileNameType& filename2_);
+
+    /**
+     * Method for checking the file provided in input really exists
+     * @param filename2_ Name of .txt file 
+    */
+    void check_filename(const T::FileNameType& filename2_) const;
 
     /**
      * Add the index (of the dataset) of an individual belonging to a precise group, to the vector containing all the individuals of the same group

@@ -26,9 +26,9 @@ public:
 
     /**
      * Constructor for the initialization of the protected components of the class.
-     * @param filename Name of the .txt file in which the time variables are kept
+     * @param filename1_ Name of the .txt file in which the time variables are kept
     */
-    TimeDomain(const T::FileNameType& filename) {read_from_file(filename);};
+    TimeDomain(const T::FileNameType& filename1_);
 
     /**
      * Default destructor 
@@ -41,21 +41,21 @@ protected:
 
     /**
      * Method for reading time variables from a file, using GetPot
-     * @param filename Name of a .txt file containing time variables
+     * @param filename1_ Name of a .txt file containing time variables
     */
-    void read_from_file(const T::FileNameType& filename);
+    void read_from_file(const T::FileNameType& filename1_);
 
     /**
      * Method for checking that the file from which we read the time variables really exists.
      * Otherwise, it throws an exception.
-     * @param filename Name of the file .txt containing time variables
+     * @param filename1_ Name of the file .txt containing time variables
     */
-    void check_filename(const T::FileNameType& filename) const;
+    void check_filename(const T::FileNameType& filename1_) const;
 
     /**
      * Method for checking that the dimension of the vector of time intervals is provided and has not null dimension.
      * Otherwise, it throws an exception.
-     * @param Size dimension of the vector of time intervals
+     * @param size dimension of the vector of time intervals
     */
     void check_condition(const T::NumberType& size) const;
 

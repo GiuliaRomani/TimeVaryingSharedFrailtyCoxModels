@@ -17,13 +17,17 @@ TimeDomain::TimeDomain(): n_intervals(0) {
     v_intervals.resize(n_intervals);
 };
 
-// Method for reading data from file using GetPot
-void TimeDomain::read_from_file(const T::FileNameType& filename){
-    // Check filename is correctly provided
-    check_filename(filename);
+TimeDomain::TimeDomain(const T::FileNameType& filename1_) {
+    // Check the input file exists
+    check_filename(filename1_);
+    
+    // Once sure it exists
+    read_from_file(filename1_);
+};
 
-    // If the filename is correctly provided
-    GetPot datafile(filename.c_str());
+// Method for reading data from file using GetPot
+void TimeDomain::read_from_file(const T::FileNameType& filename1_){
+    GetPot datafile(filename1_.c_str());
 
     // Read number of subdivision of time domain and check correctness
     const T::NumberType size_intervals = static_cast<T::NumberType>(datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN()));
@@ -49,11 +53,11 @@ void TimeDomain::read_from_file(const T::FileNameType& filename){
 };
 
 // Method for checking the filename is correct and exists
-void TimeDomain::check_filename(const T::FileNameType& filename_) const{
-    std::ifstream check(filename_);
+void TimeDomain::check_filename(const T::FileNameType& filename1_) const{
+    std::ifstream check(filename1_);
     if(check.fail()){
         T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename_).c_str());
+        T::ExceptionType msg2 = msg1.append((filename1_).c_str());
         T::ExceptionType msg3 = msg2.append(" does not exist.");
         //throw MyException("File provided does not exist.");
         throw MyException(msg3);

@@ -47,7 +47,6 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
     std::cout << std::endl;
 };
 
-
 /**
  * This method return a unique pointer to one of the time-varying model present in the FactoryType object.
  * 

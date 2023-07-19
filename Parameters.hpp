@@ -29,14 +29,14 @@ public:
 
     /**
      * Constructor
-     * @param filename Name of the file where some parameters-related variables are located and extracted
+     * @param filename1_ Name of the file where some parameters-related variables are located and extracted
      * @param n_parameters_ Number of model parameters. Once the time-varying model is chosen, the number of parameters is defined
      * @param n_intervals_ Number of intervals of the temporal domain
      * @param n_regressors_ Number of regressors of the dataset
      * @param n_ranges_ Number of different type of parameters constituting the vector
      * @param all_n_parameters Vector containing the numerosity associated to each type of parameter.
     */
-    Parameters(const T::FileNameType& filename, 
+    Parameters(const T::FileNameType& filename1_, 
             const T::NumberType& n_parameters_, const T::NumberType& n_intervals_, 
             const T::NumberType& n_regressors_, const T::NumberType& n_ranges_, 
             const T::VectorNumberType& all_n_parameters_);
@@ -61,24 +61,24 @@ protected:
  
 
     /**
+     * Method for checking the existence of the file passed as input
+     * @param filename1_ Name of the file, whose existence in the directory must be checked
+    */
+    void check_filename(const T::FileNameType& filename1_) const;
+
+    /**
      * Method for reading the range of the parameters and the optimized vector of parameters from an input file.
      * Some controls on the meaningfull anc correctness of the initialized values are done.
-     * @param filename Name of a .txt file
+     * @param filename1_ Name of a .txt file
     */
-    void read_from_file(const T::FileNameType& filename);   
+    void read_from_file(const T::FileNameType& filename1_);   
 
     /**
      * Simple method for copying the content of the vector of parameters into another vector.
      * Here we also check that the overall number of parameters coincides with the sum of the element inside this vector
-     * @param all_n_parameters Vector whose content must be copied
+     * @param all_n_parameters_ Vector whose content must be copied
     */
     void initialize_all_n_parameters(const T::VectorNumberType& all_n_parameters_);
-
-    /**
-     * Method for checking the existence of the file passed as input
-     * @param filename Name of the file, whose existence in the directory must be checked
-    */
-    void check_filename(const T::FileNameType& filename_) const;
 
     /**
      * This method controls that the vector of the minimum and maximum range of the parameters has been correctly 

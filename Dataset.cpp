@@ -1,18 +1,25 @@
+// Include header files
 #include "Dataset.hpp"
 #include "GetPot"
+#include "MyException.hpp"
 
+// Include libraries
 #include <sstream>
 #include <memory>
 
 namespace DatasetInfoClass{
     
 // Constructor
-DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2): Time(filename1) {
+DatasetInfo::DatasetInfo(const T::FileNameType& filename1_, const T::FileNameType& filename2_): 
+Time(filename1_) {
+    // Check the second inut fle exists
+    check_filename(filename2_);
+
     // Initialize the number of groups to zero
     n_groups = 0;
 
     // Initialize the rest of the class
-    read_from_file(filename2);
+    read_from_file(filename2_);
 
     // Initialize the dropout_intervals variable
     initialize_dropout_intervals();
@@ -22,11 +29,11 @@ DatasetInfo::DatasetInfo(const T::FileNameType& filename1, const T::FileNameType
 };
 
 // Method for reading from file
-void DatasetInfo::read_from_file(const T::FileNameType& filename2){
+void DatasetInfo::read_from_file(const T::FileNameType& filename2_){
     T::CheckType first_line = false;
     T::NumberType i = 0;                                // Number of row
     T::NumberType j = 0;                                // Number of column
-    std::ifstream filename(filename2.c_str());
+    std::ifstream filename(filename2_.c_str());
 
     while(!filename.fail() & !filename.eof()){
         std::string line;
@@ -63,6 +70,18 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2){
             j = 0;
             i += 1;
         }
+    }
+};
+
+// Method for checking the filename is correct and exists
+void DatasetInfo::check_filename(const T::FileNameType& filename2_) const{
+    std::ifstream check(filename2_);
+    if(check.fail()){
+        T::ExceptionType msg1 = "File ";
+        T::ExceptionType msg2 = msg1.append((filename2_).c_str());
+        T::ExceptionType msg3 = msg2.append(" does not exist.");
+        //throw MyException("File provided does not exist.");
+        throw MyException(msg3);
     }
 };
 

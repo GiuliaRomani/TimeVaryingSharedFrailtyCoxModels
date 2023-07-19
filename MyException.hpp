@@ -44,7 +44,7 @@ public:
     */
     virtual ~ MyException() noexcept = default;
 
-private:
+protected:
     T::ExceptionType message;           //! Content of the exception
 };
 
