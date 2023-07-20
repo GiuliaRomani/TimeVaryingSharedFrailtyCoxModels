@@ -101,15 +101,15 @@ protected:
      * vector of parameters
      * @param v_parameters_ Optimal vector of parameters
     */
-    virtual void compute_se(T::VectorXdr& v_parameters) = 0;
+    virtual void compute_se(T::VectorXdr& v_parameters_) = 0;
     
 
-    // Virtual method to derive the interval variance of the frailty
     /**
      * Virtual pure method for initializing and comuting the standard deviation 
      * of the frailty variance
+     * @param v_parameters_ Optimal vector of parameters
     */
-    //virtual void compute_sd_frailty() = 0;
+    virtual void compute_sd_frailty(T::VectorXdr& v_parameters_) = 0;
 
 };
 

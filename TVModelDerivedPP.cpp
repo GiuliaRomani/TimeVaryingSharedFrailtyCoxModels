@@ -50,7 +50,6 @@ T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_par
     gammak.block(1,0,Dataset::n_intervals-1,1) = v_parameters_.block(Dataset::n_intervals + Dataset::n_regressors, 0, Dataset::n_intervals - 1, 1);
 
     T::VariableType sigma = v_parameters_(n_parameters - 1);
-    sigma = sqrt(sigma);
 
     return std::make_tuple(phi, betar, gammak, sigma);
 };
@@ -146,7 +145,7 @@ void PowerParameterModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
     }
 };
 
-// compute the standard error of the parameters
+// Compute the standard error of the parameters
 void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
      // Initialize the diagonal of the hessian matrix
      compute_hessian_diagonal(v_parameters_);
@@ -161,6 +160,18 @@ void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
+// Compute the standard deviation of the frailty
+void PowerParameterModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+    T::TuplePPType extracted_parameters = extract_parameters(v_parameters_);
+    auto gammak = std::get<2>(extracted_parameters);
+    auto sigma = std::get<3>(extracted_parameters);
+
+    for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
+        sd_frailty(k) = sigma * gammak(k);
+        variance_frailty(k) = pow(sd_frailty(k), 2);
+    }
+};
+
 
 // Method for builfing the result, provided the optimal vector
 void PowerParameterModel::evaluate_loglikelihood(){
@@ -169,8 +180,11 @@ void PowerParameterModel::evaluate_loglikelihood(){
     // Initialize the standard error of the parameters
     compute_se(v_parameters);
 
+    // Compute the standard deviaiton of the frailty
+    compute_sd_frailty(v_parameters);
+
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty);
     result.print_results();
 };
 

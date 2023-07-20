@@ -162,8 +162,9 @@ void LogFrailtyModel::build_loglikelihood(){
 
         // Extract parameters and variables from the vectors
         auto [phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r] = extract_parameters(v_parameters_);
-        auto d_ij = std::get<1>(extract_dropout_variables(indexes_group_));
-        auto d_i = std::get<2>(extract_dropout_variables(indexes_group_));
+        T::TupleDropoutType extracted_dropout = extract_dropout_variables(indexes_group_);
+        auto d_ij = std::get<1>(extracted_dropout);
+        auto d_i = std::get<2>(extracted_dropout);
         auto time_to_event_group(extract_time_to_event(indexes_group_));
 
         // Define some useful variables
@@ -258,14 +259,34 @@ void LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
+void LogFrailtyModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+    T::TupleLFType extracted_parameters = extract_parameters(v_parameters_);
+    auto sigma2c = std::get<2>(extracted_parameters);
+    auto sigmacb = std::get<3>(extracted_parameters);
+    auto sigma2b = std::get<4>(extracted_parameters);
+
+    T::VariableType instant = 0.;
+
+    for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
+        instant = Dataset::v_intervals(k);
+        
+        variance_frailty(k) = sigma2c + sigma2b * instant * instant + 2 * sigmacb * instant;
+        sd_frailty(k) = std::sqrt(variance_frailty(k));
+    }
+}
+
 // Method for executing the log-likelihood
 void LogFrailtyModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_lf = ll_lf(v_parameters);
 
+    // Compute the standard error of the parameters
     compute_se(v_parameters);
+
+    // Compute the stardard deviation of the frailty
+    compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty);
     result.print_results();
 };
 

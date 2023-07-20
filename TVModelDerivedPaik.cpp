@@ -219,14 +219,31 @@ void PaikModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
+void PaikModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+    T::TuplePaikType extracted_parameters = extract_parameters(v_parameters_);
+    auto mu1 = std::get<2>(extracted_parameters);
+    auto mu2 = std::get<3>(extracted_parameters);
+    auto nu = std::get<4>(extracted_parameters);
+    auto gammak = std::get<5>(extracted_parameters);
+
+    for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
+        variance_frailty(k) = mu1 * nu + mu2 * gammak(k);
+        sd_frailty(k) = std::sqrt(variance_frailty(k));
+    }
+}
+
 // Method for executing the log-likelihood
 void PaikModel::evaluate_loglikelihood(){
     T::VariableType optimal_ll_paik = ll_paik(v_parameters);
 
+    // Compute the standard error of the parameters
     compute_se(v_parameters);
+
+    // Compute the standard deviation fo the frailty
+    compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty);
     result.print_results();
 };
 

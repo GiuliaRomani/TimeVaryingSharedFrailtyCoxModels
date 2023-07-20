@@ -47,7 +47,7 @@ public:
     */
     void evaluate_loglikelihood() override;
 
-    ~ PowerParameterModel() override = default;
+    virtual ~ PowerParameterModel() = default;
 
 private:
     T::NumberType n_parameters;                                             //! Number of model parameters         
@@ -114,9 +114,15 @@ private:
 
     /**
      * Method for computing the standard error of the parameters
-     * @param v_parameters_ Vector of parameers, whose standard error must be produced
+     * @param v_parameters_ Vector of parameters, whose standard error must be produced
     */
     void compute_se(T::VectorXdr& v_parameters) override;
+
+    /**
+     * Method for computing the standard deviation of the frailty 
+     * @param v_parameters_ Vector of parameters
+    */
+    void compute_sd_frailty(T::VectorXdr& v_parameters_) override;
 
     /**
      * Method for building the model log-likelihood function.
@@ -155,7 +161,7 @@ public:
     */
     void evaluate_loglikelihood() override;
 
-    ~ PaikModel() override = default;
+    virtual ~ PaikModel() = default;
 
 private:
     T::NumberType n_parameters;                                             //! Number of parameter of the model       
@@ -210,6 +216,12 @@ private:
      * @param v_parameters_ Vector of parameers, whose standard error must be produced
     */
     void compute_se(T::VectorXdr& v_parameters_);
+
+    /**
+     * Method for computing the standard deviation of the frailty 
+     * @param v_parameters_ Vector of parameters
+    */
+    void compute_sd_frailty(T::VectorXdr& v_parameters_) override;
     
     /**
      * Method for extracting each single parameter of the model or a single vector of similar parameters
@@ -271,7 +283,7 @@ public:
     */
     void evaluate_loglikelihood() override;
 
-    ~ LogFrailtyModel() override = default;
+    virtual ~ LogFrailtyModel() = default;
 
 private:
     T::NumberType n_parameters;                                             //! Number of parameter of the model 
@@ -351,6 +363,12 @@ private:
      * @param v_parameters_ Vector of parameers, whose standard error must be produced
     */
     void compute_se(T::VectorXdr& v_parameters_);
+
+    /**
+     * Method for computing the standard deviation of the frailty 
+     * @param v_parameters_ Vector of parameters
+    */
+    void compute_sd_frailty(T::VectorXdr& v_parameters_) override;
     
     /**
      * Method for extracting each single parameter of the model or a single vector of similar parameters

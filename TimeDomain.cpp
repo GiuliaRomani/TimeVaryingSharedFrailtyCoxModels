@@ -30,7 +30,7 @@ void TimeDomain::read_from_file(const T::FileNameType& filename1_){
     GetPot datafile(filename1_.c_str());
 
     // Read number of subdivision of time domain and check correctness
-    const T::NumberType size_intervals = static_cast<T::NumberType>(datafile("TimeDomain/length_vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN()));
+    const T::NumberType size_intervals = static_cast<T::NumberType>(datafile("TimeDomain/length_vector_intervals", 0));
     check_condition(size_intervals);
 
     // To check if the vector of time intervals is sorted, to load it into a normal vector
@@ -67,10 +67,7 @@ void TimeDomain::check_filename(const T::FileNameType& filename1_) const{
 // Method for checking that the number of elements of the time vector is not null and is really provided
 void TimeDomain::check_condition(const T::NumberType& size_int) const{
     if(size_int == 0){
-        throw MyException("Null number of subdivisions of time domain.");
-    }
-    if(std::isnan(size_int)){
-        throw MyException("Number of subdivision of the time domain not provided.");
+        throw MyException("Null or not provided number of subdivisions of time domain.");
     }
 };
 

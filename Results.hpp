@@ -27,7 +27,7 @@ public:
     * @param se_ The vector of standard error of the optimal_parameters_
     */
     Results(const T::IdNameType& name_model_, const T::NumberType n_parameters_,  const T::VectorXdr& optimal_parameters_, 
-            const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_);
+            const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_, const T::VectorXdr& sd_frailty_);
 
 
     /**
@@ -37,13 +37,14 @@ public:
 
 
 private:
-    T::IdNameType name_model;				            // Name of the model
+    T::IdNameType name_model;				            //! Name of the model
 
-    T::NumberType n_parameters;                         // Number of parameters of the model
-    T::VectorXdr optimal_parameters;                    // Parameters obtained by the maximization procedure
-    T::VariableType optimal_loglikelihood;              // Value of the maximized log-likelihood
-    T::VariableType AIC;                                // AKAIKE INFORMATION CRITERION
-    T::VectorXdr se;					                // Standard error of the parameters
+    T::NumberType n_parameters;                         //! Number of parameters of the model
+    T::VectorXdr optimal_parameters;                    //! Parameters obtained by the maximization procedure
+    T::VariableType optimal_loglikelihood;              //! Value of the maximized log-likelihood
+    T::VariableType AIC;                                //! AKAIKE INFORMATION CRITERION
+    T::VectorXdr se;					                //! Standard error of the parameters
+    T::VectorXdr sd_frailty;                            //! Standard deviation of the frailty
 
 
     /**

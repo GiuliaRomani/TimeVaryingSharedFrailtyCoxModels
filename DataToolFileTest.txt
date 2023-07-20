@@ -3,7 +3,7 @@
 #------------------------------------------------------------------
 
 [TimeDomain]
-	length_vector_intervals = 9 
+	length_vector_intervals = 9
 	vector_intervals = '1.0 1.7 2.2 3 3.5 4.2 5 5.5 6'
 [../]
 
