@@ -33,6 +33,9 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
             build_loglikelihood();
             build_dd_loglikelihood();
 
+            if(n_threads > 1)
+                build_loglikelihood_parallel();
+
 };
         
 // Virtual method for computing the number of parameters
@@ -183,6 +186,32 @@ void PaikModel::build_loglikelihood(){
     };
 };
 
+void PaikModel::build_loglikelihood_parallel() {
+    ll_paik_parallel = [this] (T::VectorXdr& v_parameters_){
+        T::VariableType log_likelihood = 0;
+        T::SharedPtrType indexes_group = nullptr;
+        T::NumberType id = 0;
+
+        // For each group, compute the likelihood and then sum them
+        T::MapType::iterator it_map;
+        T::MapType::iterator it_map_end = Dataset::map_groups.end();
+
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(static) reduction(+:log_likelihood)
+        for(T::NumberType i = 0; i < n_groups; ++i){
+            if(it_map != it_map_end){
+                it_map = Dataset::map_groups.begin();
+                std::advance(it_map, i);
+                indexes_group = it_map->second;
+
+                log_likelihood += ll_group_paik(v_parameters_, indexes_group);
+
+                indexes_group = nullptr;
+            }           
+        }
+        return log_likelihood;
+    };
+};
+
 // Method for building the second derivative of the function wrt one direction
 void PaikModel::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
@@ -195,8 +224,13 @@ void PaikModel::build_dd_loglikelihood(){
         T::VectorXdr v_parameters_minus = v_parameters_;
         v_parameters_plus(index_) = valueplush;
         v_parameters_minus(index_) = valueminush;
-        
-        T::VariableType result = (ll_paik(v_parameters_plus) + ll_paik(v_parameters_minus) - 2*ll_paik(v_parameters_))/(h_dd * h_dd);
+
+        T::VariableType result = 0.;
+        if(n_threads == 1)
+            result = (ll_paik(v_parameters_plus) + ll_paik(v_parameters_minus) - 2*ll_paik(v_parameters_))/(h_dd * h_dd);
+        else
+            result = (ll_paik_parallel(v_parameters_plus) + ll_paik_parallel(v_parameters_minus) - 2*ll_paik_parallel(v_parameters_))/(h_dd * h_dd);
+
         return result;
     };
 };
@@ -234,7 +268,11 @@ void PaikModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 
 // Method for executing the log-likelihood
 void PaikModel::evaluate_loglikelihood(){
-    T::VariableType optimal_ll_paik = ll_paik(v_parameters);
+    T::VariableType optimal_ll_paik = 0.;
+    if(n_threads == 1)
+        optimal_ll_paik = ll_paik(v_parameters);
+    else
+        optimal_ll_paik = ll_paik_parallel(v_parameters);
 
     // Compute the standard error of the parameters
     compute_se(v_parameters);
@@ -243,7 +281,7 @@ void PaikModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty, n_threads);
     result.print_results();
 };
 

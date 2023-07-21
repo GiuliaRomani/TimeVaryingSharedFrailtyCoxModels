@@ -32,6 +32,9 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
             build_loglikelihood();
             build_dd_loglikelihood();
 
+            if(n_threads > 1)
+                build_loglikelihood_parallel();
+
 };
         
 // Virtual method for computing the number of parameters
@@ -223,6 +226,35 @@ void LogFrailtyModel::build_loglikelihood(){
     };
 };
 
+// Method for building the global log-likelihood in a parallel version
+void LogFrailtyModel::build_loglikelihood_parallel(){
+    ll_lf_parallel = [this] (T::VectorXdr& v_parameters_){
+        T::VariableType log_likelihood = 0;
+        T::SharedPtrType indexes_group = nullptr;
+
+        // For each group, compute the likelihood and then sum them
+        T::MapType::iterator it_map;
+        T::MapType::iterator it_map_end = Dataset::map_groups.end();
+
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(dynamic) reduction(+:log_likelihood)
+        for(T::NumberType i = 0; i < n_groups; ++i){
+            if(it_map != it_map_end){
+                it_map = Dataset::map_groups.begin();
+                std::advance(it_map, i);
+                indexes_group = it_map->second;
+
+                log_likelihood += ll_group_lf(v_parameters_, indexes_group);
+
+                indexes_group = nullptr;
+            }           
+        }
+
+        // Subtract the constant term
+        log_likelihood -= (Dataset::n_groups)*log(M_PI);;
+        return log_likelihood;
+    };
+}
+
 // Method for building the second derivative of the function wrt one direction
 void LogFrailtyModel::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
@@ -277,7 +309,11 @@ void LogFrailtyModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 
 // Method for executing the log-likelihood
 void LogFrailtyModel::evaluate_loglikelihood(){
-    T::VariableType optimal_ll_lf = ll_lf(v_parameters);
+    T::VariableType optimal_ll_lf;
+    if(n_threads == 1)
+        optimal_ll_lf = ll_lf(v_parameters);
+    else
+        optimal_ll_lf = ll_lf_parallel(v_parameters);
 
     // Compute the standard error of the parameters
     compute_se(v_parameters);
@@ -286,7 +322,7 @@ void LogFrailtyModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty, n_threads);
     result.print_results();
 };
 

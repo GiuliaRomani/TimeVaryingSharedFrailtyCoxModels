@@ -12,6 +12,7 @@ ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& fi
     check_filename(filename1);
     GetPot datafile(filename1.c_str());
     h_dd = datafile("DiscretizationStep/h_dd",1e-3);
+    n_threads = static_cast<T::NumberType>(datafile("NumberThreads/n_threads", 1));
 
     // Initialize the other simple data structire
     variance_frailty.resize(Dataset::n_intervals);

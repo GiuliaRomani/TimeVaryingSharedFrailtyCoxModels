@@ -27,7 +27,7 @@ public:
     * @param se_ The vector of standard error of the optimal_parameters_
     */
     Results(const T::IdNameType& name_model_, const T::NumberType n_parameters_,  const T::VectorXdr& optimal_parameters_, 
-            const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_, const T::VectorXdr& sd_frailty_);
+            const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_, const T::VectorXdr& sd_frailty_, T::NumberType n_threads_);
 
 
     /**
@@ -45,6 +45,8 @@ private:
     T::VariableType AIC;                                //! AKAIKE INFORMATION CRITERION
     T::VectorXdr se;					                //! Standard error of the parameters
     T::VectorXdr sd_frailty;                            //! Standard deviation of the frailty
+
+    T::NumberType n_threads;                            //! Number of threads for the parallel version
 
 
     /**

@@ -43,7 +43,6 @@ public:
     */
     ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2);
 
-    // Define and Compute the log-likelihood
     /**
      * Virtual pure method for the computation of the model log-likelihood 
     */
@@ -66,6 +65,8 @@ protected:
     T::VectorXdr hessian_diag;                                              //! Diagonal of the Hessian matrix of the log-likelihood function
     T::VectorXdr se;                                                        //! Standard error of the parameters
 
+    T::NumberType n_threads;                                                //! Number of threads for the parallel version
+
     /**
      * Method for checking that the file from which we read the time variables really exists.
      * Otherwise, it throws an exception.
@@ -82,6 +83,11 @@ protected:
      * Virtual pure method that construct the model log-likelihood 
     */
     virtual void build_loglikelihood() = 0;
+
+    /**
+     * Virtual pure method for constructing the log-likelihood in the parallel version
+    */
+    virtual void build_loglikelihood_parallel() = 0;
 
     /**
      * Virtual pure method that construct the centered finite difference scheme for the computation

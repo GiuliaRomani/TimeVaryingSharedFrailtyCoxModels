@@ -8,6 +8,7 @@
 #include <iostream>
 #include <utility>
 #include <chrono>
+#include <iomanip>
 
 // Type alias
 using T = TypeTraits;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]){
     ptrMethod -> evaluate_loglikelihood();
     const auto end = std::chrono::steady_clock::now();
     const std::chrono::duration<T::VariableType> elapsed_seconds = end - start;
-    std::cout << "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl; 
+    std::cout << "Elapsed time: " << resetiosflags(std::ios::scientific) << elapsed_seconds.count() << "s" << std::endl; 
     }
     catch(const MyException& e) {
         std::cout << e.what() << std::endl;

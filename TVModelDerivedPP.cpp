@@ -7,6 +7,8 @@
 #include <tuple>
 #include <algorithm>
 #include <random>
+#include <iterator>
+#include <omp.h>
 
 namespace TVModel{
 using T = TypeTraits;
@@ -32,6 +34,10 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
             // Build the log-likelihood and the one-directional second derivative
             build_loglikelihood();
             build_dd_loglikelihood();
+
+            // If the provided number of threads is greater than 1, parallelization is required
+            if(n_threads > 1)
+                build_loglikelihood_parallel();
 };
         
 // Virtual method for computing the number of parameters
@@ -119,6 +125,35 @@ void PowerParameterModel::build_loglikelihood(){
     };
 };
 
+// Method for buidling the global loglikelihood in the parallel version
+void PowerParameterModel::build_loglikelihood_parallel(){
+    ll_pp_parallel = [this] (T::VectorXdr& v_parameters_){
+        T::VariableType log_likelihood = 0;
+        T::SharedPtrType indexes_group = nullptr;
+
+        // For each group, compute the likelihood and then sum them
+        T::MapType::iterator it_map;
+        T::MapType::iterator it_map_end = Dataset::map_groups.end();
+
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(dynamic) reduction(+:log_likelihood)
+        for(T::NumberType i = 0; i < n_groups; ++i){
+            if(it_map != it_map_end){
+                it_map = Dataset::map_groups.begin();
+                std::advance(it_map, i);
+                indexes_group = it_map->second;
+
+                log_likelihood += ll_group_pp(v_parameters_, indexes_group);
+
+                indexes_group = nullptr;
+            }           
+        }
+
+        // Subtract the constant term
+        log_likelihood -= ((Dataset::n_groups)/2)*log(M_PI);
+        return log_likelihood;
+    };
+};
+
 // Method for building the second derivative of the function wrt one direction
 void PowerParameterModel::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
@@ -132,7 +167,12 @@ void PowerParameterModel::build_dd_loglikelihood(){
         v_parameters_plus(index_) = valueplush;
         v_parameters_minus(index_) = valueminush;
         
-        T::VariableType result = (ll_pp(v_parameters_plus) + ll_pp(v_parameters_minus) - 2*ll_pp(v_parameters_))/(h_dd * h_dd);
+        T::VariableType result = 0.;
+        if(n_threads == 1)
+            result = (ll_pp(v_parameters_plus) + ll_pp(v_parameters_minus) - 2*ll_pp(v_parameters_))/(h_dd * h_dd);
+        else
+            result = (ll_pp_parallel(v_parameters_plus) + ll_pp_parallel(v_parameters_minus) - 2*ll_pp_parallel(v_parameters_))/(h_dd * h_dd);
+
         return result;
     };
 };
@@ -173,10 +213,15 @@ void PowerParameterModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 };
 
 
-// Method for builfing the result, provided the optimal vector
+// Method for building the result, provided the optimal vector
 void PowerParameterModel::evaluate_loglikelihood(){
-    T::VariableType optimal_ll_pp = ll_pp(v_parameters);
-
+    T::VariableType optimal_ll_pp = 0.;
+    if(n_threads == 1)
+        optimal_ll_pp = ll_pp(v_parameters);
+    else
+        optimal_ll_pp = ll_pp_parallel(v_parameters);
+    
+        
     // Initialize the standard error of the parameters
     compute_se(v_parameters);
 
@@ -184,9 +229,11 @@ void PowerParameterModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
 
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty);
+    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, n_threads);
     result.print_results();
 };
+
+
 
 } // end namespace
 

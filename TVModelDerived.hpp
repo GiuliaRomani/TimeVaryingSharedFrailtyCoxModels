@@ -47,6 +47,9 @@ public:
     */
     void evaluate_loglikelihood() override;
 
+    /**
+     * Virtual destructor 
+    */
     virtual ~ PowerParameterModel() = default;
 
 private:
@@ -68,6 +71,18 @@ private:
      * @return Evaluation of the log-likelihood at the input, for all the clusters
     */
     std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_pp;  
+
+    /**
+     * This function is later built as a lambda function.
+     * It implements the model log-likelihood as has been defined in the reference, but in a parallel version
+     * using OpenMP and a number of threads provided in input by the user. 
+     * 
+     * The default provided value is 1, that implies no paralellization. A greater value corresponds to parallelization.
+     * 
+     * @param v_parameters Vector of parameters, where the log-likelihood is evaluated
+     * @return Evaluation of the log-likelihood at the input, for all clusters
+    */
+    std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_pp_parallel;  
 
     /**
      * This function compute the log-likelihood for all the individuals belonging to a cluster/group/faculty.
@@ -130,6 +145,11 @@ private:
     void build_loglikelihood() override;
 
     /**
+     * Virtual pure method for constructing the log-likelihood in the parallel version
+    */
+    void build_loglikelihood_parallel() override;
+
+    /**
      * Method for building the second derivative of the log-likelihood function. 
      * It uses a centered finite difference scheme, with accuracy of the secon order.
     */
@@ -178,10 +198,21 @@ private:
      * 1) extract_parameters for extracting the vector of parameters
      * 2) ll_group_pp to compute the log-likelihood related to a cluster/group
      * 
-     * @param v_parameters Vector of parameters, where the log-likelihood has to be evaluated
+     * @param v_parameters_ Vector of parameters, where the log-likelihood has to be evaluated
      * @return Evaluation of the log-likelihood at the input, for all the clusters
     */
-    std::function<T::VariableType(T::VectorXdr&)> ll_paik; 
+    std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_paik; 
+
+    /**
+     * This function is later built as a lmabda function.
+     * It implelemnts the model log-likelihood as has been defined in the reference and in the report, 
+     * but using parallel implementation provided by OpenMP with a number of threads specified by the user. 
+     * If no threads or just 1 is provided, no parallel implementation is chosen.
+     * 
+     * @param v_parameters_ Vector of parameters, where the log-likelihood has to be evaluated
+     * @return The evaluation of the log-likelihood
+    */
+    std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_paik_parallel; 
 
     /**
      * This function compute the log-likelihood for all the individuals belonging to a cluster/group/faculty.
@@ -252,6 +283,11 @@ private:
     void build_loglikelihood() override;
 
     /**
+     * Method for building the model log-likelihood function in parallel
+    */
+    void build_loglikelihood_parallel() override;
+
+    /**
      * Method for building the second derivative of the log-likelihood function. 
      * It uses a centered finite difference scheme, with accuracy of the secon order.
     */
@@ -283,6 +319,9 @@ public:
     */
     void evaluate_loglikelihood() override;
 
+    /**
+     * Virtual destructor
+    */
     virtual ~ LogFrailtyModel() = default;
 
 private:
@@ -304,6 +343,21 @@ private:
      * @return Evaluation of the log-likelihood at the input, for all the clusters
     */    
     std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_lf; 
+
+    /**
+     * This function is later built as a lambda function. 
+     * It implements the model log-likelihood as has been defined in the reference and in the report, in a parallel version
+     * using OpenMP and a number of threads specified by the user. If no threads or just 1 are provided, no parallelization is used.
+     * 
+     * Inside this function, other methods or functions are called: 
+     * 
+     * 1) extract_parameters for extracting the vector of parameters
+     * 2) ll_group_pp to compute the log-likelihood related to a cluster/group
+     * 
+     * @param v_parameters Vector of parameters, where the log-likelihood has to be evaluated
+     * @return Evaluation of the log-likelihood at the input, for all the clusters
+    */    
+    std::function<T::VariableType(T::VectorXdr& v_parameters_)> ll_lf_parallel; 
 
     /**
      * This function compute the log-likelihood for all the individuals belonging to a cluster/group/faculty.
@@ -397,11 +451,17 @@ private:
     void build_loglikelihood() override;
 
     /**
+     * Method for building the model log-likelihood function in parallel
+    */
+    void build_loglikelihood_parallel() override;
+
+    /**
      * Method for building the second derivative of the log-likelihood function. 
      * It uses a centered finite difference scheme, with accuracy of the secon order.
     */
     void build_dd_loglikelihood() override;
 };
+
 
 
 }
