@@ -4,4 +4,4 @@ make distclean
 
 make
 
-./main DataToolFile.txt DataIndividualsFile.txt
+./main Data/DataToolFile.txt Data/DataIndividualsFile.txt
