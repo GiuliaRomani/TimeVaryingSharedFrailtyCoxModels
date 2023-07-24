@@ -129,6 +129,25 @@ void DatasetInfo::initialize_e_time(){
     }
 };
 
+// Method for printing the number of individuals in each group
+void DatasetInfo::print_dimension_groups(){
+    auto it_begin = map_groups.cbegin();
+    auto it_end = map_groups.cend();
+    T::NumberType num_individuals = 0;
+    T::GroupNameType name_group;
+    T::SharedPtrType ptr_group = nullptr;
+
+    for(; it_begin != it_end; ++it_begin){
+        name_group = it_begin -> first;
+        ptr_group = it_begin -> second;
+        num_individuals = (*ptr_group).size();
+
+        std::cout << "Group " << name_group << " has " << num_individuals << " individuals " << std::endl; 
+
+        ptr_group = nullptr;
+    }
+}
+
 // Define the function to compute the e_time value in the matrix
 T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk){
     T::VariableType result = 0.;
@@ -143,7 +162,7 @@ T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::Variable
 };
 
 // Extract the shared pointer to the name group in the map of groups
-std::shared_ptr<T::VectorIndexType> DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{
+T::SharedPtrType DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{
     T::MapType::const_iterator group_position = map_groups.find(name_group);
     if(group_position == map_groups.cend())
         return nullptr;

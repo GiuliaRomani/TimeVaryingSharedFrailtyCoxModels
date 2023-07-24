@@ -190,13 +190,13 @@ void PaikModel::build_loglikelihood_parallel() {
     ll_paik_parallel = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
         T::SharedPtrType indexes_group = nullptr;
-        T::NumberType id = 0;
+        //T::NumberType id = 0;
 
         // For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(static) reduction(+:log_likelihood)
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(guided) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
@@ -206,6 +206,9 @@ void PaikModel::build_loglikelihood_parallel() {
                 log_likelihood += ll_group_paik(v_parameters_, indexes_group);
 
                 indexes_group = nullptr;
+
+                //id = omp_get_thread_num();
+                //std::cout << "Iteration " << i << " executed by thread " << id << " out of " << n_threads << std::endl;
             }           
         }
         return log_likelihood;
@@ -268,6 +271,8 @@ void PaikModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 
 // Method for executing the log-likelihood
 void PaikModel::evaluate_loglikelihood(){
+    //Dataset::print_dimension_groups();
+
     T::VariableType optimal_ll_paik = 0.;
     if(n_threads == 1)
         optimal_ll_paik = ll_paik(v_parameters);

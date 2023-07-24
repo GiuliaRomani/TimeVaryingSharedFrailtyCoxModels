@@ -135,6 +135,8 @@ void PowerParameterModel::build_loglikelihood_parallel(){
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
+        //T::NumberType id = 0;
+
     #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(dynamic) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
@@ -145,6 +147,9 @@ void PowerParameterModel::build_loglikelihood_parallel(){
                 log_likelihood += ll_group_pp(v_parameters_, indexes_group);
 
                 indexes_group = nullptr;
+
+                //id = omp_get_thread_num();
+                //std::cout << "Iteration " << i << "executed by thread " << id << " out of " << n_threads << std::endl;
             }           
         }
 
@@ -215,6 +220,8 @@ void PowerParameterModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 
 // Method for building the result, provided the optimal vector
 void PowerParameterModel::evaluate_loglikelihood(){
+    //Dataset::print_dimension_groups();
+
     T::VariableType optimal_ll_pp = 0.;
     if(n_threads == 1)
         optimal_ll_pp = ll_pp(v_parameters);

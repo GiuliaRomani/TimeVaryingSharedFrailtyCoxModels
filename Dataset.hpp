@@ -74,7 +74,7 @@ protected:
      * @param name_group Group/cluster, whose individuals must be extracted
      * @return Shared pointer to the vector of indexes
     */
-    std::shared_ptr<T::VectorIndexType> extract_individuals_group(const T::GroupNameType& name_group) const;
+    T::SharedPtrType extract_individuals_group(const T::GroupNameType& name_group) const;
 
     /**
      * Initialize the temporal dropout variable d_ijk
@@ -94,6 +94,11 @@ protected:
      * @return e_time (e_ijk in the reference)
     */
     T::VariableType e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk);
+
+    /**
+     * Method for printing the number of individuals in each group
+    */
+   void print_dimension_groups();
 };
 
 } // end namespace
