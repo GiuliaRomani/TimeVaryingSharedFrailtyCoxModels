@@ -177,7 +177,7 @@ void PaikModel::build_loglikelihood(){
                 exp1 = ll - d_ik_sizel;
                 pow1 = pow(arg3, exp1);
                 pow2 = pow(arg1, ll);
-                loglik4 += coeff_binom * gamma_res3 * gamma_res4 * pow1 / (gamma_res2 * gamma_res1 * pow2);
+                loglik4 += coeff_binom * gamma_res3 / (gamma_res2 * gamma_res1 * pow2) * gamma_res4 * pow1;
             }
             loglik3 += log(loglik4);           
         }

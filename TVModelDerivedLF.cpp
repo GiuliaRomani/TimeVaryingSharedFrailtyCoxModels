@@ -238,7 +238,7 @@ void LogFrailtyModel::build_loglikelihood_parallel(){
 
         //T::NumberType id = 0;
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(dynamic) reduction(+:log_likelihood)
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(static) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();

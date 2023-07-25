@@ -37,8 +37,8 @@ void Results::print_results() const {
     std::cout << "Number of parameter: " << n_parameters << std::endl;
     std::cout << "Log-likelihood: " << std::setiosflags(std::ios::scientific) << std::setprecision(3) << optimal_loglikelihood << std::endl;
     std::cout << "AIC:  " << std::setprecision(3) << AIC << std::endl;
-    std::cout << "Standard Error of the parameters: \n" <<std::setprecision(3) << se << std::endl;
-    std::cout << "Standard Deviation of the frailty: \n" << std::setprecision(3) << sd_frailty << std::endl;
+    //std::cout << "Standard Error of the parameters: \n" <<std::setprecision(3) << se << std::endl;
+    //std::cout << "Standard Deviation of the frailty: \n" << std::setprecision(3) << sd_frailty << std::endl;
 };
 
 } // end namespace
