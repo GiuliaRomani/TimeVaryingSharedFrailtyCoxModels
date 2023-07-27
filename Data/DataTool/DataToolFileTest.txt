@@ -33,5 +33,5 @@
 [../]
 
 [NumberThreads]
-	n_threads = 1
+	n_threads = 2
 [../]

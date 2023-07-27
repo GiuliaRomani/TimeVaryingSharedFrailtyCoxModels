@@ -105,19 +105,16 @@ void PaikModel::build_loglikelihood(){
     // Implement the function ll_paik
     ll_paik = [this] (T::VectorXdr& v_parameters_){              
         T::VariableType log_likelihood_group, log_likelihood = 0;
-        T::SharedPtrType indexes_group = nullptr;
 
         // For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map = Dataset::map_groups.begin();
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
         for(; it_map != it_map_end; ++it_map){
             // All the indexes in a group
-            indexes_group = it_map->second;
+            const auto& indexes_group = it_map->second;
 
             log_likelihood_group = ll_group_paik(v_parameters_, indexes_group); 
             log_likelihood += log_likelihood_group;
-
-            indexes_group = nullptr;
         }
         return log_likelihood;
     };
@@ -189,23 +186,20 @@ void PaikModel::build_loglikelihood(){
 void PaikModel::build_loglikelihood_parallel() {
     ll_paik_parallel = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
-        T::SharedPtrType indexes_group = nullptr;
         //T::NumberType id = 0;
 
         // For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map, indexes_group) schedule(guided) reduction(+:log_likelihood)
+    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map) schedule(guided) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
                 std::advance(it_map, i);
-                indexes_group = it_map->second;
+                const auto& indexes_group = it_map->second;
 
                 log_likelihood += ll_group_paik(v_parameters_, indexes_group);
-
-                indexes_group = nullptr;
 
                 //id = omp_get_thread_num();
                 //std::cout << "Iteration " << i << " executed by thread " << id << " out of " << n_threads << std::endl;
