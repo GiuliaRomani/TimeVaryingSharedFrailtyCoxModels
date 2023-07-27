@@ -3,7 +3,7 @@
 
 #include "TypeTraits.hpp"
 
-namespace ResultsMethod{
+namespace TVSFCM{
 using T = TypeTraits;
 
 /**
@@ -47,7 +47,6 @@ private:
     T::VectorXdr sd_frailty;                            //! Standard deviation of the frailty
 
     T::NumberType n_threads;                            //! Number of threads for the parallel version
-
 
     /**
      * Compute the Akaike Informaion Criterior (AIC)

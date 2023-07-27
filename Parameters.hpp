@@ -17,7 +17,7 @@
  * computation of the log-likelihood. Indeed, if only a parameter is out of range, it could induce not valid operations.
 */
 
-namespace Params{
+namespace TVSFCM{
 using T = TypeTraits;
 
 class Parameters{

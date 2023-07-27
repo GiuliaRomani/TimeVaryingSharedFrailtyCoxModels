@@ -9,33 +9,34 @@
 #include <iostream>
 
 /**
- * DatasetInfo class contains the dataset and other basic variables necessary to the execution of the time-varying models.
+ * Dataset class contains the dataset and other basic variables necessary to the execution of the time-varying models.
 */
 
 
 // Class 
-namespace DatasetInfoClass{
+namespace TVSFCM{
 using T = TypeTraits;
-using Time = TimeDomainInfo::TimeDomain;
 
-class DatasetInfo: public TimeDomainInfo::TimeDomain{
+class Dataset: public TVSFCM::TimeDomain{
+using TimeDomain = TVSFCM::TimeDomain;
+
 public:
     /**
      * Default constructor
     */
-    DatasetInfo() = default;
+    Dataset() = default;
 
     /**
      * Constructor for the class. It initializes the variables starting from two input files
      * @param filename1 file .txt containing time-variables
      * @param filename2 file .txt containing the dataset
     */
-    DatasetInfo(const T::FileNameType& filename1, const T::FileNameType& filename2);
+    Dataset(const T::FileNameType& filename1, const T::FileNameType& filename2);
   
     /**
      * Default destructor 
     */
-    ~ DatasetInfo() = default;
+    ~ Dataset() = default;
 
 protected:
     T::NumberType n_individuals;                    // Number of individuals 

@@ -14,7 +14,7 @@
  * with no mistakes. Otherwise an exception is thrown for each occurred error.
 */
 
-namespace TimeDomainInfo{
+namespace TVSFCM{
 using T = TypeTraits;
 
 class TimeDomain{

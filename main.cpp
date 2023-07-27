@@ -24,8 +24,6 @@ int main(int argc, char *argv[]){
     catch(const MyException& e){
         std::cout << e.what() << std::endl;
     };
-    
-    // Initialize the filename in input
     T::FileNameType filename1 = argv[1];
     T::FileNameType filename2 = argv[2];
 

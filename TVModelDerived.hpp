@@ -20,13 +20,15 @@
 */
 
 
-namespace TVModel{
+namespace TVSFCM{
 using T = TypeTraits;
-using Parameters = Params::Parameters;
+using ModelBase = TVSFCM::ModelBase;
 
 // Class for implementing PowerParameter Model
-class PowerParameterModel final: public TVModel::ModelBase,
-                                 public Parameters{
+class PowerParameterModel final: public TVSFCM::ModelBase,
+                                 public TVSFCM::Parameters{
+
+using Parameters = TVSFCM::Parameters;
 public:
     /**
      * Deafult constructor
@@ -103,7 +105,7 @@ private:
     std::function<T::VariableType(T::IndexType index_, T::VectorXdr& v_parameters_)> dd_ll_pp;	
 
 
-    QuadraturePoints::Points9 points9;                                      //! Struct for the nine points quadrature formula
+    TVSFCM::QuadraturePoints9 points9;                                      //! Struct for the nine points quadrature formula
     T::NumberType n_nodes = 9;                                              //! Number of points 
     std::array<T::VariableType, 9>& nodes = points9.nodes;                  //! Array of nodes
     std::array<T::VariableType, 9>& weights = points9.weights;              //! Array of weights
@@ -159,8 +161,8 @@ private:
 
 //--------------------------------------------------------------------------------------------------
 // Class for implementing PAIK Model
-class PaikModel final: public TVModel::ModelBase, 
-                       public Parameters{
+class PaikModel final: public TVSFCM::ModelBase, 
+                       public TVSFCM::Parameters{
 public:
     /**
      * Default Constructor

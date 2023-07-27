@@ -10,7 +10,7 @@
 #include <fstream>
 #include <string>
 
-namespace Params{
+namespace TVSFCM{
 
 // Constructor
 Parameters::Parameters(const T::FileNameType& filename1_, 

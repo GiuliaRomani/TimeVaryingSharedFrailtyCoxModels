@@ -3,7 +3,7 @@
 #include <iostream>
 #include <iomanip>
 
-namespace ResultsMethod{
+namespace TVSFCM{
 
 Results::Results(const T::IdNameType& name_model_, const T::NumberType n_parameters_,  const T::VectorXdr& optimal_parameters_, 
                  const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_, const T::VectorXdr& sd_frailty_,

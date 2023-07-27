@@ -3,7 +3,7 @@
 #include "GetPot"
 #include "MyException.hpp"
 
-namespace TVModel{
+namespace TVSFCM{
 
 ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2): 
 		Dataset(filename1, filename2){

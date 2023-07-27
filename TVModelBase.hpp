@@ -25,9 +25,8 @@
 */
 
 // Class
-namespace TVModel{
+namespace TVSFCM{
 using T = TypeTraits;
-using Dataset = DatasetInfoClass::DatasetInfo;
 
 class ModelBase: public Dataset{
 public:
@@ -55,7 +54,7 @@ public:
 
 
 protected:
-    ResultsMethod::Results result;                                          //! Results of the model application
+    TVSFCM::Results result;                                          //! Results of the model application
                                               
     T::VariableType h_dd;                                                   //! Discretization step of the second derivative
 

@@ -5,7 +5,7 @@
 
 #include <array>
 
-namespace QuadraturePoints{
+namespace TVSFCM{
 using T = TypeTraits;
 
 /**
@@ -15,7 +15,7 @@ using T = TypeTraits;
 */
 
     //! QuadratureFormula with 9 points
-    struct Points9{
+    struct QuadraturePoints9{
         T::NumberType n = 9;
         std::array<T::VariableType, 9> nodes{0., -0.723551018752838, 0.723551018752838, 
                                             -1.46855328921667, 1.46855328921667,-2.26658058453184, 
@@ -26,7 +26,7 @@ using T = TypeTraits;
     };
 
     //! QuadratureFormula with 10 points
-    struct Points10{
+    struct QuadraturePoints10{
         T::NumberType n = 10;
         std::array<T::VariableType, 10> nodes{0.342901327223705,-0.342901327223705,1.03661082978951,
                                             -1.03661082978951,1.75668364929988,-1.75668364929988,

@@ -7,12 +7,12 @@
 #include <sstream>
 #include <memory>
 
-namespace DatasetInfoClass{
+namespace TVSFCM{
     
 // Constructor
-DatasetInfo::DatasetInfo(const T::FileNameType& filename1_, const T::FileNameType& filename2_): 
-Time(filename1_) {
-    // Check the second inut fle exists
+Dataset::Dataset(const T::FileNameType& filename1_, const T::FileNameType& filename2_): 
+    TimeDomain(filename1_) {
+    // Check the second input fle exists
     check_filename(filename2_);
 
     // Initialize the number of groups to zero
@@ -29,7 +29,7 @@ Time(filename1_) {
 };
 
 // Method for reading from file
-void DatasetInfo::read_from_file(const T::FileNameType& filename2_){
+void Dataset::read_from_file(const T::FileNameType& filename2_){
     T::CheckType first_line = false;
     T::NumberType i = 0;                                // Number of row
     T::NumberType j = 0;                                // Number of column
@@ -74,7 +74,7 @@ void DatasetInfo::read_from_file(const T::FileNameType& filename2_){
 };
 
 // Method for checking the filename is correct and exists
-void DatasetInfo::check_filename(const T::FileNameType& filename2_) const{
+void Dataset::check_filename(const T::FileNameType& filename2_) const{
     std::ifstream check(filename2_);
     if(check.fail()){
         T::ExceptionType msg1 = "File ";
@@ -86,7 +86,7 @@ void DatasetInfo::check_filename(const T::FileNameType& filename2_) const{
 };
 
 // Method for adding individual code group name and index to the map
-void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual){
+void Dataset::add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual){
     T::MapType::iterator group_position = map_groups.find(name_group);
     if(group_position == map_groups.end()){
         map_groups[name_group] = std::make_shared<T::VectorIndexType>();
@@ -99,57 +99,54 @@ void DatasetInfo::add_to_map_groups(const T::GroupNameType& name_group, const T:
 };
 
 // Initialize the dropout_intervals variable
-void DatasetInfo::initialize_dropout_intervals(){
+void Dataset::initialize_dropout_intervals(){
     // Resize the matrix according to the right dimensions and fill it with null elements
     // dropout_intervals.resize(n_individuals, n_intervals);
-    dropout_intervals.setZero(n_individuals, Time::n_intervals);
+    dropout_intervals.setZero(n_individuals, TimeDomain::n_intervals);
 
     // Fill the matrix according to the condition
     for(T::NumberType i = 0; i < n_individuals; ++i){
-        for(T::NumberType k = 0; k < (Time::n_intervals); ++k){
-            if((time_to_event(i) < Time::v_intervals(k+1)) & (time_to_event(i) >= Time::v_intervals(k)))
+        for(T::NumberType k = 0; k < (TimeDomain::n_intervals); ++k){
+            if((time_to_event(i) < TimeDomain::v_intervals(k+1)) & (time_to_event(i) >= TimeDomain::v_intervals(k)))
                 dropout_intervals(i,k) = 1.;
         }
     } 
 };
 
 // Initialize the e_time matrix
-void DatasetInfo::initialize_e_time(){
+void Dataset::initialize_e_time(){
     // Resize the matrix
-    e_time.resize(n_individuals, Time::n_intervals);
+    e_time.resize(n_individuals, TimeDomain::n_intervals);
 
     // Fill the matrix
     for(T::IndexType i = 0; i < n_individuals; ++i){
         T::VariableType time_individual = time_to_event(i);
-        for(T::IndexType k = 0; k < (Time::n_intervals); ++k){
-            T::VariableType v_k = Time::v_intervals(k);
-            T::VariableType v_kk = Time::v_intervals(k+1);
+        for(T::IndexType k = 0; k < (TimeDomain::n_intervals); ++k){
+            T::VariableType v_k = TimeDomain::v_intervals(k);
+            T::VariableType v_kk = TimeDomain::v_intervals(k+1);
             e_time(i,k) = e_time_function(time_individual, v_k, v_kk);
         }
     }
 };
 
 // Method for printing the number of individuals in each group
-void DatasetInfo::print_dimension_groups(){
+void Dataset::print_dimension_groups(){
     auto it_begin = map_groups.cbegin();
     auto it_end = map_groups.cend();
     T::NumberType num_individuals = 0;
     T::GroupNameType name_group;
-    T::SharedPtrType ptr_group = nullptr;
 
     for(; it_begin != it_end; ++it_begin){
         name_group = it_begin -> first;
-        ptr_group = it_begin -> second;
+        const auto& ptr_group = it_begin -> second;
         num_individuals = (*ptr_group).size();
 
         std::cout << "Group " << name_group << " has " << num_individuals << " individuals " << std::endl; 
-
-        ptr_group = nullptr;
     }
 }
 
 // Define the function to compute the e_time value in the matrix
-T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk){
+T::VariableType Dataset::e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk){
     T::VariableType result = 0.;
     if(time_t < v_k)
         result = 0.;
@@ -162,7 +159,7 @@ T::VariableType DatasetInfo::e_time_function(T::VariableType time_t, T::Variable
 };
 
 // Extract the shared pointer to the name group in the map of groups
-T::SharedPtrType DatasetInfo::extract_individuals_group(const T::GroupNameType& name_group) const{
+T::SharedPtrType Dataset::extract_individuals_group(const T::GroupNameType& name_group) const{
     T::MapType::const_iterator group_position = map_groups.find(name_group);
     if(group_position == map_groups.cend())
         return nullptr;

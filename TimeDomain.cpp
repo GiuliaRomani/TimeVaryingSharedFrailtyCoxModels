@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <fstream>
 
-namespace TimeDomainInfo{
+namespace TVSFCM{
 
 // Default constructor
 TimeDomain::TimeDomain(): n_intervals(0) {
