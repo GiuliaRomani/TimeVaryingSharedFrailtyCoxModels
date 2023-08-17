@@ -232,7 +232,8 @@ void CSFMwithPowerParameter::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
 
     // Store the results in the class
-    result = Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, n_threads);
+    result = Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, 
+                    ParallelComponents::n_threads, ParallelComponents::chunk_size, ParallelComponents::schedule_type_name);
     result.print_results();
 };
 

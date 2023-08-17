@@ -29,11 +29,11 @@
 [../]
 
 [Model]
-	id_model = 3
+	id_model = 1
 [../]
 
 [ParallelVersion]
-	n_threads = 1
+	n_threads = 2
 	chunk_size = 1
-	id_schedule_type = 1
+	id_schedule_type = 2
 [../]

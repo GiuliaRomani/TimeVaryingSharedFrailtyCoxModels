@@ -32,6 +32,8 @@
 	id_model = 3
 [../]
 
-[NumberThreads]
-	n_threads = 4
+[ParallelVersion]
+	n_threads = 2
+	chunk_size = 1
+	id_schedule_type = 2
 [../]

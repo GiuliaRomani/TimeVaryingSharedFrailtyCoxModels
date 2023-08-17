@@ -56,8 +56,8 @@ protected:
 
     T::VectorXdr v_parameters;                              //! Vector of parameters
     T::NumberType n_ranges;                                 //! Number of ranges to be provided
-    T::VectorXdr range_min_parameters;                     //! Vector containing the range of the parameters
-    T::VectorXdr range_max_parameters;                     //! Vector containing the range of the parameters
+    T::VectorType range_min_parameters;                     //! Vector containing the range of the parameters
+    T::VectorType range_max_parameters;                     //! Vector containing the range of the parameters
     T::VectorNumberType all_n_parameters;                   //! Subdivision of the parameters
  
 
@@ -88,7 +88,7 @@ protected:
      * @param range_min_ Vector of the minimum range of parameters
      * @param range_max_ Vector of the maximum range of parameters
     */
-    void check_condition(const T::VectorXdr& range_min_, const T::VectorXdr& range_max_) const;
+    void check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const;
     
     /**
      * This method overloads the previous one based on the input and control that each parameter

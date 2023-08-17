@@ -28,13 +28,11 @@ public:
     */
     ~ ParallelComponents() = default;
 
-
-    // n_threads(n_threads_), chunk_size(chunk_size_), schedule_type(schedule_type_){};
-
 protected:
     T::NumberType n_threads;                                //! Number of threads for the omp parallel version
     T::NumberType chunk_size;                               //! Number of chunk size for the for loop
     T::NumberType schedule_type;                            //! Id number for the for loop scheduling
+    T::ScheduleType schedule_type_name;                     //! Name of the for loop scheduling
 
     /**
      * Method for checking the existence of the file where the variables should be contained
@@ -47,6 +45,16 @@ protected:
      * @param filename1_ Name of the .txt file containing the data
     */
     void read_from_file(const T::FileNameType& filename1_);
+
+    /**
+     * Method for checking that the id of the schedule type exists, otherwise an exception is thrown
+    */
+    void check_schedule_type() const;
+
+    /**
+     * Method for initializing the name of the adopted schedule type
+    */
+    void set_schedule_type_name();
 };
 
 } // end namespace

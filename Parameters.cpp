@@ -55,8 +55,8 @@ void Parameters::read_from_file(const T::FileNameType& filename1_){
 
     // Read the min and max range of parameters and then check they are provided
     for(T::NumberType i = 0; i < n_ranges; ++i){
-        range_min_parameters(i) = datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
-        range_max_parameters(i) = datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
+        range_min_parameters[i] = datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
+        range_max_parameters[i] = datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
     check_condition(range_min_parameters, range_max_parameters);
 
@@ -93,7 +93,7 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
 };
 
 // Method for checking conditions for range bound
-void Parameters::check_condition(const T::VectorXdr& range_min_, const T::VectorXdr& range_max_) const{
+void Parameters::check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const{
     const T::NumberType& n = range_min_.size();
     
     for(T::NumberType i = 0; i < n; ++i){

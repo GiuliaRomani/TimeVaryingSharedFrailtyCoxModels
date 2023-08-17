@@ -25,6 +25,8 @@ struct TypeTraits{
 
     using ExceptionType = std::string;              //! Type of the content of an exception
 
+    using ScheduleType = std::string;               //! Type indicating the schedule type used in the OpenMP for loop
+
     using IdType = unsigned int;                    //! Type of the numeric Id of a method
     using IdNameType = std::string;                 //! Type of the name of a method
     
