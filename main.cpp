@@ -33,7 +33,6 @@ int main(int argc, char *argv[]){
 
     // Create the object factory map
     static T::FactoryType methods(TVSFCM::RegisteredMethods());
-    TVSFCM::PrintMethods(methods);
 
     // Call the model
     try{
