@@ -1,7 +1,7 @@
 
 // Include header files
 #include "TVModelDerived.hpp"
-#include "SupportFunctions.cpp"
+#include "MathFunctions.cpp"
 
 // Include libraries
 #include <cmath>
@@ -9,13 +9,15 @@
 #include <algorithm>
 #include <random>
 
+/**
+ * Implementation of the methods declared in the class "AdaptedPaikeaM"
+*/
 
-namespace TVModel{
+namespace TVSFCM{
 using T = TypeTraits;
 
-// Implementations for the Paik Model
 // Constructor
-PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
+AdaptedPaikeaM::AdaptedPaikeaM(const T::FileNameType& filename1, const T::FileNameType& filename2):
         // Constructor for base classes
         ModelBase(filename1, filename2),
         Parameters(filename1, 2 * Dataset::n_intervals + Dataset::n_regressors + 2, 
@@ -39,12 +41,12 @@ PaikModel::PaikModel(const T::FileNameType& filename1, const T::FileNameType& fi
 };
         
 // Virtual method for computing the number of parameters
-void PaikModel::compute_n_parameters() {
+void AdaptedPaikeaM::compute_n_parameters() {
     n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors + 2);
 };
 
 // Virtual method for extracting the parameters fromt the vector
-T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr& v_parameters_){
+T::TuplePaikType AdaptedPaikeaM::extract_parameters(T::VectorXdr& v_parameters_){
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
@@ -56,7 +58,7 @@ T::TuplePaikType PaikModel::extract_parameters(T::VectorXdr& v_parameters_){
     return std::make_tuple(phi, betar, mu1, mu2, nu, gammak);
 };
 
-T::TupleMatrixAType PaikModel::extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_){
+T::TupleMatrixAType AdaptedPaikeaM::extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_){
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::MatrixXdr A_ijk(n_individuals_group, Dataset::n_intervals);
     T::VectorXdr A_ik(Dataset::n_intervals);
@@ -78,7 +80,7 @@ T::TupleMatrixAType PaikModel::extract_matrixA_variables(T::SharedPtrType indexe
     return std::make_tuple(A_ijk, A_ik, A_i);
 };
 
-T::TupleDropoutType PaikModel::extract_dropout_variables(T::SharedPtrType indexes_group_){
+T::TupleDropoutType AdaptedPaikeaM::extract_dropout_variables(T::SharedPtrType indexes_group_){
     // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::MatrixXdr d_ijk(n_individuals_group, Dataset::n_intervals);
@@ -101,7 +103,7 @@ T::TupleDropoutType PaikModel::extract_dropout_variables(T::SharedPtrType indexe
 };
 
 // Method for building the log-likelihood
-void PaikModel::build_loglikelihood(){
+void AdaptedPaikeaM::build_loglikelihood(){
     // Implement the function ll_paik
     ll_paik = [this] (T::VectorXdr& v_parameters_){              
         T::VariableType log_likelihood_group, log_likelihood = 0;
@@ -183,7 +185,7 @@ void PaikModel::build_loglikelihood(){
     };
 };
 
-void PaikModel::build_loglikelihood_parallel() {
+void AdaptedPaikeaM::build_loglikelihood_parallel() {
     ll_paik_parallel = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
         //T::NumberType id = 0;
@@ -192,7 +194,8 @@ void PaikModel::build_loglikelihood_parallel() {
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map) schedule(guided) reduction(+:log_likelihood)
+    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
@@ -210,7 +213,7 @@ void PaikModel::build_loglikelihood_parallel() {
 };
 
 // Method for building the second derivative of the function wrt one direction
-void PaikModel::build_dd_loglikelihood(){
+void AdaptedPaikeaM::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
     dd_ll_paik = [this] (T::IndexType index_, T::VectorXdr& v_parameters_){
         T::VariableType value = v_parameters_(index_);
@@ -233,14 +236,14 @@ void PaikModel::build_dd_loglikelihood(){
 };
 
 // Method for computing the second derivtaive of the log-likelihood
-void PaikModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){    
+void AdaptedPaikeaM::compute_hessian_diagonal(T::VectorXdr& v_parameters_){    
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_paik(i, v_parameters_);
     }
 };
 
 // compute the standard error of the parameters
-void PaikModel::compute_se(T::VectorXdr& v_parameters_){
+void AdaptedPaikeaM::compute_se(T::VectorXdr& v_parameters_){
     compute_hessian_diagonal(v_parameters_);
     T::VariableType information_element;
      
@@ -250,7 +253,7 @@ void PaikModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
-void PaikModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+void AdaptedPaikeaM::compute_sd_frailty(T::VectorXdr& v_parameters_){
     T::TuplePaikType extracted_parameters = extract_parameters(v_parameters_);
     auto mu1 = std::get<2>(extracted_parameters);
     auto mu2 = std::get<3>(extracted_parameters);
@@ -264,7 +267,7 @@ void PaikModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 }
 
 // Method for executing the log-likelihood
-void PaikModel::evaluate_loglikelihood(){
+void AdaptedPaikeaM::evaluate_loglikelihood(){
     //Dataset::print_dimension_groups();
 
     T::VariableType optimal_ll_paik = 0.;
@@ -280,7 +283,7 @@ void PaikModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty, n_threads);
+    result = Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty, n_threads);
     result.print_results();
 };
 

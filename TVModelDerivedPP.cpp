@@ -1,4 +1,3 @@
-
 // Include header files
 #include "TVModelDerived.hpp"
 
@@ -10,14 +9,15 @@
 #include <iterator>
 #include <omp.h>
 
-namespace TVModel{
+/**
+ * Implementation of the methods declared in the class "CSFMwithPowerParameter"
+*/
+
+namespace TVSFCM{
 using T = TypeTraits;
 
-//-------------------------------------------------------------------------------------------------------------
-// Implementations for the PoweParameter model
-
 // Constructor
-PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
+CSFMwithPowerParameter::CSFMwithPowerParameter(const T::FileNameType& filename1, const T::FileNameType& filename2):
         // Constructor for base classes
         ModelBase(filename1, filename2),
         Parameters(filename1, 2 * Dataset::n_intervals + Dataset::n_regressors, 
@@ -39,15 +39,16 @@ PowerParameterModel::PowerParameterModel(const T::FileNameType& filename1, const
             if(n_threads > 1)
                 build_loglikelihood_parallel();
 };
-        
+
+
 // Virtual method for computing the number of parameters
-void PowerParameterModel::compute_n_parameters() {
+void CSFMwithPowerParameter::compute_n_parameters() {
     n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors);
 };
 
 
 // Method for extracting the parameters from the vector of parameters
-T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_parameters_) const{
+T::TuplePPType CSFMwithPowerParameter::extract_parameters(const T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors, 1);
@@ -62,7 +63,7 @@ T::TuplePPType PowerParameterModel::extract_parameters(const T::VectorXdr& v_par
 
 
 // Method for building the log-likelihood
-void PowerParameterModel::build_loglikelihood(){
+void CSFMwithPowerParameter::build_loglikelihood(){
     // Implement the function ll_pp
 
     ll_pp = [this] (T::VectorXdr& v_parameters_){
@@ -122,8 +123,9 @@ void PowerParameterModel::build_loglikelihood(){
     };
 };
 
+
 // Method for buidling the global loglikelihood in the parallel version
-void PowerParameterModel::build_loglikelihood_parallel(){
+void CSFMwithPowerParameter::build_loglikelihood_parallel(){
     ll_pp_parallel = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
 
@@ -131,7 +133,8 @@ void PowerParameterModel::build_loglikelihood_parallel(){
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map) schedule(guided) reduction(+:log_likelihood)
+    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
@@ -148,8 +151,9 @@ void PowerParameterModel::build_loglikelihood_parallel(){
     };
 };
 
+
 // Method for building the second derivative of the function wrt one direction
-void PowerParameterModel::build_dd_loglikelihood(){
+void CSFMwithPowerParameter::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
     dd_ll_pp = [this] (T::IndexType index_, T::VectorXdr& v_parameters_){
         T::VariableType value = v_parameters_(index_);
@@ -171,16 +175,18 @@ void PowerParameterModel::build_dd_loglikelihood(){
     };
 };
 
+
 // Method for computing the second derivtaive of the log-likelihood
-void PowerParameterModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){  
+void CSFMwithPowerParameter::compute_hessian_diagonal(T::VectorXdr& v_parameters_){  
     // Initialize the hessian diagonal matrix 
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_pp(i, v_parameters_);
     }
 };
 
+
 // Compute the standard error of the parameters
-void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
+void CSFMwithPowerParameter::compute_se(T::VectorXdr& v_parameters_){
      // Initialize the diagonal of the hessian matrix
      compute_hessian_diagonal(v_parameters_);
      
@@ -194,8 +200,9 @@ void PowerParameterModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
+
 // Compute the standard deviation of the frailty
-void PowerParameterModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+void CSFMwithPowerParameter::compute_sd_frailty(T::VectorXdr& v_parameters_){
     T::TuplePPType extracted_parameters = extract_parameters(v_parameters_);
     auto gammak = std::get<2>(extracted_parameters);
     auto sigma = std::get<3>(extracted_parameters);
@@ -208,7 +215,7 @@ void PowerParameterModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
 
 
 // Method for building the result, provided the optimal vector
-void PowerParameterModel::evaluate_loglikelihood(){
+void CSFMwithPowerParameter::evaluate_loglikelihood(){
     //Dataset::print_dimension_groups();
 
     T::VariableType optimal_ll_pp = 0.;
@@ -225,10 +232,9 @@ void PowerParameterModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
 
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, n_threads);
+    result = Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, n_threads);
     result.print_results();
 };
-
 
 
 } // end namespace

@@ -28,7 +28,7 @@ public:
      * Constructor for the initialization of the protected components of the class.
      * @param filename1_ Name of the .txt file in which the time variables are kept
     */
-    TimeDomain(const T::FileNameType& filename1_);
+    explicit TimeDomain(const T::FileNameType& filename1_);
 
     /**
      * Default destructor 

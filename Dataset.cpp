@@ -80,7 +80,6 @@ void Dataset::check_filename(const T::FileNameType& filename2_) const{
         T::ExceptionType msg1 = "File ";
         T::ExceptionType msg2 = msg1.append((filename2_).c_str());
         T::ExceptionType msg3 = msg2.append(" does not exist.");
-        //throw MyException("File provided does not exist.");
         throw MyException(msg3);
     }
 };

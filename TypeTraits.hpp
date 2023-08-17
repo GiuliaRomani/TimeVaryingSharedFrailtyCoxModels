@@ -7,8 +7,13 @@
 #include <vector>
 #include <memory>
 #include <tuple>
-
 #include <Eigen/Dense>
+
+/**
+ * Struct containing the type aliases used in the project.
+*/
+
+namespace TVSFCM{
 
 struct TypeTraits{
     using VariableType = double;                    //! Type used to indicate the basic variable
@@ -33,6 +38,7 @@ struct TypeTraits{
     using VectorType = std::vector<VariableType>;                                           //! Type used for any vector of VariableType type
     using VectorIndexType = std::vector<IndexType>;                                         //! Type used to for any vector of IndexType type
     using VectorNumberType = std::vector<NumberType>;                                       //! Type used for storing integers
+
 
     /**
      * Tye of the factory. It is a map, where the first element indicates the numeric id of one model and the second element its name. 
@@ -80,6 +86,8 @@ struct TypeTraits{
     using TupleMatrixAType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
 
 };
+
+} // end namespace
 
 
 #endif //TYPETRAITS_HPP

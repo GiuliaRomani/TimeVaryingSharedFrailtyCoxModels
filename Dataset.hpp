@@ -12,14 +12,11 @@
  * Dataset class contains the dataset and other basic variables necessary to the execution of the time-varying models.
 */
 
-
 // Class 
 namespace TVSFCM{
 using T = TypeTraits;
 
-class Dataset: public TVSFCM::TimeDomain{
-using TimeDomain = TVSFCM::TimeDomain;
-
+class Dataset: public TimeDomain{
 public:
     /**
      * Default constructor
@@ -39,16 +36,16 @@ public:
     ~ Dataset() = default;
 
 protected:
-    T::NumberType n_individuals;                    // Number of individuals 
-    T::NumberType n_regressors;                     // Number of regressors
-    T::NumberType n_groups;                         // Number of groups in the cluster variable
+    T::NumberType n_individuals;                    //! Number of individuals 
+    T::NumberType n_regressors;                     //! Number of regressors
+    T::NumberType n_groups;                         //! Number of groups in the cluster variable
 
-    T::MatrixXdr dataset;                           // Matrix of the dataset (n_individuals, n_regressors)
-    T::VectorXdr time_to_event;                     // Vector of time-to-event (n_individuals)
-    T::MatrixXdr e_time;                            // Matrix of the e_time (n_individuals, n_intervals)
-    T::MatrixXdr dropout_intervals;                 // Matrix of the dropout events (n_individuals, n_intervals)
-    T::VectorXdrGroupType dataset_group;            // Vector of the individual group (n_gindividual)
-    T::MapType map_groups;                          // Map associating to each group the index of individuals belonging to that group (n_groups couples)
+    T::MatrixXdr dataset;                           //! Matrix of the dataset (n_individuals, n_regressors)
+    T::VectorXdr time_to_event;                     //! Vector of time-to-event (n_individuals)
+    T::MatrixXdr e_time;                            //! Matrix of the e_time (n_individuals, n_intervals)
+    T::MatrixXdr dropout_intervals;                 //! Matrix of the dropout events (n_individuals, n_intervals)
+    T::VectorXdrGroupType dataset_group;            //! Vector of the individual group (n_gindividual)
+    T::MapType map_groups;                          //! Map associating to each group the index of individuals belonging to that group (n_groups couples)
 
 
     /**
@@ -103,4 +100,5 @@ protected:
 };
 
 } // end namespace
+
 #endif // DATASET_HPP

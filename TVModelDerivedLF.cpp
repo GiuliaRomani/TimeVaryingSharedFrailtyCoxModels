@@ -8,13 +8,15 @@
 #include <algorithm>
 #include <random>
 
-namespace TVModel{
+/**
+ * Implementation of the methods declared in the class "StochasticTimeDependentCSFM"
+*/
+
+namespace TVSFCM{
 using T = TypeTraits;
 
-//-------------------------------------------------------------------------------------------------------------
-// Implementations for the LogFrailty model
 // Constructor
-LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::FileNameType& filename2):
+StochasticTimeDependentCSFM::StochasticTimeDependentCSFM(const T::FileNameType& filename1, const T::FileNameType& filename2):
         // Constructor for base classes
         ModelBase(filename1, filename2),
         Parameters(filename1, Dataset::n_intervals + Dataset::n_regressors + 3, 
@@ -37,13 +39,14 @@ LogFrailtyModel::LogFrailtyModel(const T::FileNameType& filename1, const T::File
 
 };
         
+
 // Virtual method for computing the number of parameters
-void LogFrailtyModel::compute_n_parameters() {
+void StochasticTimeDependentCSFM::compute_n_parameters() {
     n_parameters = (Dataset::n_intervals + Dataset::n_regressors + 3);
 };
 
 
-T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr& v_parameters_) const{
+T::TupleLFType StochasticTimeDependentCSFM::extract_parameters(T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
@@ -65,7 +68,8 @@ T::TupleLFType LogFrailtyModel::extract_parameters(T::VectorXdr& v_parameters_) 
     return std::make_tuple(phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r);
 };
 
-T::TupleDropoutType LogFrailtyModel::extract_dropout_variables(const T::SharedPtrType indexes_group_) const{
+
+T::TupleDropoutType StochasticTimeDependentCSFM::extract_dropout_variables(const T::SharedPtrType indexes_group_) const{
     // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::MatrixXdr d_ijk(n_individuals_group, Dataset::n_intervals);
@@ -86,7 +90,8 @@ T::TupleDropoutType LogFrailtyModel::extract_dropout_variables(const T::SharedPt
     return std::tuple(d_ijk, d_ij, d_i);
 };
 
-T::VectorXdr LogFrailtyModel::extract_time_to_event(const T::SharedPtrType indexes_group_) const{
+
+T::VectorXdr StochasticTimeDependentCSFM::extract_time_to_event(const T::SharedPtrType indexes_group_) const{
     // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::VectorXdr time_to_event_group(n_individuals_group);
@@ -98,8 +103,9 @@ T::VectorXdr LogFrailtyModel::extract_time_to_event(const T::SharedPtrType index
     return time_to_event_group;
 };
 
+
 // Method for building the log-likelihood
-void LogFrailtyModel::build_loglikelihood(){
+void StochasticTimeDependentCSFM::build_loglikelihood(){
 
     // Implement the function ll_lf
     ll_lf = [this] (T::VectorXdr& v_parameters_){
@@ -223,8 +229,9 @@ void LogFrailtyModel::build_loglikelihood(){
     };
 };
 
+
 // Method for building the global log-likelihood in a parallel version
-void LogFrailtyModel::build_loglikelihood_parallel(){
+void StochasticTimeDependentCSFM::build_loglikelihood_parallel(){
     ll_lf_parallel = [this] (T::VectorXdr& v_parameters_){
         T::VariableType log_likelihood = 0;
 
@@ -232,7 +239,8 @@ void LogFrailtyModel::build_loglikelihood_parallel(){
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    #pragma omp parallel for num_threads(n_threads) firstprivate(it_map) schedule(static) reduction(+:log_likelihood)
+    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
@@ -249,8 +257,9 @@ void LogFrailtyModel::build_loglikelihood_parallel(){
     };
 }
 
+
 // Method for building the second derivative of the function wrt one direction
-void LogFrailtyModel::build_dd_loglikelihood(){
+void StochasticTimeDependentCSFM::build_dd_loglikelihood(){
     // Implement the function dd_ll_pp
     dd_ll_lf = [this] (T::IndexType index_, T::VectorXdr& v_parameters_){
         T::VariableType value = v_parameters_(index_);
@@ -267,15 +276,17 @@ void LogFrailtyModel::build_dd_loglikelihood(){
     };
 };
 
+
 // Method for computing the second derivtaive of the log-likelihood
-void LogFrailtyModel::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
+void StochasticTimeDependentCSFM::compute_hessian_diagonal(T::VectorXdr& v_parameters_){
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_lf(i, v_parameters_);
     }
 };
 
+
 // compute the standard error of the parameters
-void LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
+void StochasticTimeDependentCSFM::compute_se(T::VectorXdr& v_parameters_){
      compute_hessian_diagonal(v_parameters_);
      T::VariableType information_element;
      
@@ -285,7 +296,8 @@ void LogFrailtyModel::compute_se(T::VectorXdr& v_parameters_){
      }
 };
 
-void LogFrailtyModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
+
+void StochasticTimeDependentCSFM::compute_sd_frailty(T::VectorXdr& v_parameters_){
     T::TupleLFType extracted_parameters = extract_parameters(v_parameters_);
     auto sigma2c = std::get<2>(extracted_parameters);
     auto sigmacb = std::get<3>(extracted_parameters);
@@ -301,8 +313,9 @@ void LogFrailtyModel::compute_sd_frailty(T::VectorXdr& v_parameters_){
     }
 }
 
+
 // Method for executing the log-likelihood
-void LogFrailtyModel::evaluate_loglikelihood(){
+void StochasticTimeDependentCSFM::evaluate_loglikelihood(){
     //Dataset::print_dimension_groups();
 
     T::VariableType optimal_ll_lf;
@@ -318,7 +331,7 @@ void LogFrailtyModel::evaluate_loglikelihood(){
     compute_sd_frailty(v_parameters);
        
     // Store the results in the class
-    result = ResultsMethod::Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty, n_threads);
+    result = Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty, n_threads);
     result.print_results();
 };
 

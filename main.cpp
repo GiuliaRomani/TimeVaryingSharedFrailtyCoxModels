@@ -11,17 +11,17 @@
 #include <iomanip>
 
 // Type alias
-using T = TypeTraits;
+using T = TVSFCM::TypeTraits;
 
 int main(int argc, char *argv[]){
 
     // Check the number of input files
     try{
         if(argc != 3){
-            throw MyException("Not enough files provided.");  
+            throw TVSFCM::MyException("Not enough files provided.");  
         }
     }
-    catch(const MyException& e){
+    catch(const TVSFCM::MyException& e){
         std::cout << e.what() << std::endl;
     };
     T::FileNameType filename1 = argv[1];
@@ -32,12 +32,12 @@ int main(int argc, char *argv[]){
     T::IdType id = datafile("Model/id_model", 2);
 
     // Create the object factory map
-    static T::FactoryType methods(RegisteredMethods());
-    PrintMethods(methods);
+    static T::FactoryType methods(TVSFCM::RegisteredMethods());
+    TVSFCM::PrintMethods(methods);
 
     // Call the model
     try{
-    std::unique_ptr<TVModel::ModelBase> ptrMethod = MakeLikelihoodMethod(id, filename1.c_str(), filename2.c_str());
+    std::unique_ptr<TVSFCM::ModelBase> ptrMethod = TVSFCM::MakeLikelihoodMethod(id, filename1.c_str(), filename2.c_str());
 
     // Measure time elapsed
     const auto start = std::chrono::steady_clock::now();
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
     const std::chrono::duration<T::VariableType> elapsed_seconds = end - start;
     std::cout << "Elapsed time: " << resetiosflags(std::ios::scientific) << elapsed_seconds.count() << "s" << std::endl; 
     }
-    catch(const MyException& e) {
+    catch(const TVSFCM::MyException& e) {
         std::cout << e.what() << std::endl;
     };
     

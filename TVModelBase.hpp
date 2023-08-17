@@ -1,10 +1,10 @@
-
 #ifndef TIME_VARYING_MODEL_BASE
 #define TIME_VARYING_MODEL_BASE
 
-// Include all necessary header files
+// Include header files
 #include "Dataset.hpp"
 #include "Results.hpp"
+#include "ParallelComponents.hpp"
 
 // Include libraries
 #include <iostream>
@@ -28,7 +28,8 @@
 namespace TVSFCM{
 using T = TypeTraits;
 
-class ModelBase: public Dataset{
+class ModelBase: public Dataset,
+                 public ParallelComponents{
 public:
     /** 
      * Default Constructor
@@ -54,7 +55,7 @@ public:
 
 
 protected:
-    TVSFCM::Results result;                                          //! Results of the model application
+    Results result;                                                         //! Results of the model application
                                               
     T::VariableType h_dd;                                                   //! Discretization step of the second derivative
 
@@ -63,8 +64,6 @@ protected:
     
     T::VectorXdr hessian_diag;                                              //! Diagonal of the Hessian matrix of the log-likelihood function
     T::VectorXdr se;                                                        //! Standard error of the parameters
-
-    T::NumberType n_threads;                                                //! Number of threads for the parallel version
 
     /**
      * Method for checking that the file from which we read the time variables really exists.
@@ -119,5 +118,6 @@ protected:
 };
 
 } // end namespace
+
 #endif // TIME_VARYING_MODEL_BASE
 

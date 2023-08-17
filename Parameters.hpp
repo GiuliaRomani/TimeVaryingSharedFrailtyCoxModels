@@ -1,15 +1,17 @@
 #ifndef PARAMETERS_HPP
 #define PARAMETERS_HPP
 
+// INclude header files
 #include "TypeTraits.hpp"
 
+// Include libraries
 #include <iostream>
 
 /**
  * Parameters class contains the unknown constrained parameters of the models. 
- * Each model defines its own vector and they differ both in shape and numerosity. 
- * Precisely, its dimension is computed starting from some variables belonging to different classes (Time, Dataset) and only once
- * the model is selected.
+ * Each model defines its own vector and they differ in both shape and numerosity. 
+ * Precisely, its dimension is computed starting from some variables belonging to different classes (Time, Dataset) and it is
+ * known only once the model is selected.
  * 
  * Theoretically this vector should be obtained as a result of a maximization procedure, that is not here applied.
  * Thus, the optimized vector is already provided and the correctness of its components is proved,
@@ -41,11 +43,10 @@ public:
             const T::NumberType& n_regressors_, const T::NumberType& n_ranges_, 
             const T::VectorNumberType& all_n_parameters_);
     
-
     /**
      * Default desctructor
     */
-   ~ Parameters() = default;
+    ~ Parameters() = default;
 
 
 protected:

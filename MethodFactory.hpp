@@ -1,4 +1,3 @@
-
 #ifndef METHODFACTORY_HPP
 #define METHODFACTORY_HPP
 
@@ -11,7 +10,7 @@
 #include <memory>
 #include <iostream>
 
-
+namespace TVSFCM{
 using T = TypeTraits;
 
 /**
@@ -21,9 +20,9 @@ using T = TypeTraits;
 T::FactoryType RegisteredMethods() {
     T::FactoryType mapMethod;
 
-    mapMethod.insert(std::pair(1, "Paik"));
-    mapMethod.insert(std::pair(2, "Power Parameter"));
-    mapMethod.insert(std::pair(3, "Stochastic Frailty"));
+    mapMethod.insert(std::pair(1, "AdaptedPaikeaM"));
+    mapMethod.insert(std::pair(2, "CSFM with Power Parameter"));
+    mapMethod.insert(std::pair(3, "Stochastic Time-Dependent CSFM"));
 
     return mapMethod;
 };
@@ -58,15 +57,16 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
  * TVModel::PowerParameterModel, TVModel::LogFrailtyModel. If a wrong numeric id is provided, it throws an exception.
 */
 template<class ... Args>
-std::unique_ptr<TVModel::ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
+std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
     switch(id){
-        case 1:  return std::make_unique<TVModel::PaikModel>(std::forward<Args>(args) ...);
-        case 2:  return std::make_unique<TVModel::PowerParameterModel>(std::forward<Args>(args) ...);
-        case 3:  return std::make_unique<TVModel::LogFrailtyModel>(std::forward<Args>(args) ...);            
+        case 1:  return std::make_unique<AdaptedPaikeaM>(std::forward<Args>(args) ...);
+        case 2:  return std::make_unique<CSFMwithPowerParameter>(std::forward<Args>(args) ...);
+        case 3:  return std::make_unique<StochasticTimeDependentCSFM>(std::forward<Args>(args) ...);            
         default:  throw MyException("Not existent id method!");
     };
 };
 
+} // end namespace
 
 #endif // METHODFACTORY_HPP
 

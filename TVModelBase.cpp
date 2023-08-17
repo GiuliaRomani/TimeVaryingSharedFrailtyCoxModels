@@ -6,13 +6,13 @@
 namespace TVSFCM{
 
 ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2): 
-		Dataset(filename1, filename2){
+		Dataset(filename1, filename2),
+        ParallelComponents(filename1){
 
     // Before extracting the discretization step from the input file, check that it exists.
     check_filename(filename1);
     GetPot datafile(filename1.c_str());
     h_dd = datafile("DiscretizationStep/h_dd",1e-3);
-    n_threads = static_cast<T::NumberType>(datafile("NumberThreads/n_threads", 1));
 
     // Initialize the other simple data structire
     variance_frailty.resize(Dataset::n_intervals);
@@ -34,7 +34,6 @@ void ModelBase::check_filename(const T::FileNameType& filename_) const{
         throw MyException(msg3);
     }
 };
-
 
 } // end namespace
 

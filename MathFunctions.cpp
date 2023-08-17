@@ -1,10 +1,12 @@
+// Include header files
 #include "TypeTraits.hpp"
 
+// Include libraries
 #include <iostream>
 #include <cmath>
 
+namespace TVSFCM{
 using T = TypeTraits;
-
 
 /**
  * The function computes the natual logarithm of the binomial coefficient between two integer numbers,
@@ -28,4 +30,5 @@ inline T::VariableType binom(T::NumberType n, T::NumberType k){
     return std::exp(logbinom(n,k));
 };
 
+} // end namespace
 
