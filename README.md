@@ -21,14 +21,14 @@ DataToolFile.txt: It is composed of different blocks read using GetPot and they 
 - Model
 - ParallelVersion
 
-## What the user need to decide
+## What the user needs to decide
 Other than the variables related to the dataset, the user has to decide two important blocks of the previous list: Model and ParallelVersion.
 
 Model: The user has to provide the numeric id of one of the three Time-Varying Shared Frailty Cox Model he/she wants to apply.
 The possibilities are: 
 - (1) for the "Adapted Paik et al's Model"
 - (2) for the "Centre-Specific Frailty Model with Power Parameter"
-- (3) for the "Stochastic Time-Dependent Centre-Specific Frailty Model"
+- (3) for the "Stochastic Time-Dependent Centre-Specific Frailty Model".
 If a different value is chosen, the project throws an exception.
 
 ParallelVersion: The C++ implementation of these models provides also a parallel version of some code sections, to speed up the computations.
@@ -39,7 +39,7 @@ The user has to provide three quantities:
     - (1) for "static"
     - (2) for "dynamic"
     - (3) for "guided"
-    - (4) for "auto"
+    - (4) for "auto".
 If any of the previous values is omitted, the project provides them a default value equal to (1). 
 Only for the schedule_type, if a different value is chosen, the project throws an exception.
 
