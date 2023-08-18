@@ -41,7 +41,7 @@ protected:
     void read_from_file(const T::FileNameType& filename1_);
 
     /**
-     * Method for checking that the parallel variables read from file are positive
+     * Method for checking that the parallel variables read from file are positive. Otherwise an exception is thrown.
      * @param n_threads_
      * @param chunk_size_
      * @param schedule_type_
@@ -49,7 +49,7 @@ protected:
     void check_condition(T::IntType n_threads_, T::IntType chunk_size_, T::IntType schedule_type_);
 
     /**
-     * Method for checking that the id of the schedule type exists, otherwise an exception is thrown
+     * Method for checking that the id of the schedule type exists, otherwise an exception is thrown.
     */
     void check_schedule_type() const;
 

@@ -31,10 +31,11 @@ AdaptedPaikeaM::AdaptedPaikeaM(const T::FileNameType& filename1, const T::FileNa
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
-            // Build the log-likelihood
+            // Build the log-likelihood functions
             build_loglikelihood();
             build_dd_loglikelihood();
 
+            // If the number of declared threads is > 1, then build also the log-likelihoof function for the parallel version
             if(n_threads > 1)
                 build_loglikelihood_parallel();
 

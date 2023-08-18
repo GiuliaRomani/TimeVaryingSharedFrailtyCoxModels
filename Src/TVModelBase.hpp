@@ -108,6 +108,10 @@ protected:
     */
     virtual void compute_sd_frailty(T::VectorXdr& v_parameters_) = 0;
 
+    /**
+     * Method for checking that the provided discretization step is positive, otherwise an exception is thrown.
+     * @param h_dd_ Discretization step
+    */
     void check_condition(T::VariableType h_dd_);
 
 };

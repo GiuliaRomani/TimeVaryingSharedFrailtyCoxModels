@@ -72,7 +72,7 @@ private:
     /**
      * Method for printing the results in case of not-parallel implementation
     */
-   void print_results_noparallel() const;
+    void print_results_noparallel() const;
 
 };
 

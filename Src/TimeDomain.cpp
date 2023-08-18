@@ -18,7 +18,7 @@ TimeDomain::TimeDomain(): n_intervals(0) {
 };
 
 TimeDomain::TimeDomain(const T::FileNameType& filename1_) { 
-    // Once sure it exists
+    // Read the data from file
     read_from_file(filename1_);
 };
 
@@ -26,46 +26,41 @@ TimeDomain::TimeDomain(const T::FileNameType& filename1_) {
 void TimeDomain::read_from_file(const T::FileNameType& filename1_){
     GetPot datafile(filename1_.c_str());
 
-    // Read number of subdivision of time domain and check correctness
-    T::IntType size_intervals_ = datafile("TimeDomain/length_vector_intervals", 0);
-    T::NumberType size_intervals = check_condition(size_intervals_);
+    // Read dimension of the time-domain vector
+    T::IntType size_v_intervals = datafile("TimeDomain/length_vector_intervals", 0);
+    T::NumberType n_intervals = check_condition(size_v_intervals);
     
     // To check if the vector of time intervals is sorted, to load it into a normal vector
-    T::VectorType v_intervals_copy(size_intervals, 0.);
-    for(T::NumberType i = 0; i < size_intervals; ++i){
-        v_intervals_copy[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
+    T::VectorType v_intervals(n_intervals, 0.);
+    for(T::NumberType i = 0; i < size_v_intervals; ++i){
+        v_intervals[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
 
     // Check correctness of the initialization
-    check_condition(v_intervals_copy);
+    check_condition(v_intervals);
 
     // Sort the vector in case it is not sorted
-    std::sort(v_intervals_copy.begin(), v_intervals_copy.end());
+    std::sort(v_intervals.begin(), v_intervals.end()); 
 
-    // Initialize the vector of the time domain subdivision using an Eigen trick
-    v_intervals.resize(size_intervals);
-    T::MappedVectorType vv_intervals(v_intervals_copy.data(), size_intervals); 
-    v_intervals = vv_intervals;  
-
-    // Initialize the number of intervals 
-    n_intervals = size_intervals - 1;
+    // Initialize the number of intervals as the dimension of the time-domain vector - 1 
+    n_intervals -= 1;
 };
 
-// Method for checking that the number of elements of the time vector is not null and is really provided
-T::NumberType TimeDomain::check_condition(const T::IntType& size_int) const{
-    if(size_int < 0)
-        throw MyException("Provided negative number of subdivision of time domain.");
-    else if(size_int == 0){
-        throw MyException("Null or not provided number of subdivisions of time domain.");
+// Method for checking that the number of elements of the time-domain vector is non negative and null
+T::NumberType TimeDomain::check_condition(const T::IntType& size_v_intervals_) const{
+    if(size_v_intervals_ < 0)
+        throw MyException("Provided negative dimension of the time domain vector.");
+    else if(size_v_intervals_ == 0){
+        throw MyException("Null or not provided dimension of the time-domain vector.");
     }
-    return static_cast<T::NumberType>(size_int);
+    return static_cast<T::NumberType>(size_v_intervals_);
 };
 
 // Method for checking conditions for time bounds
 void TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
     // If the entire vector is not provided, the first element will be NaN.
     if(std::isnan(*(v_intervals_.begin()))){
-        throw MyException("Vector of time intervals is not provided.");
+        throw MyException("Time-domain vector is not provided.");
     }
 
     // If the vector is provided but with a different dimension from the one 
@@ -73,12 +68,11 @@ void TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
     // If at least one element of the vector is negative, the program throws an exception.
     for(const auto & t: v_intervals_){
         if(std::isnan(t))
-            throw MyException("Wrong information about the lenght of the time intervals vector");
+            throw MyException("Wrong information about the lenght of the time-domain vector.");
         else if(t < 0)
-            throw MyException("At least one element of the vector of time intervals is negative.");
+            throw MyException("At least one element of the time-domain vector is negative.");
     }
 };
-
 
 } // end namespace
 

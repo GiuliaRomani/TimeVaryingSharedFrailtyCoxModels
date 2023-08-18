@@ -30,25 +30,24 @@ StochasticTimeDependentCSFM::StochasticTimeDependentCSFM(const T::FileNameType& 
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
-            // Build the log-likelihood
+            // Build the log-likelihood fuctions
             build_loglikelihood();
             build_dd_loglikelihood();
 
+            // If more than 1 threads is declared, build also the log-likelihood function for the parallel execution
             if(n_threads > 1)
                 build_loglikelihood_parallel();
 
 };
         
-
 // Virtual method for computing the number of parameters
 void StochasticTimeDependentCSFM::compute_n_parameters() {
     n_parameters = (Dataset::n_intervals + Dataset::n_regressors + 3);
 };
 
-
 T::TupleLFType StochasticTimeDependentCSFM::extract_parameters(T::VectorXdr& v_parameters_) const{
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                  
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
     T::VariableType lambda1 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors);
     T::VariableType lambda2 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors+1);
@@ -65,6 +64,7 @@ T::TupleLFType StochasticTimeDependentCSFM::extract_parameters(T::VectorXdr& v_p
     T::VariableType gammas = sigmacb / sigma2b;
     T::VariableType sigma2r = sigma2c - sigma2b * gammas * gammas;
 
+    // Return a tuple with all the variables to be returned
     return std::make_tuple(phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r);
 };
 
@@ -132,7 +132,6 @@ void StochasticTimeDependentCSFM::build_loglikelihood(){
     ll_group_lf = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType indexes_group_){
 
         // Extract single parameters from the vector
-        // v_parameters_(index) = x;
         auto [phi, betar, sigma2c, sigmacb, sigma2b, gammas, sigma2r] = extract_parameters(v_parameters_);
         auto [d_ijk, d_ij, d_i] = extract_dropout_variables(indexes_group_);
 
@@ -306,7 +305,7 @@ void StochasticTimeDependentCSFM::compute_sd_frailty(T::VectorXdr& v_parameters_
     T::VariableType instant = 0.;
 
     for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
-        instant = Dataset::v_intervals(k);
+        instant = Dataset::v_intervals[k];
         
         variance_frailty(k) = sigma2c + sigma2b * instant * instant + 2 * sigmacb * instant;
         sd_frailty(k) = std::sqrt(variance_frailty(k));

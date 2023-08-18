@@ -36,8 +36,8 @@ public:
     ~ TimeDomain() = default;
 
 protected:
-    T::VectorXdr v_intervals;                               //! Vector of time instants, that constitute the intervals of the time domain
-    T::NumberType n_intervals;                              //! Number of intervals of the time domain
+    T::VectorType v_intervals;                               //! Vector of time instants, constituting the intervals of the time domain. Also called time-domain vector
+    T::NumberType n_intervals;                               //! Number of intervals of the time domain
 
     /**
      * Method for reading time variables from a file, using GetPot
@@ -46,14 +46,16 @@ protected:
     void read_from_file(const T::FileNameType& filename1_);
 
     /**
-     * Method for checking that the dimension of the vector of time intervals is provided and has not null dimension.
+     * Method for checking that the dimension of the time-domain vector is provided, it is not null
+     * and not negative.
      * Otherwise, it throws an exception.
-     * @param size dimension of the vector of time intervals
+     * @param size Integer dimension of the time-domain vector
+     * @return The same dimension but converted into an unsigned int
     */
-    T::NumberType check_condition(const T::IntType& size) const;
+    T::NumberType check_condition(const T::IntType& size_v_intervals_) const;
 
     /**
-     * Method for checking that all the elements of the vector are really provided.
+     * Method for checking that all the elements of the time-domain vector are really provided.
      * Otherwise, it throws an exception.
      * @param v_intervals_ Vector of time intervals
     */

@@ -19,7 +19,7 @@ ParallelComponents::ParallelComponents(const T::FileNameType& filename1_){
     set_schedule_type_name();
 };
 
-// Method for reading data from file
+// Method for reading data from file and check they are positive
 void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     GetPot datafile(filename1_.c_str());
 
@@ -32,7 +32,6 @@ void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     // Check the input values are not negative
     check_condition(n_threads_, chunk_size_, schedule_type_);
 };
-
 
 // Method for checking the parallel input variables are positive
 void ParallelComponents::check_condition(T::IntType n_threads_, T::IntType chunk_size_, T::IntType schedule_type_){
@@ -47,7 +46,6 @@ void ParallelComponents::check_condition(T::IntType n_threads_, T::IntType chunk
     chunk_size = static_cast<T::NumberType>(chunk_size_);
     schedule_type = static_cast<T::NumberType>(schedule_type_);
 };
-
 
 // Method for checking the schedule type exists
 void ParallelComponents::check_schedule_type() const{

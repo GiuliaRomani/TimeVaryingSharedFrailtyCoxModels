@@ -6,23 +6,25 @@
 namespace TVSFCM{
 
 ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& filename2): 
-		Dataset(filename1, filename2),
+	    Dataset(filename1, filename2),
         ParallelComponents(filename1){
 
+    // Initialize GetPot and read the discretization step. Then check its positiveness
     GetPot datafile(filename1.c_str());
     h_dd = datafile("DiscretizationStep/h_dd", 1e-3);
     check_condition(h_dd);
 
-    // Initialize the other simple data structire
+    // Initialize the other the frailty variance and standard deviation to the number of intervals of the time-domain
     variance_frailty.resize(Dataset::n_intervals);
     sd_frailty.resize(Dataset::n_intervals);
     
-    // Correct dimension will be set up for each method
+    // Initialize to 0 the dimension of the hessian matrix and the vector of standard error, because they depend
+    // on the parameter vector
     hessian_diag.resize(0);
     se.resize(0);
 };
 
-
+// Method for checking that the discretization step is positive
 void ModelBase::check_condition(T::VariableType h_dd_){
     if(h_dd_ < 0)
         throw MyException("Provided negative discretization step.");

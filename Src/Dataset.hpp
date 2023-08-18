@@ -55,6 +55,13 @@ protected:
     void read_from_file(const T::FileNameType& filename2_);
 
     /**
+     * Method for checking that the future dimensions of the dataset are not-negative, otherwise an excpetion is thrown
+     * @param n_individuals_ Number of individuals
+     * @param n_regressors_ Number of regressors
+    */
+    void check_condition(T::IntType n_individuals_, T::IntType n_regressors_);
+
+    /**
      * Add the index (of the dataset) of an individual belonging to a precise group, to the vector containing all the individuals of the same group
      * @param name_group Name of the group the individual belong to
      * @param index_individual Index (of the dataset) of the individual
@@ -90,7 +97,7 @@ protected:
     /**
      * Method for printing the number of individuals in each group
     */
-   void print_dimension_groups();
+    void print_dimension_groups();
 };
 
 } // end namespace
