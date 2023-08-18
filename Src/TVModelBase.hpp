@@ -65,13 +65,6 @@ protected:
     T::VectorXdr hessian_diag;                                              //! Diagonal of the Hessian matrix of the log-likelihood function
     T::VectorXdr se;                                                        //! Standard error of the parameters
 
-    /**
-     * Method for checking that the file from which we read the time variables really exists.
-     * Otherwise, it throws an exception.
-     * @param filename Name of the file .txt containing time variables
-    */
-    void check_filename(const T::FileNameType& filename) const;
-
     /** 
      * Virtual pure method for computing the model number of parameters
     */
@@ -114,6 +107,8 @@ protected:
      * @param v_parameters_ Optimal vector of parameters
     */
     virtual void compute_sd_frailty(T::VectorXdr& v_parameters_) = 0;
+
+    void check_condition(T::VariableType h_dd_);
 
 };
 

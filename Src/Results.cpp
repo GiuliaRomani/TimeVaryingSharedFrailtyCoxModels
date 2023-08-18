@@ -59,8 +59,8 @@ void Results::print_results_noparallel() const{
         if (i % 6 == 0)
             std::cout << std::endl;
     }
-    std::cout << std::endl;
 
+    std::cout << std::endl;
     std::cout << "Standard deviation of the frailty:" << std::endl;;
     for(T::IndexType i = 1; i <= sd_frailty.size(); ++i){
         std::cout << std::setprecision(3) << sd_frailty(i-1) << " ";

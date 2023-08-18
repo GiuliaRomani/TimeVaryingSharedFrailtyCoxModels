@@ -12,8 +12,6 @@ namespace TVSFCM{
 // Constructor
 Dataset::Dataset(const T::FileNameType& filename1_, const T::FileNameType& filename2_): 
     TimeDomain(filename1_) {
-    // Check the second input fle exists
-    check_filename(filename2_);
 
     // Initialize the number of groups to zero
     n_groups = 0;
@@ -70,17 +68,6 @@ void Dataset::read_from_file(const T::FileNameType& filename2_){
             j = 0;
             i += 1;
         }
-    }
-};
-
-// Method for checking the filename is correct and exists
-void Dataset::check_filename(const T::FileNameType& filename2_) const{
-    std::ifstream check(filename2_);
-    if(check.fail()){
-        T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename2_).c_str());
-        T::ExceptionType msg3 = msg2.append(" does not exist.");
-        throw MyException(msg3);
     }
 };
 

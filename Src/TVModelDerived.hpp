@@ -325,7 +325,7 @@ private:
     T::NumberType n_parameters;                                             //! Number of parameter of the model 
     T::VectorXdr& v_parameters = Parameters::v_parameters;                  //! Vector of parameters
 
-    T::IdNameType name_method = "LogFrailty";                               //! Name of this method
+    T::IdNameType name_method = "Stcohastic Time Dependent CSFM";           //! Name of this method
 
     /**
      * This function is later built as a lambda function. 

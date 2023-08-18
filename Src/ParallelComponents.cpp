@@ -9,9 +9,6 @@ namespace TVSFCM{
     
 // Constuctor
 ParallelComponents::ParallelComponents(const T::FileNameType& filename1_){
-    // Check the input file really exists
-    check_filename(filename1_);
-
     // If it exists, extract and store the variables
     read_from_file(filename1_);
 
@@ -22,25 +19,35 @@ ParallelComponents::ParallelComponents(const T::FileNameType& filename1_){
     set_schedule_type_name();
 };
 
-// Method for checking the filename is correct and exits
-void ParallelComponents::check_filename(const T::FileNameType& filename1_) const{
-    std::ifstream check(filename1_);
-    if(check.fail()){
-        T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename1_).c_str());
-        T::ExceptionType msg3 = msg2.append(" does not exist.");
-        throw MyException(msg3);
-    }
-};
-
 // Method for reading data from file
 void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     GetPot datafile(filename1_.c_str());
 
-    n_threads = static_cast<T::NumberType>(datafile("ParallelVersion/n_threads", 1));
-    chunk_size = static_cast<T::NumberType>(datafile("ParallelVersion/chunk_size", 1));
-    schedule_type = static_cast<T::NumberType>(datafile("ParallelVersion/id_schedule_type", 1));
+    T::IntType n_threads_, chunk_size_, schedule_type_;
+
+    n_threads_ = datafile("ParallelVersion/n_threads", 1);
+    chunk_size_ = datafile("ParallelVersion/chunk_size", 1);
+    schedule_type_ = datafile("ParallelVersion/id_schedule_type", 1); 
+
+    // Check the input values are not negative
+    check_condition(n_threads_, chunk_size_, schedule_type_);
 };
+
+
+// Method for checking the parallel input variables are positive
+void ParallelComponents::check_condition(T::IntType n_threads_, T::IntType chunk_size_, T::IntType schedule_type_){
+    if(n_threads_ < 0)
+        throw MyException("Provided negative value for number of threads.");
+    else if(chunk_size_ < 0)
+        throw MyException("Provided negative value for chunk size.");
+    else if(schedule_type_ < 0)
+        throw MyException("Provided negative value for the type of schedule");
+
+    n_threads = static_cast<T::NumberType>(n_threads_);
+    chunk_size = static_cast<T::NumberType>(chunk_size_);
+    schedule_type = static_cast<T::NumberType>(schedule_type_);
+};
+
 
 // Method for checking the schedule type exists
 void ParallelComponents::check_schedule_type() const{

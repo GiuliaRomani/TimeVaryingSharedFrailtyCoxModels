@@ -27,6 +27,13 @@ T::FactoryType RegisteredMethods() {
     return mapMethod;
 };
 
+// Check that the id of the method is positive and then convert it
+T::IdType check_id_type(T::IntType id_) {
+    if(id_ < 0)
+        throw MyException("Provided negative id method.");
+
+    return static_cast<T::IdType>(id_);
+};
 
 /**
  * This method print the numerical id and the name of the time-vaying model stored in the FactoryType object.
@@ -62,7 +69,7 @@ std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... 
         case 1:  return std::make_unique<AdaptedPaikeaM>(std::forward<Args>(args) ...);
         case 2:  return std::make_unique<CSFMwithPowerParameter>(std::forward<Args>(args) ...);
         case 3:  return std::make_unique<StochasticTimeDependentCSFM>(std::forward<Args>(args) ...);            
-        default:  throw MyException("Not existent id method!");
+        default:  throw MyException("Not existent or not provided id method!");
     };
 };
 

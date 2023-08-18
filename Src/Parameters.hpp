@@ -62,12 +62,6 @@ protected:
  
 
     /**
-     * Method for checking the existence of the file passed as input
-     * @param filename1_ Name of the file, whose existence in the directory must be checked
-    */
-    void check_filename(const T::FileNameType& filename1_) const;
-
-    /**
      * Method for reading the range of the parameters and the optimized vector of parameters from an input file.
      * Some controls on the meaningfull anc correctness of the initialized values are done.
      * @param filename1_ Name of a .txt file

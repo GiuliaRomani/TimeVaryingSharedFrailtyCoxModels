@@ -17,6 +17,7 @@ namespace TVSFCM{
 
 struct TypeTraits{
     using VariableType = double;                    //! Type used to indicate the basic variable
+    using IntType = int;
     using NumberType = unsigned int;                //! Type used to indicate a positive integer number of elements
     using IndexType = unsigned int;                 //! Type used to indicate any index of a matrix or of a vector
     using CheckType = bool;                         //! Type used for returning the status of a check/control
@@ -86,7 +87,6 @@ struct TypeTraits{
      * Type used to indicate the tuple for the variables of the dataset
     */
     using TupleMatrixAType = std::tuple<MatrixXdr, VectorXdr, VariableType>;
-
 };
 
 } // end namespace

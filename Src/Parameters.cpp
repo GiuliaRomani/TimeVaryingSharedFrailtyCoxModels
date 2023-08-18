@@ -21,9 +21,6 @@ Parameters::Parameters(const T::FileNameType& filename1_,
             n_intervals(n_intervals_),
             n_regressors(n_regressors_),
             n_ranges(n_ranges_){
-                // Check the input file really exists
-                check_filename(filename1_);
-
             	// Resize the vector of parameters
             	v_parameters.resize(n_parameters);	
             	
@@ -32,17 +29,6 @@ Parameters::Parameters(const T::FileNameType& filename1_,
                 
                 // Read data from file
                 read_from_file(filename1_);
-};
-
-// Method for checking the filename is correct and exits
-void Parameters::check_filename(const T::FileNameType& filename1_) const{
-    std::ifstream check(filename1_);
-    if(check.fail()){
-        T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename1_).c_str());
-        T::ExceptionType msg3 = msg2.append(" does not exist.");
-        throw MyException(msg3);
-    }
 };
 
 // Method for reading data from file

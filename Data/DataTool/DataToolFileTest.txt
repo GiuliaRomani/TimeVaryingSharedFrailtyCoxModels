@@ -33,7 +33,7 @@
 [../]
 
 [ParallelVersion]
-	n_threads = 2
+	n_threads = 1
 	chunk_size = 2
-	id_schedule_type = 8
+	id_schedule_type = 2
 [../]

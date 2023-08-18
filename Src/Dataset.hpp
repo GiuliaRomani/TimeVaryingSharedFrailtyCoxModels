@@ -55,12 +55,6 @@ protected:
     void read_from_file(const T::FileNameType& filename2_);
 
     /**
-     * Method for checking the file provided in input really exists
-     * @param filename2_ Name of .txt file 
-    */
-    void check_filename(const T::FileNameType& filename2_) const;
-
-    /**
      * Add the index (of the dataset) of an individual belonging to a precise group, to the vector containing all the individuals of the same group
      * @param name_group Name of the group the individual belong to
      * @param index_individual Index (of the dataset) of the individual

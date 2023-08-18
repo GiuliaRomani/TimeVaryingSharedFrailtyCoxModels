@@ -46,18 +46,11 @@ protected:
     void read_from_file(const T::FileNameType& filename1_);
 
     /**
-     * Method for checking that the file from which we read the time variables really exists.
-     * Otherwise, it throws an exception.
-     * @param filename1_ Name of the file .txt containing time variables
-    */
-    void check_filename(const T::FileNameType& filename1_) const;
-
-    /**
      * Method for checking that the dimension of the vector of time intervals is provided and has not null dimension.
      * Otherwise, it throws an exception.
      * @param size dimension of the vector of time intervals
     */
-    void check_condition(const T::NumberType& size) const;
+    T::NumberType check_condition(const T::IntType& size) const;
 
     /**
      * Method for checking that all the elements of the vector are really provided.

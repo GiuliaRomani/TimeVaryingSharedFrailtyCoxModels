@@ -9,10 +9,9 @@ ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& fi
 		Dataset(filename1, filename2),
         ParallelComponents(filename1){
 
-    // Before extracting the discretization step from the input file, check that it exists.
-    check_filename(filename1);
     GetPot datafile(filename1.c_str());
-    h_dd = datafile("DiscretizationStep/h_dd",1e-3);
+    h_dd = datafile("DiscretizationStep/h_dd", 1e-3);
+    check_condition(h_dd);
 
     // Initialize the other simple data structire
     variance_frailty.resize(Dataset::n_intervals);
@@ -23,16 +22,10 @@ ModelBase::ModelBase(const T::FileNameType& filename1, const T::FileNameType& fi
     se.resize(0);
 };
 
-// Method for checking the filename is correct and exists
-void ModelBase::check_filename(const T::FileNameType& filename_) const{
-    std::ifstream check(filename_);
-    if(check.fail()){
-        T::ExceptionType msg1 = "File ";
-        T::ExceptionType msg2 = msg1.append((filename_).c_str());
-        T::ExceptionType msg3 = msg2.append(" does not exist.");
-        //throw MyException("File provided does not exist.");
-        throw MyException(msg3);
-    }
+
+void ModelBase::check_condition(T::VariableType h_dd_){
+    if(h_dd_ < 0)
+        throw MyException("Provided negative discretization step.");
 };
 
 } // end namespace
