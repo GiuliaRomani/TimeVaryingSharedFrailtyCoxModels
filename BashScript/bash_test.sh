@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 make distclean
 
 make
