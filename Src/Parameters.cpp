@@ -40,14 +40,14 @@ void Parameters::read_from_file(const T::FileNameType& filename1_){
     range_max_parameters.resize(n_ranges);
 
     // Read the min and max range of parameters and then check they are provided
-    for(T::NumberType i = 0; i < n_ranges; ++i){
+    for(T::IndexType i = 0; i < n_ranges; ++i){
         range_min_parameters[i] = datafile("Parameters/Ranges/range_min", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
         range_max_parameters[i] = datafile("Parameters/Ranges/range_max", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
     check_condition(range_min_parameters, range_max_parameters);
 
     // Read the parameters from the input file
-    for(T::NumberType i = 0; i < n_parameters; ++i){
+    for(T::IndexType i = 0; i < n_parameters; ++i){
     	v_parameters(i) = datafile("Parameters/Values/params", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
     check_condition(v_parameters);
@@ -82,7 +82,7 @@ void Parameters::initialize_all_n_parameters(const T::VectorNumberType& all_n_pa
 void Parameters::check_condition(const T::VectorType& range_min_, const T::VectorType& range_max_) const{
     const T::NumberType& n = range_min_.size();
     
-    for(T::NumberType i = 0; i < n; ++i){
+    for(T::IndexType i = 0; i < n; ++i){
         if(std::isnan(range_min_[i]) || std::isnan(range_max_[i])){
             throw MyException("Either the minimum or maximum range of at least a category is not provided.");
         }
@@ -99,15 +99,16 @@ void Parameters::check_condition(const T::VectorType& range_min_, const T::Vecto
 // Method for checking conditions for parameters values
 void Parameters::check_condition(const T::VectorXdr& v_parameters_) const{    
     // Check that each single value of the parameter vector is properly defined
-    T::NumberType n, actual_j = 0;
+    T::NumberType n = 0;
+    T::IndexType actual_j = 0;
     T::VariableType a,b = 0.;
     
-    for(T::NumberType i = 0; i < n_ranges; ++i){
+    for(T::IndexType i = 0; i < n_ranges; ++i){
     	n = all_n_parameters[i];
 	    a = range_min_parameters[i];
 	    b = range_max_parameters[i];
 	
-	    for(T::NumberType j = 0; j < n; ++j){
+	    for(T::IndexType j = 0; j < n; ++j){
 	    	if(std::isnan(v_parameters(actual_j))){
                 throw MyException("At least one parameter is not provided ");
 	    	}

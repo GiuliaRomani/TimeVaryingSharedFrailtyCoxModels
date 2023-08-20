@@ -180,7 +180,7 @@ void StochasticTimeDependentCSFM::build_loglikelihood(){
 
         arg1 = gammas * d_i;
         arg2 = d_ij.dot(time_to_event_group);
-        for(T::NumberType u = 0; u < n_nodes; ++u ){
+        for(T::IndexType u = 0; u < n_nodes; ++u ){
             partial1 = 0.;
             node = nodes[u];
             weight = weights[u];
@@ -188,7 +188,7 @@ void StochasticTimeDependentCSFM::build_loglikelihood(){
             for(const auto &i: *indexes_group_){
                 dataset_betar = Dataset::dataset.row(i) * betar;
                 time_to_event_i = Dataset::time_to_event(i);
-                for (T::NumberType k = 0; k < Dataset::n_intervals; ++k){
+                for (T::IndexType k = 0; k < Dataset::n_intervals; ++k){
                     res_f = f_ijk(arg3, k, time_to_event_i, v_parameters_);
                     partial1 += exp(dataset_betar) * res_f;
                 }
@@ -240,7 +240,7 @@ void StochasticTimeDependentCSFM::build_loglikelihood_parallel(){
 
     omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
     #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
-        for(T::NumberType i = 0; i < n_groups; ++i){
+        for(T::IndexType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
                 std::advance(it_map, i);
@@ -304,7 +304,7 @@ void StochasticTimeDependentCSFM::compute_sd_frailty(T::VectorXdr& v_parameters_
 
     T::VariableType instant = 0.;
 
-    for(T::NumberType k = 0; k < Dataset::n_intervals; ++k){
+    for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
         instant = Dataset::v_intervals[k];
         
         variance_frailty(k) = sigma2c + sigma2b * instant * instant + 2 * sigmacb * instant;

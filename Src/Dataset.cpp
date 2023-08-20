@@ -62,7 +62,7 @@ void Dataset::read_from_file(const T::FileNameType& filename2_){
             // Read the regressors, one at the time, and convert them into a double from a string.
             std::string value_regressor;
             while(getline(value_line, value_regressor, ',')){
-                double value = std::stod(value_regressor.c_str());
+                T::VariableType value = std::stod(value_regressor.c_str());
                 if( j < n_regressors)
                     dataset(i,j) = value;
                 else if(j == n_regressors){     // The last element is not a regressor but the time-to-event, that must be non-negative
@@ -81,7 +81,7 @@ void Dataset::read_from_file(const T::FileNameType& filename2_){
 };
 
 // Method for cheking the future dimensions of the dataset are non-negative
-void Dataset::check_condition(T::IntType n_individuals_, T::IntType n_regressors_){
+void Dataset::check_condition(const T::IntType n_individuals_, const T::IntType n_regressors_){
     if(n_individuals_ < 0)
         throw MyException("Provided negative number of individuals.");
     else if(n_regressors_ < 0)
@@ -113,8 +113,8 @@ void Dataset::initialize_dropout_intervals(){
     dropout_intervals.setZero(n_individuals, TimeDomain::n_intervals);
 
     // Fill the matrix according to the condition
-    for(T::NumberType i = 0; i < n_individuals; ++i){
-        for(T::NumberType k = 0; k < (TimeDomain::n_intervals); ++k){
+    for(T::IndexType i = 0; i < n_individuals; ++i){
+        for(T::IndexType k = 0; k < (TimeDomain::n_intervals); ++k){
             if((time_to_event(i) < TimeDomain::v_intervals[k+1]) & (time_to_event(i) >= TimeDomain::v_intervals[k]))
                 dropout_intervals(i,k) = 1.;
         }
@@ -128,17 +128,17 @@ void Dataset::initialize_e_time(){
 
     // Fill the matrix
     for(T::IndexType i = 0; i < n_individuals; ++i){
-        T::VariableType time_individual = time_to_event(i);
+        T::TimeType time_individual = time_to_event(i);
         for(T::IndexType k = 0; k < (TimeDomain::n_intervals); ++k){
-            T::VariableType v_k = TimeDomain::v_intervals[k];
-            T::VariableType v_kk = TimeDomain::v_intervals[k+1];
+            T::TimeType v_k = TimeDomain::v_intervals[k];
+            T::TimeType v_kk = TimeDomain::v_intervals[k+1];
             e_time(i,k) = e_time_function(time_individual, v_k, v_kk);
         }
     }
 };
 
 // Method for printing the number of individuals in each group
-void Dataset::print_dimension_groups(){
+void Dataset::print_dimension_groups() const{
     auto it_begin = map_groups.cbegin();
     auto it_end = map_groups.cend();
     T::NumberType num_individuals = 0;
@@ -155,10 +155,10 @@ void Dataset::print_dimension_groups(){
 }
 
 // Define the function to compute the e_time value in the matrix
-T::VariableType Dataset::e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk){
-    T::VariableType result = 0.;
+T::TimeType Dataset::e_time_function(const T::TimeType time_t, const T::TimeType v_k, const T::TimeType v_kk) const{
+    T::TimeType result = 0;
     if(time_t < v_k)
-        result = 0.;
+        result = 0;
     else if((time_t >= v_k) & (time_t < v_kk))
         result = (time_t - v_k);
     else if(time_t >= v_kk)

@@ -41,8 +41,8 @@ protected:
     T::NumberType n_groups;                         //! Number of groups in the cluster variable
 
     T::MatrixXdr dataset;                           //! Matrix of the dataset (n_individuals, n_regressors)
-    T::VectorXdr time_to_event;                     //! Vector of time-to-event (n_individuals)
-    T::MatrixXdr e_time;                            //! Matrix of the e_time (n_individuals, n_intervals)
+    T::VectorTimeXdr time_to_event;                     //! Vector of time-to-event (n_individuals)
+    T::MatrixTimeXdr e_time;                            //! Matrix of the e_time (n_individuals, n_intervals)
     T::MatrixXdr dropout_intervals;                 //! Matrix of the dropout events (n_individuals, n_intervals)
     T::VectorXdrGroupType dataset_group;            //! Vector of the individual group (n_gindividual)
     T::MapType map_groups;                          //! Map associating to each group the index of individuals belonging to that group (n_groups couples)
@@ -59,7 +59,7 @@ protected:
      * @param n_individuals_ Number of individuals
      * @param n_regressors_ Number of regressors
     */
-    void check_condition(T::IntType n_individuals_, T::IntType n_regressors_);
+    void check_condition(const T::IntType n_individuals_, const T::IntType n_regressors_);
 
     /**
      * Add the index (of the dataset) of an individual belonging to a precise group, to the vector containing all the individuals of the same group
@@ -92,12 +92,12 @@ protected:
      * @param v_kk right boundary of the k-th interval
      * @return e_time (e_ijk in the reference)
     */
-    T::VariableType e_time_function(T::VariableType time_t, T::VariableType v_k, T::VariableType v_kk);
+    T::TimeType e_time_function(const T::TimeType time_t, const T::TimeType v_k, const T::TimeType v_kk) const;
 
     /**
      * Method for printing the number of individuals in each group
     */
-    void print_dimension_groups();
+    void print_dimension_groups() const;
 };
 
 } // end namespace

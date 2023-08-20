@@ -32,7 +32,7 @@ void TimeDomain::read_from_file(const T::FileNameType& filename1_){
     
     // To check if the vector of time intervals is sorted, to load it into a normal vector
     v_intervals.resize(n_intervals);
-    for(T::NumberType i = 0; i < n_intervals; ++i){
+    for(T::IndexType i = 0; i < n_intervals; ++i){
         v_intervals[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
 
@@ -47,7 +47,7 @@ void TimeDomain::read_from_file(const T::FileNameType& filename1_){
 };
 
 // Method for checking that the number of elements of the time-domain vector is non negative and null
-void TimeDomain::check_condition(const T::IntType& size_v_intervals_){
+void TimeDomain::check_condition(const T::IntType size_v_intervals_){
     if(size_v_intervals_ < 0)
         throw MyException("Provided negative dimension of the time domain vector.");
     else if(size_v_intervals_ == 0){
@@ -57,7 +57,7 @@ void TimeDomain::check_condition(const T::IntType& size_v_intervals_){
 };
 
 // Method for checking conditions for time bounds
-void TimeDomain::check_condition(const T::VectorType & v_intervals_) const{
+void TimeDomain::check_condition(const T::VectorTimeType & v_intervals_) const{
     // If the entire vector is not provided, the first element will be NaN.
     if(std::isnan(*(v_intervals_.begin()))){
         throw MyException("Time-domain vector is not provided.");

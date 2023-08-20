@@ -17,10 +17,11 @@ namespace TVSFCM{
 
 struct TypeTraits{
     using VariableType = double;                    //! Type used to indicate the basic variable
-    using IntType = int;
+    using TimeType = double;                        //! Type used to indicate the temporal variables
     using NumberType = unsigned int;                //! Type used to indicate a positive integer number of elements
     using IndexType = unsigned int;                 //! Type used to indicate any index of a matrix or of a vector
     using CheckType = bool;                         //! Type used for returning the status of a check/control
+    using IntType = int;                            //! Type used by GetPot to read input data (the other option is double)
 
     using FileNameType = std::string;               //! Type used to indicate the name of the file passed to constructors
 
@@ -33,12 +34,14 @@ struct TypeTraits{
     
     using GroupNameType = std::string;              //! Type used to indicate the name of the clusters/groups in which the individuals are divided
 
-    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                      //! Type used for any dynamic vector
-    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic>;         //! Type used for any dynamic matrix Eigen::RowMajor
+    using VectorXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, 1>;                      //! Type used for any dynamic vector of internal type VariableType
+    using VectorTimeXdr = Eigen::Matrix<TimeType, Eigen::Dynamic, 1>;                      //! Type used for any dynamic vector of internal type TimeType
+    using MatrixXdr = Eigen::Matrix<VariableType, Eigen::Dynamic, Eigen::Dynamic>;         //! Type used for any dynamic matrix of internal type VariableType
+    using MatrixTimeXdr = Eigen::Matrix<TimeType, Eigen::Dynamic, Eigen::Dynamic>;         //! Type used for any dynamic matrix of internal type TimeType
     using VectorXdrGroupType = Eigen::Matrix<GroupNameType, Eigen::Dynamic, 1>;            //! Type used for collecting all the groups
-    using MappedVectorType = Eigen::Map<VectorXdr>; 
 
     using VectorType = std::vector<VariableType>;                                           //! Type used for any vector of VariableType type
+    using VectorTimeType = std::vector<TimeType>;
     using VectorIndexType = std::vector<IndexType>;                                         //! Type used to for any vector of IndexType type
     using VectorNumberType = std::vector<NumberType>;                                       //! Type used for storing integers
 
