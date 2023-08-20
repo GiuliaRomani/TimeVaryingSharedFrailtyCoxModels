@@ -52,7 +52,7 @@ protected:
      * @param size Integer dimension of the time-domain vector
      * @return The same dimension but converted into an unsigned int
     */
-    T::NumberType check_condition(const T::IntType& size_v_intervals_) const;
+    void check_condition(const T::IntType& size_v_intervals_);
 
     /**
      * Method for checking that all the elements of the time-domain vector are really provided.

@@ -49,6 +49,12 @@ public:
     virtual void evaluate_loglikelihood() = 0;
 
     /**
+     * Method for printing the results of the model application. It calls the print_results() method
+     * of the Result class
+    */
+    void print_results() const;
+
+    /**
      * Default destructor
     */
     virtual ~ ModelBase() = default;

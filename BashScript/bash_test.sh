@@ -8,7 +8,7 @@ make
 
 cd Src
 
-#clear 
+clear 
 
 ./main ../Data/DataTool/DataToolFileTest.txt ../Data/DataIndividuals/DataIndividualsFileTest.txt
 

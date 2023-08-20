@@ -42,6 +42,8 @@ int main(int argc, char *argv[]){
         const auto end = std::chrono::steady_clock::now();
         const std::chrono::duration<T::VariableType> elapsed_seconds = end - start;
 
+        ptrMethod -> print_results();
+
         std::cout << std::endl;
         std::cout << "Elapsed time: " << resetiosflags(std::ios::scientific) << elapsed_seconds.count() << "s" << std::endl; 
 

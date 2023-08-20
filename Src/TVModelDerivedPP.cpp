@@ -133,8 +133,9 @@ void CSFMwithPowerParameter::build_loglikelihood_parallel(){
         T::MapType::iterator it_map;
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
 
-    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
-    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
+    // ParallelComponents::chunk_size
+    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), 0);
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) shared(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::NumberType i = 0; i < n_groups; ++i){
             if(it_map != it_map_end){
                 it_map = Dataset::map_groups.begin();
@@ -234,7 +235,6 @@ void CSFMwithPowerParameter::evaluate_loglikelihood(){
     // Store the results in the class
     result = Results(name_method, n_parameters, v_parameters, optimal_ll_pp, se, sd_frailty, 
                     ParallelComponents::n_threads, ParallelComponents::chunk_size, ParallelComponents::schedule_type_name);
-    result.print_results();
 };
 
 

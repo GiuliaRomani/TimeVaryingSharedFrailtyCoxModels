@@ -28,11 +28,11 @@ void TimeDomain::read_from_file(const T::FileNameType& filename1_){
 
     // Read dimension of the time-domain vector
     T::IntType size_v_intervals = datafile("TimeDomain/length_vector_intervals", 0);
-    T::NumberType n_intervals = check_condition(size_v_intervals);
+    check_condition(size_v_intervals);
     
     // To check if the vector of time intervals is sorted, to load it into a normal vector
-    T::VectorType v_intervals(n_intervals, 0.);
-    for(T::NumberType i = 0; i < size_v_intervals; ++i){
+    v_intervals.resize(n_intervals);
+    for(T::NumberType i = 0; i < n_intervals; ++i){
         v_intervals[i] = datafile("TimeDomain/vector_intervals", std::numeric_limits<T::VariableType>::quiet_NaN(), i);
     }
 
@@ -47,13 +47,13 @@ void TimeDomain::read_from_file(const T::FileNameType& filename1_){
 };
 
 // Method for checking that the number of elements of the time-domain vector is non negative and null
-T::NumberType TimeDomain::check_condition(const T::IntType& size_v_intervals_) const{
+void TimeDomain::check_condition(const T::IntType& size_v_intervals_){
     if(size_v_intervals_ < 0)
         throw MyException("Provided negative dimension of the time domain vector.");
     else if(size_v_intervals_ == 0){
         throw MyException("Null or not provided dimension of the time-domain vector.");
     }
-    return static_cast<T::NumberType>(size_v_intervals_);
+    n_intervals = static_cast<T::NumberType>(size_v_intervals_);
 };
 
 // Method for checking conditions for time bounds

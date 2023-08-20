@@ -39,7 +39,7 @@ void Results::print_results() const {
 
 
 void Results::print_results_noparallel() const{
-    std::cout << "------------------- Printing results -----------------------" << std::endl;
+    std::cout << "--------------------- Appplication Summary -----------------------" << std::endl;
     std::cout << std::endl;
 
     std::cout << "Parallel execution: NO" << std::endl;
@@ -71,7 +71,7 @@ void Results::print_results_noparallel() const{
 };
 
 void Results::print_results_parallel() const{
-    std::cout << "------------------- Printing results -----------------------" << std::endl;
+    std::cout << "--------------------- Application Summary -----------------------" << std::endl;
     std::cout << std::endl;
 
     std::cout << "Parallel execution with: number of threads = " << n_threads << std::endl;

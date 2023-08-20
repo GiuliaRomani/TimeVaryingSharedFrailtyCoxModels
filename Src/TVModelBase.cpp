@@ -30,5 +30,10 @@ void ModelBase::check_condition(T::VariableType h_dd_){
         throw MyException("Provided negative discretization step.");
 };
 
+// Method for printing the results of the model application
+void ModelBase::print_results() const{
+    result.print_results();
+}
+
 } // end namespace
 

@@ -84,7 +84,7 @@ void Parameters::check_condition(const T::VectorType& range_min_, const T::Vecto
     
     for(T::NumberType i = 0; i < n; ++i){
         if(std::isnan(range_min_[i]) || std::isnan(range_max_[i])){
-            throw MyException("Either the minimum or maximum range at least a category is not provided ");
+            throw MyException("Either the minimum or maximum range of at least a category is not provided.");
         }
 
         if(range_min_[i] > range_max_[i]){
