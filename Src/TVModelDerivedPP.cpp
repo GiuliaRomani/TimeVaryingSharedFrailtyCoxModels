@@ -130,16 +130,16 @@ void CSFMwithPowerParameter::build_loglikelihood_parallel(){
         T::VariableType log_likelihood = 0;
 
         // For each group, compute the likelihood and then sum them
-        T::MapType::iterator it_map;
+        T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
+        T::MapType::iterator it_map;
 
-    // ParallelComponents::chunk_size
-    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), 0);
-    #pragma omp parallel for num_threads(ParallelComponents::n_threads) shared(it_map) schedule(runtime) reduction(+:log_likelihood)
-        for(T::IndexType i = 0; i < n_groups; ++i){
+    omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
+        for(T::IndexType j = 0; j < n_groups; ++j){
             if(it_map != it_map_end){
-                it_map = Dataset::map_groups.begin();
-                std::advance(it_map, i);
+                it_map = it_map_begin;
+                std::advance(it_map, j);
                 const auto& indexes_group = it_map->second;
 
                 log_likelihood += ll_group_pp(v_parameters_, indexes_group);

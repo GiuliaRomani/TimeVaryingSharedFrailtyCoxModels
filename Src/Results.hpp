@@ -62,17 +62,17 @@ private:
     /**
      * Compute the Akaike Informaion Criterior (AIC)
     */
-    void compute_AIC();
+    void compute_AIC() noexcept;
 
     /**
      * Method for printing the results in case of parallel implementation
     */
-    void print_results_parallel() const;
+    void print_results_parallel() const noexcept;
 
     /**
      * Method for printing the results in case of not-parallel implementation
     */
-    void print_results_noparallel() const;
+    void print_results_noparallel() const noexcept;
 
 };
 

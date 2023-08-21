@@ -17,7 +17,7 @@ using T = TypeTraits;
  * This method insert in a FactoryType object the available time-varying models, each represented by a couple composed of (numerical_id, name) of the model itself. 
  * @return Initialized FactoryType object
 */
-T::FactoryType RegisteredMethods() {
+T::FactoryType RegisteredMethods() noexcept{
     T::FactoryType mapMethod;
 
     mapMethod.insert(std::pair(1, "AdaptedPaikeaM"));
@@ -64,7 +64,7 @@ void PrintMethods(const T::FactoryType & FactoryMethods){
  * TVModel::PowerParameterModel, TVModel::LogFrailtyModel. If a wrong numeric id is provided, it throws an exception.
 */
 template<class ... Args>
-std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args){
+std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args) {
     switch(id){
         case 1:  return std::make_unique<AdaptedPaikeaM>(std::forward<Args>(args) ...);
         case 2:  return std::make_unique<CSFMwithPowerParameter>(std::forward<Args>(args) ...);

@@ -45,6 +45,9 @@ public:
     */
     void evaluate_loglikelihood() override;
 
+    /**
+     * Virtual destructor
+    */
     virtual ~ AdaptedPaikeaM() = default;
 
 private:
@@ -98,32 +101,32 @@ private:
     /**
      * Method for computing thr number of parameters of this model. It initalizes the private variable n_parameters
     */
-    void compute_n_parameters() override;
+    void compute_n_parameters() noexcept override;
 
     /**
      * Method for computing the diagonal of the hessian matrix of the log-likelihood function.
      * @param v_parameters_ Vector of parameters, where the hessian must be evaluated
     */
-    void compute_hessian_diagonal(T::VectorXdr& v_parameters_);
+    void compute_hessian_diagonal(T::VectorXdr& v_parameters_) noexcept override;
 
     /**
      * Method for computing the standard error of the parameters
      * @param v_parameters_ Vector of parameers, whose standard error must be produced
     */
-    void compute_se(T::VectorXdr& v_parameters_);
+    void compute_se(T::VectorXdr& v_parameters_) noexcept override;
 
     /**
      * Method for computing the standard deviation of the frailty 
      * @param v_parameters_ Vector of parameters
     */
-    void compute_sd_frailty(T::VectorXdr& v_parameters_) override;
+    void compute_sd_frailty(T::VectorXdr& v_parameters_) noexcept override;
     
     /**
      * Method for extracting each single parameter of the model or a single vector of similar parameters
      * @param v_parameters_ Vector of parameters
      * @return A customized model tuple containing all the extracted parameters
     */
-    T::TuplePaikType extract_parameters(T::VectorXdr& v_parameters_);
+    T::TuplePaikType extract_parameters(T::VectorXdr& v_parameters_) noexcept;
 
     /**
      * Method for extracting the variables related to the dataset, for each group/cluster of individuals
@@ -132,30 +135,30 @@ private:
      * @param betar_ Vector of regressor coefficients
      * @return A customized tuple containing the variables to be extracted
     */
-    T::TupleMatrixAType extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_);
+    T::TupleMatrixAType extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_) noexcept;
 
     /**
      * Method for extracting the variables related to the dropout, for each group/cluster of individuals
      * @param indexes_group_ Vector of indexes of the dataset, of the individuals belonging to a cluster/group/faculty
      * @return A customized tuple containing the dropout variables to be extracted
     */
-    T::TupleDropoutType extract_dropout_variables(T::SharedPtrType indexes_group_);
+    T::TupleDropoutType extract_dropout_variables(T::SharedPtrType indexes_group_) noexcept;
 
     /**
      * Method for building the model log-likelihood function.
     */
-    void build_loglikelihood() override;
+    void build_loglikelihood() noexcept override;
 
     /**
      * Method for building the model log-likelihood function in parallel
     */
-    void build_loglikelihood_parallel() override;
+    void build_loglikelihood_parallel() noexcept override;
 
     /**
      * Method for building the second derivative of the log-likelihood function. 
      * It uses a centered finite difference scheme, with accuracy of the secon order.
     */
-    void build_dd_loglikelihood() override;
+    void build_dd_loglikelihood() noexcept override;
 };
 //--------------------------------------------------------------------------------------------------
 
@@ -407,13 +410,13 @@ private:
      * Method for computing the diagonal of the hessian matrix of the log-likelihood function.
      * @param v_parameters_ Vector of parameters, where the hessian must be evaluated
     */
-    void compute_hessian_diagonal(T::VectorXdr& v_parameters_);
+    void compute_hessian_diagonal(T::VectorXdr& v_parameters_) override;
 
     /**
      * Method for computing the standard error of the parameters
      * @param v_parameters_ Vector of parameers, whose standard error must be produced
     */
-    void compute_se(T::VectorXdr& v_parameters_);
+    void compute_se(T::VectorXdr& v_parameters_) override;
 
     /**
      * Method for computing the standard deviation of the frailty 

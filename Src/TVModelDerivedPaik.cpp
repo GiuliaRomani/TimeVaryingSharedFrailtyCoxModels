@@ -49,7 +49,7 @@ void AdaptedPaikeaM::compute_n_parameters() {
 // Virtual method for extracting the parameters fromt the vector
 T::TuplePaikType AdaptedPaikeaM::extract_parameters(T::VectorXdr& v_parameters_){
     // Extract parameters from the vector
-    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 // block(0,0,n_intervals,1);  
+    T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                  
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
     T::VariableType mu1 = v_parameters_(Dataset::n_intervals + Dataset::n_regressors);
     T::VariableType mu2 = 1 - mu1;
@@ -192,15 +192,16 @@ void AdaptedPaikeaM::build_loglikelihood_parallel() {
         //T::NumberType id = 0;
 
         // For each group, compute the likelihood and then sum them
-        T::MapType::iterator it_map;
+        T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
+        T::MapType::iterator it_map;
 
     omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
     #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
-        for(T::IndexType i = 0; i < n_groups; ++i){
+        for(T::IndexType j = 0; j < n_groups; ++j){
             if(it_map != it_map_end){
-                it_map = Dataset::map_groups.begin();
-                std::advance(it_map, i);
+                it_map = it_map_begin;
+                std::advance(it_map, j);
                 const auto& indexes_group = it_map->second;
 
                 log_likelihood += ll_group_paik(v_parameters_, indexes_group);

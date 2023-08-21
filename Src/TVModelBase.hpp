@@ -52,7 +52,7 @@ public:
      * Method for printing the results of the model application. It calls the print_results() method
      * of the Result class
     */
-    void print_results() const;
+    void print_results() const noexcept;
 
     /**
      * Default destructor

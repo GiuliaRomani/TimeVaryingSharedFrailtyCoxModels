@@ -26,7 +26,7 @@ void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     T::IntType n_threads_, chunk_size_, schedule_type_;
 
     n_threads_ = datafile("ParallelVersion/n_threads", 1);
-    chunk_size_ = datafile("ParallelVersion/chunk_size", 1);
+    chunk_size_ = datafile("ParallelVersion/chunk_size", 0);
     schedule_type_ = datafile("ParallelVersion/id_schedule_type", 1); 
 
     // Check the input values are not negative

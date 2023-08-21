@@ -66,24 +66,24 @@ protected:
      * @param name_group Name of the group the individual belong to
      * @param index_individual Index (of the dataset) of the individual
     */
-    void add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual);
+    void add_to_map_groups(const T::GroupNameType& name_group, const T::IndexType& index_individual) noexcept;
 
     /**
      * Extract the vector of dataset indexes of all individuals belonging to a predefined cluster
      * @param name_group Group/cluster, whose individuals must be extracted
      * @return Shared pointer to the vector of indexes
     */
-    T::SharedPtrType extract_individuals_group(const T::GroupNameType& name_group) const;
+    T::SharedPtrType extract_individuals_group(const T::GroupNameType& name_group) const noexcept;
 
     /**
      * Initialize the temporal dropout variable d_ijk
     */
-    void initialize_dropout_intervals();
+    void initialize_dropout_intervals() noexcept;
 
     /**
      * Initialize the temporal variable e_time using the method e_time_function(...)
     */
-    void initialize_e_time();
+    void initialize_e_time() noexcept;
 
     /**
      * Method for defining the individual and interval e_time variable, according to its definition provided in the reference
@@ -92,12 +92,12 @@ protected:
      * @param v_kk right boundary of the k-th interval
      * @return e_time (e_ijk in the reference)
     */
-    T::TimeType e_time_function(const T::TimeType time_t, const T::TimeType v_k, const T::TimeType v_kk) const;
+    T::TimeType e_time_function(const T::TimeType time_t, const T::TimeType v_k, const T::TimeType v_kk) const noexcept;
 
     /**
      * Method for printing the number of individuals in each group
     */
-    void print_dimension_groups() const;
+    void print_dimension_groups() const noexcept;
 };
 
 } // end namespace

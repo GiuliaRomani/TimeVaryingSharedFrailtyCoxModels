@@ -15,7 +15,7 @@ using T = TypeTraits;
  * @param k Second term of the binomial coefficient
  * @return Logarithm of the binomial coefficient
 */
-inline T::VariableType logbinom(T::NumberType n, T::NumberType k){
+inline T::VariableType logbinom(T::NumberType n, T::NumberType k) noexcept{
     return std::lgamma(n+1) - std::lgamma(n-k+1) - std::lgamma(k+1);
 };
 
@@ -26,7 +26,7 @@ inline T::VariableType logbinom(T::NumberType n, T::NumberType k){
  * @param k Second term of the binomial coefficient
  * @return Binomial coefficient
 */
-inline T::VariableType binom(T::NumberType n, T::NumberType k){
+inline T::VariableType binom(T::NumberType n, T::NumberType k) noexcept{
     return std::exp(logbinom(n,k));
 };
 

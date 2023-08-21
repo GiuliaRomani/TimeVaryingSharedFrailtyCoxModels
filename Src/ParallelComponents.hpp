@@ -56,7 +56,7 @@ protected:
     /**
      * Method for initializing the name of the adopted schedule type
     */
-    void set_schedule_type_name();
+    void set_schedule_type_name() noexcept;
 };
 
 } // end namespace
