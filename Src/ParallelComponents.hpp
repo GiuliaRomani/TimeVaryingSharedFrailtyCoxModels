@@ -31,11 +31,11 @@ public:
 protected:
     T::NumberType n_threads;                                //! Number of threads for the omp parallel version
     T::NumberType chunk_size;                               //! Number of chunk size for the for loop
-    T::NumberType schedule_type;                            //! Id number for the for loop scheduling
+    T::IdType schedule_type;                                //! Id number for the for loop scheduling
     T::ScheduleType schedule_type_name;                     //! Name of the for loop scheduling
 
     /**
-     * Method for reading data from file and initializing the protected data structure 
+     * Method for reading data from file and initializing the protected data structures 
      * @param filename1_ Name of the .txt file containing the data
     */
     void read_from_file(const T::FileNameType& filename1_);
@@ -54,7 +54,7 @@ protected:
     void check_schedule_type() const;
 
     /**
-     * Method for initializing the name of the adopted schedule type
+     * Method for initializing the name of the adopted scheduling strategy
     */
     void set_schedule_type_name() noexcept;
 };

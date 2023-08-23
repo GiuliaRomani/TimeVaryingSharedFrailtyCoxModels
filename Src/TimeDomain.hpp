@@ -22,7 +22,7 @@ public:
     /**
      * Default constructor
     */
-    TimeDomain();
+    TimeDomain() = default;
 
     /**
      * Constructor for the initialization of the protected components of the class.

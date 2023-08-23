@@ -70,7 +70,7 @@ private:
     void print_results_parallel() const noexcept;
 
     /**
-     * Method for printing the results in case of not-parallel implementation
+     * Method for printing the results in case of serial implementation
     */
     void print_results_noparallel() const noexcept;
 

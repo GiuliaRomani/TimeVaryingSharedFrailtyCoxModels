@@ -43,7 +43,7 @@ public:
     /**
      * Destructor
     */
-    virtual ~ MyException() noexcept = default;
+    virtual ~ MyException() = default;
 
 protected:
     T::ExceptionType message;           //! Content of the exception

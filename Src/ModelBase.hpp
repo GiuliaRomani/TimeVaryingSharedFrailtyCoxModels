@@ -1,5 +1,5 @@
-#ifndef TIME_VARYING_MODEL_BASE
-#define TIME_VARYING_MODEL_BASE
+#ifndef MODEL_BASE_HPP
+#define MODEL_BASE_HPP
 
 // Include header files
 #include "Dataset.hpp"
@@ -10,18 +10,20 @@
 #include <iostream>
 
 /**
- * TVModel class: abstract base class for any Time-Varying Shared Frailty Cox model. It define the basic data and function members that
+ * ModelBase class: abstract base class for any Time-Varying Shared Frailty Cox model. It define the basic data and function members that
  * all the three different models required. 
  * 
  * 
  * It is abstract since no instaces of this class are allowed. 
  * 
- * The methods are pure to permit each model to its own implementation.
+ * Some of the methods are virtual to use polymorphism through an object factory.
  * 
- * Some of the methods are virtual to use polymorphism through a factory object.
+ * The methods are pure to permit each model to define its own implementation.
  * 
- * It is composed by the ResultsMethod::Results class for storing the result of a model application and 
- * it is publicly derived by the DatasetInfoClass::DatasetInfo class for the dataset and other useful variables of the temporal domain.
+ * 
+ * It is composed of the Results class for storing the result of a model application and 
+ * it is publicly derived by the Dataset class and ParallelComponents,
+ * for using the dataset, some useful variables of the temporal domain and the variables of the parallel computing.
 */
 
 // Class
@@ -77,7 +79,7 @@ protected:
     virtual void compute_n_parameters() = 0;
 
     /**
-     * Virtual pure method that construct the model log-likelihood 
+     * Virtual pure method that constructs the model log-likelihood 
     */
     virtual void build_loglikelihood() = 0;
 
@@ -108,7 +110,7 @@ protected:
     
 
     /**
-     * Virtual pure method for initializing and comuting the standard deviation 
+     * Virtual pure method for initializing and computing the standard deviation 
      * of the frailty variance
      * @param v_parameters_ Optimal vector of parameters
     */
@@ -118,11 +120,11 @@ protected:
      * Method for checking that the provided discretization step is positive, otherwise an exception is thrown.
      * @param h_dd_ Discretization step
     */
-    void check_condition(T::VariableType h_dd_);
+    void check_condition(T::VariableType h_dd_) const;
 
 };
 
 } // end namespace
 
-#endif // TIME_VARYING_MODEL_BASE
+#endif // MODEL_BASE_HPP
 

@@ -10,7 +10,7 @@ using T = TypeTraits;
 
 /**
  * The function computes the natual logarithm of the binomial coefficient between two integer numbers,
- * using the fact that the gamma function of an integer corresponds to the factorial of that integer.
+ * using the fact that the gamma function of an (integer + 1) corresponds to the factorial of that integer.
  * @param n First term of the binomial coefficient
  * @param k Second term of the binomial coefficient
  * @return Logarithm of the binomial coefficient

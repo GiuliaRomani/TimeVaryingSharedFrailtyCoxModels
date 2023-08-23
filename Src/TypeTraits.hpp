@@ -47,7 +47,7 @@ struct TypeTraits{
 
 
     /**
-     * Tye of the factory. It is a map, where the first element indicates the numeric id of one model and the second element its name. 
+     * Type of the object factory. It is a map, where the first element indicates the numeric id of one model and the second element its name. 
     */
     using FactoryType = std::map<IdType, IdNameType>;     
 
@@ -65,19 +65,19 @@ struct TypeTraits{
 
     /**
      * Type used to indicate a tuple associated to the "CSFM with Power Parameter". It contains the type of the different 
-     * categories that constitutes the vector of parameters.
+     * categories that constitute the vector of parameters.
     */
     using TuplePPType = std::tuple<VectorXdr, VectorXdr, VectorXdr, VariableType>;
 
     /**
-     * Type used to indicate a tuple associated to the "Adapted Paik et al.'s model". It contains the type of the different 
-     * categories that constitutes the vector of parameters.
+     * Type used to indicate a tuple associated to the "Adapted Paik eaM". It contains the type of the different 
+     * categories that constitute the vector of parameters.
     */
     using TuplePaikType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VectorXdr>;
 
     /**
      * Type used to indicate a tuple associated to the "Stochastic Time-Dependent CSFM ". It contains the type of the different 
-     * categories that constitutes the vector of parameters.
+     * categories that constitute the vector of parameters.
     */
     using TupleLFType = std::tuple<VectorXdr, VectorXdr, VariableType, VariableType, VariableType, VariableType, VariableType>;
 

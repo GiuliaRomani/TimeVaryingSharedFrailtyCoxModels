@@ -2,8 +2,8 @@
 #define METHODFACTORY_HPP
 
 // Include header files
-#include "TVModelBase.hpp"
-#include "TVModelDerived.hpp"
+#include "ModelBase.hpp"
+#include "ModelDerived.hpp"
 #include "MyException.hpp"
 
 // Include libraries
@@ -14,20 +14,25 @@ namespace TVSFCM{
 using T = TypeTraits;
 
 /**
- * This method insert in a FactoryType object the available time-varying models, each represented by a couple composed of (numerical_id, name) of the model itself. 
+ * This method inserts in a FactoryType object the available Time-Varying Shared Frailty Cox Models, 
+ * each represented by a couple composed of (numerical_id, name) of the model itself. 
  * @return Initialized FactoryType object
 */
-T::FactoryType RegisteredMethods() noexcept{
-    T::FactoryType mapMethod;
+T::FactoryType RegisterMethods() noexcept{
+    T::FactoryType MethodFactory;
 
-    mapMethod.insert(std::pair(1, "AdaptedPaikeaM"));
-    mapMethod.insert(std::pair(2, "CSFM with Power Parameter"));
-    mapMethod.insert(std::pair(3, "Stochastic Time-Dependent CSFM"));
+    MethodFactory.insert(std::pair(1, "AdaptedPaikeaM"));
+    MethodFactory.insert(std::pair(2, "CSFM with Power Parameter"));
+    MethodFactory.insert(std::pair(3, "Stochastic Time-Dependent CSFM"));
 
-    return mapMethod;
+    return MethodFactory;
 };
 
-// Check that the id of the method is positive and then convert it
+/**
+ * This method controls that the id of the method is positive. 
+ * If so, convert it from an integer to an unsigned integer. 
+ * Otherwise, it throws an exception.
+*/
 T::IdType check_id_type(T::IntType id_) {
     if(id_ < 0)
         throw MyException("Provided negative id method.");
@@ -36,39 +41,40 @@ T::IdType check_id_type(T::IntType id_) {
 };
 
 /**
- * This method print the numerical id and the name of the time-vaying model stored in the FactoryType object.
+ * This method prints the numerical id and the name of the time-vaying model stored in the FactoryType object.
  * 
  * If no models are contained, it throws an exception.
- * @param FactoryMethods FactoryMethods object, already intialized
+ * @param MethodFactory FactoryMethods object, already intialized
 */
-void PrintMethods(const T::FactoryType & FactoryMethods){
-    if(FactoryMethods.empty()){
-        throw MyException("FactoryMethods object is empty!");
+void PrintMethods(const T::FactoryType & MethodFactory){
+    if(MethodFactory.empty()){
+        throw MyException("MethodFactory object is empty!");
     }
 
     std::cout << "Registered methods in the factory:" << std::endl;
-    for (const auto & [id, name]: FactoryMethods){
+    for (const auto & [id, name]: MethodFactory){
         std::cout << id << " " << name << std::endl;
     }
     std::cout << std::endl;
 };
 
 /**
- * This method return a unique pointer to one of the time-varying model present in the FactoryType object.
+ * This method returns a unique pointer to the base class, initialized with one of the time-varying models
+ * present in the FactoryType object.
  * 
  * If the selected model does not exist, an exception is thrown.
  * 
  * @param id Numeric id of the model the user want to apply. 
- * @param args Variadic template for the arguments of the model call.
- * @return Unique pointer to base class TVModel::ModelBase, initialized with an object of the derived class, that could be TVModel::PaikModel, 
- * TVModel::PowerParameterModel, TVModel::LogFrailtyModel. If a wrong numeric id is provided, it throws an exception.
+ * @param filename1_ Name of the first file from which the parameters have to be extracted
+ * @param filename2_ Name of the second file from which the parameters have to be extracted
+ * @return Unique pointer to base class ModelBase, initialized with an object of the derived class, that could be AdaptedPaikeaM, 
+ * CSFMwithPowerParameter and StochasticTimeDependentCSFM. If a wrong numeric id is provided, it throws an exception.
 */
-template<class ... Args>
-std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, Args && ... args) {
+std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, const T::FileNameType& filename1_, const T::FileNameType& filename2_) {
     switch(id){
-        case 1:  return std::make_unique<AdaptedPaikeaM>(std::forward<Args>(args) ...);
-        case 2:  return std::make_unique<CSFMwithPowerParameter>(std::forward<Args>(args) ...);
-        case 3:  return std::make_unique<StochasticTimeDependentCSFM>(std::forward<Args>(args) ...);            
+        case 1:  return std::make_unique<AdaptedPaikeaM>(filename1_, filename2_);
+        case 2:  return std::make_unique<CSFMwithPowerParameter>(filename1_, filename2_);
+        case 3:  return std::make_unique<StochasticTimeDependentCSFM>(filename1_, filename2_);            
         default:  throw MyException("Not existent or not provided id method!");
     };
 };

@@ -1,6 +1,10 @@
 # .gitignore file for the PACS Project
 
-# Ignore 
+# Ignore the following files
+
 .vscode
 .make.dep
+
+.o
+
 

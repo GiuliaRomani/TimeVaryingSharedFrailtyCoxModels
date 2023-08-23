@@ -44,7 +44,7 @@ public:
             const T::VectorNumberType& all_n_parameters_);
     
     /**
-     * Default desctructor
+     * Default destructor
     */
     ~ Parameters() = default;
 
@@ -63,7 +63,7 @@ protected:
 
     /**
      * Method for reading the range of the parameters and the optimized vector of parameters from an input file.
-     * Some controls on the meaningfull anc correctness of the initialized values are done.
+     * A control on the correctness of the initialized values is done.
      * @param filename1_ Name of a .txt file
     */
     void read_from_file(const T::FileNameType& filename1_);   
@@ -78,7 +78,7 @@ protected:
     /**
      * This method controls that the vector of the minimum and maximum range of the parameters has been correctly 
      * filled during its construction (that is, the minimum range is less than or equal to the maximum range)
-     * and that no elements are missing. Othwerise, FALSE status is returned.
+     * and that no elements are missing. Othwerise, an exception is thrown.
      * @param range_min_ Vector of the minimum range of parameters
      * @param range_max_ Vector of the maximum range of parameters
     */
@@ -86,7 +86,7 @@ protected:
     
     /**
      * This method overloads the previous one based on the input and control that each parameter
-     * belong to its correct range, otherwise a negative status value is returned
+     * belong to its correct range, otherwise an exception is thrown.
      * @param v_parameters_ Vector of optimized parameters
     */
     void check_condition(const T::VectorXdr& v_parameters_) const;
