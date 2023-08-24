@@ -16,7 +16,7 @@ cd ..
 make distclean
 
 # Create doxygen documentation. It directly opens the index.html file
-make docs
+#make docs
 
 # Compile 
 make
@@ -25,7 +25,7 @@ make
 cd Src
 
 # Clear the terminal
-clear 
+#clear 
 
 # Execute
 ./main ../Data/DataTool/DataToolFile2018.txt ../Data/DataIndividuals/DataIndividualsFile2018.txt

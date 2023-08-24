@@ -197,7 +197,6 @@ void AdaptedPaikeaM::build_loglikelihood_parallel() noexcept {
 
         //! Loop over the map through an iterator
         T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
-        T::MapType::iterator it_map_end = Dataset::map_groups.end();
         T::MapType::iterator it_map;
 
     //! Parallel region
@@ -205,16 +204,14 @@ void AdaptedPaikeaM::build_loglikelihood_parallel() noexcept {
     omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
     #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map, id) schedule(runtime) reduction(+:log_likelihood)
         for(T::IndexType j = 0; j < n_groups; ++j){
-            if(it_map != it_map_end){
-                it_map = it_map_begin;
-                std::advance(it_map, j);
-                const auto& indexes_group = it_map->second;
+            it_map = it_map_begin;
+            std::advance(it_map, j);
+            const auto& indexes_group = it_map->second;
 
-                log_likelihood += ll_group_paik(v_parameters_, indexes_group);
+            log_likelihood += ll_group_paik(v_parameters_, indexes_group);
 
-                id = omp_get_thread_num();
-                std::cout << "Iteration " << j << " executed by thread " << id << " out of " << n_threads << std::endl;
-            }           
+            id = omp_get_thread_num();
+            std::cout << "Iteration " << j << " executed by thread " << id << " out of " << n_threads << std::endl;          
         }
         return log_likelihood;
     };
@@ -286,9 +283,11 @@ void AdaptedPaikeaM::evaluate_loglikelihood() noexcept{
         optimal_ll_paik = ll_paik_parallel(v_parameters);
 
     //! Compute the standard error of the parameters
+    //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
     //compute_se(v_parameters);
 
     //! Compute the standard deviation fo the frailty
+    //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
     //compute_sd_frailty(v_parameters);
        
     //! Store the results in the class

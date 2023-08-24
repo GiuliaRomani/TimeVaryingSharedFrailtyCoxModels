@@ -17,7 +17,7 @@ cd ..
 make distclean
 
 # Create doxygen documentation. It directly opens the index.html file
-make docs
+#make docs
 
 # Compile 
 make
