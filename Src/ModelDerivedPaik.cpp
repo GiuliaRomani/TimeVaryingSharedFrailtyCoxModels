@@ -19,7 +19,7 @@ using T = TypeTraits;
 //! Constructor
 AdaptedPaikeaM::AdaptedPaikeaM(const T::FileNameType& filename1_, const T::FileNameType& filename2_):
         //! Construction of the base classes
-        ModelBase(filename1,_ filename2_),
+        ModelBase(filename1_, filename2_),
         Parameters(filename1_, 2 * Dataset::n_intervals + Dataset::n_regressors + 2, 
                     Dataset::n_intervals, Dataset::n_regressors, 5, 
                     {Dataset::n_intervals, Dataset::n_regressors, 1, 1, Dataset::n_intervals}){

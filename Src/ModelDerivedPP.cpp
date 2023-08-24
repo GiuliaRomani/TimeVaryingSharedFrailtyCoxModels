@@ -17,10 +17,10 @@ namespace TVSFCM{
 using T = TypeTraits;
 
 //! Constructor
-CSFMwithPowerParameter::CSFMwithPowerParameter(const T::FileNameType& filename1, const T::FileNameType& filename2):
+CSFMwithPowerParameter::CSFMwithPowerParameter(const T::FileNameType& filename1_, const T::FileNameType& filename2_):
         //! Constructor for base classes
-        ModelBase(filename1, filename2),
-        Parameters(filename1, 2 * Dataset::n_intervals + Dataset::n_regressors, 
+        ModelBase(filename1_, filename2_),
+        Parameters(filename1_, 2 * Dataset::n_intervals + Dataset::n_regressors, 
                     Dataset::n_intervals, Dataset::n_regressors, 4, 
                     {Dataset::n_intervals, Dataset::n_regressors, Dataset::n_intervals - 1, 1}){
            

@@ -1,6 +1,12 @@
-#------------------------------------------------------------------
-#	DataToolTest for Likelihood Methods
-#------------------------------------------------------------------
+#---------------------------------------------------------------------------
+# 		Test DataTool for Likelihood Methods
+#
+# You can change only the indicated variables. If you change any of the  
+# other variables, the models may not properly work (exception).
+#
+# If you want to change the id_model, then you have to comment the wrong
+# range_min, range_max, params and uncomment the right ones. 
+#---------------------------------------------------------------------------
 
 [TimeDomain]
 	length_vector_intervals = 9
@@ -9,31 +15,31 @@
 
 [Parameters]
 	[./Ranges]
-		#range_min = '-8. -2. 1e-10 1e-10 1e-10'	# PAIK
+		#range_min = '-8. -2. 1e-10 1e-10 1e-10'	# AdaptedPaikeaM
 		#range_max = '-1e-6 2. 1 15 10'
-		range_min = '-8. -2. 1e-6 1e-6'		# PP
+		range_min = '-8. -2. 1e-6 1e-6'			# CSFMwithPowerParameter
 		range_max = '-1e-6 2. 9. 1.'
-		#range_min = '-8. -2. 1e-6 1e-6 1e-6'	#LF
+		#range_min = '-8. -2. 1e-6 1e-6 1e-6'		# StochasticTimeDependentCSFM
 		#range_max = '-1e-6 2. 4. 4. 6.28'
 	[../]
 	
 	[./Values]
-		#params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 0.40 2.00 0.2 0.2 0.3 1.5 0.089 1.2 9 4.3' # PAIK  
-		params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 6 4.9 1.0 6.5 1.8 2.3 4.6 0.7'	# PP
-		#params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 0.80 2.0 3.14'  #LF
+		#params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 0.40 2.00 0.2 0.2 0.3 1.5 0.089 1.2 9 4.3' 	#AdaptedPaikeaM 
+		params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 6 4.9 1.0 6.5 1.8 2.3 4.6 0.7'			#CSFMwithPowerParameter
+		#params = '-5.3 -3.0 -1.2 -7.9 -2.1 -2.5 -4.5 -3.8 -0.10 -0.01 0.56 -0.60 -1.80 0.80 2.0 3.14'  				#StochasticTimeDependentCSFM
 	[../]
 [../]
 
 [DiscretizationStep]
-	h_dd = 1e-3
+	h_dd = 1e-3			# Change
 [../]
 
 [Model]
-	id_model = 2
+	id_model = 2			# Change ((1,AdaptedPaikeaM), (2, CSFMwithPowerParameter), (3, StochasticTimeDependentCSFM))
 [../]
 
 [ParallelVersion]
-	n_threads = 1
-	chunk_size = 2
-	id_schedule_type = 2
+	n_threads = 1			# Change
+	chunk_size = 2			# Change
+	id_schedule_type = 2		# Change (1,2,3,4)
 [../]

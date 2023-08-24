@@ -15,10 +15,10 @@ namespace TVSFCM{
 using T = TypeTraits;
 
 //! Constructor
-StochasticTimeDependentCSFM::StochasticTimeDependentCSFM(const T::FileNameType& filename1, const T::FileNameType& filename2):
+StochasticTimeDependentCSFM::StochasticTimeDependentCSFM(const T::FileNameType& filename1_, const T::FileNameType& filename2_):
         //! Constructor for base classes
-        ModelBase(filename1, filename2),
-        Parameters(filename1, Dataset::n_intervals + Dataset::n_regressors + 3, 
+        ModelBase(filename1_, filename2_),
+        Parameters(filename1_, Dataset::n_intervals + Dataset::n_regressors + 3, 
                     Dataset::n_intervals, Dataset::n_regressors, 5, 
                     {Dataset::n_intervals, Dataset::n_regressors, 1, 1, 1}) {
 

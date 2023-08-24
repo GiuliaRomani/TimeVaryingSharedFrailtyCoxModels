@@ -1,7 +1,8 @@
-# CPPFLAGS: optimization of level3 is performed, almost all warnings are activated
+# CPPFLAGS: optimization of level3 is performed, almost all warnings are activated. No debugging.
+# CXXFLAGS: c++20 lots of warning with Eigen (found correspondence on the internet). Move to c++17, no problems. 
 
-# The user has to change this. Fill it with the path of the PACS Exampled directory
-PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/Giulia_Project/Project_PACS
+# The user has to change this. Fill it with the path of the Project_PACS directory
+PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/Giulia_Project/Project_PACS/Src
 
 # PACS libraries are stored here
 export PACS_LIB_DIR=$(PACS_PATH)/lib
@@ -10,7 +11,7 @@ export PACS_LIB_DIR=$(PACS_PATH)/lib
 export PACS_INC_DIR=$(PACS_PATH)/include
 
 XX      ?= g++
-CXXFLAGS ?= -std=c++17
+CXXFLAGS ?= -std=c++17	
 CPPFLAGS ?= -fopenmp -O3 -DNDEBUG -Wall -pedantic -I. -I$(PACS_INC_DIR) -I${mkEigenInc}
 LDFLAGS  ?= -L$(PACS_LIB_DIR) -Wl,-rpath=$(PACS_LIB_DIR)
 LDLIBS	?= 

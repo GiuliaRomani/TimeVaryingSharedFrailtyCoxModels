@@ -172,7 +172,7 @@ public:
      * @param filename1_ Name of the first file
      * @param filename2_ Name of the second file
     */
-    CSFMwithPowerParameter(const T::FileNameType& filename1, const T::FileNameType& filename2);
+    CSFMwithPowerParameter(const T::FileNameType& filename1_, const T::FileNameType& filename2_);
 
     /**
      * Method for computing the value of the log-likelihood, given the optimal vector of parameters. 
@@ -302,7 +302,7 @@ public:
      * @param filename1_ Name of the first file
      * @param filename2_ Name of the second file
     */
-    StochasticTimeDependentCSFM(const T::FileNameType& filename1, const T::FileNameType& filename2);
+    StochasticTimeDependentCSFM(const T::FileNameType& filename1_, const T::FileNameType& filename2_);
 
     /**
      * Method for computing the value of the log-likelihood, given the optimal vector of parameters. 
