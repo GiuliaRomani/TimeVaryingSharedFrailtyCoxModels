@@ -45,7 +45,7 @@ void CSFMwithPowerParameter::compute_n_parameters() noexcept{
     n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors);
 };
 
-//! Method for extracting the parameters from the vector of parameters
+//! Method for extracting the parameters from the vector of parameters (using methods of the Eigen library)
 T::TuplePPType CSFMwithPowerParameter::extract_parameters(const T::VectorXdr& v_parameters_) const noexcept{
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                 
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors, 1);

@@ -44,7 +44,7 @@ void StochasticTimeDependentCSFM::compute_n_parameters() noexcept{
     n_parameters = (Dataset::n_intervals + Dataset::n_regressors + 3);
 };
 
-//! Method for extracting the single and vector parameters from the vector of parameters
+//! Method for extracting the single and vector parameters from the vector of parameters (using methods of the Eigen library)
 T::TupleLFType StochasticTimeDependentCSFM::extract_parameters(T::VectorXdr& v_parameters_) const noexcept{
     //! Extract parameters from the vector
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                  
