@@ -39,7 +39,7 @@
 [../]
 
 [ParallelVersion]
-	n_threads = 1			# Change
+	n_threads = -1			# Change
 	chunk_size = 1			# Change
 	id_schedule_type = 4		# Change (1,2,3,4)
 [../]
