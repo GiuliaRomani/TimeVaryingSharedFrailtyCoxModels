@@ -231,8 +231,8 @@ void StochasticTimeDependentCSFM::build_loglikelihood() noexcept{
 //! Method for building the overall log-likelihood in the parallel version
 void StochasticTimeDependentCSFM::build_loglikelihood_parallel() noexcept{
     ll_lf_parallel = [this] (T::VectorXdr& v_parameters_){
-        T::VariableType log_likelihood = 0;                    //! Overall log-likelihood value
-        T::IdType id = 0;                                      //! Id of the thread executing an iteration
+        T::VariableType log_likelihood = -(Dataset::n_groups)*log(M_PI);          //! Overall log-likelihood value
+        T::IdType id = 0;                                                        //! Id of the thread executing an iteration
 
         // For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
@@ -252,8 +252,6 @@ void StochasticTimeDependentCSFM::build_loglikelihood_parallel() noexcept{
             std::cout << "Iteration " << j << " executed by thread " << id << " out of " << ParallelComponents::n_threads << std::endl;        
         }   
 
-        //! Subtract the constant term
-        log_likelihood -= (Dataset::n_groups)*log(M_PI);;
         return log_likelihood;
     };
 }

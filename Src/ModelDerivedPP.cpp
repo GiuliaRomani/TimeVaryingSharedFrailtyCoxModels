@@ -119,8 +119,8 @@ void CSFMwithPowerParameter::build_loglikelihood() noexcept{
 //! Method for buidling the overall loglikelihood in the parallel version
 void CSFMwithPowerParameter::build_loglikelihood_parallel() noexcept{
     ll_pp_parallel = [this] (T::VectorXdr& v_parameters_){
-        T::VariableType log_likelihood = 0;                 //! Overall log-likelihood value
-        T::IdType id = 0;                                   //! Id of the thread executing an iteration
+        T::VariableType log_likelihood = - ((Dataset::n_groups)/2)*log(M_PI);           //! Overall log-likelihood value
+        T::IdType id = 0;                                                               //! Id of the thread executing an iteration
 
         //! For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
@@ -139,9 +139,7 @@ void CSFMwithPowerParameter::build_loglikelihood_parallel() noexcept{
             id = omp_get_thread_num();
             std::cout << "Iteration " << j << " executed by thread " << id << " out of " << ParallelComponents::n_threads << std::endl;         
         }
-
-        //! Subtract the constant term
-        log_likelihood -= ((Dataset::n_groups)/2)*log(M_PI);
+        
         return log_likelihood;
     };
 };
