@@ -70,7 +70,7 @@ void PrintMethods(const T::FactoryType & MethodFactory){
  * @return Unique pointer to base class ModelBase, initialized with an object of the derived class, that could be AdaptedPaikeaM, 
  * CSFMwithPowerParameter and StochasticTimeDependentCSFM. If a wrong numeric id is provided, it throws an exception.
 */
-std::unique_ptr<ModelBase> MakeLikelihoodMethod(const T::IdType id, const T::FileNameType& filename1_, const T::FileNameType& filename2_) {
+std::unique_ptr<ModelBase> MakeLikelihoodModel(const T::IdType id, const T::FileNameType& filename1_, const T::FileNameType& filename2_) {
     switch(id){
         case 1:  return std::make_unique<AdaptedPaikeaM>(filename1_, filename2_);
         case 2:  return std::make_unique<CSFMwithPowerParameter>(filename1_, filename2_);

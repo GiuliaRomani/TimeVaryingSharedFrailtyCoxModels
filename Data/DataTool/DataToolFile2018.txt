@@ -15,7 +15,7 @@
 
 [Parameters]
 	[./Ranges]
-		#range_min = '-8. -2. 1e-10 1e-10 1e-10'		# AdaptedPaikeaM
+		#range_min = '-8. -2. 1e-10 1e-10 1e-10'	# AdaptedPaikeaM
 		#range_max = '-1e-6 2. 0.99999 2 10'
 		range_min = '-8. -2. 1e-10 1e-10'		# CSFMwithPowerParameter
 		range_max = '-1e-6 1. 10. 0.99999'
@@ -41,7 +41,7 @@
 [ParallelVersion]
 	n_threads = 1			# Change
 	chunk_size = 0			# Change
-	id_schedule_type = 4		# Change (1,2,3,4)
+	id_schedule_type = 4		# Change ((1, static), (2, dynamic), (3, guided), (4, auto))
 [../]
 
 

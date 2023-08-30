@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
         static T::FactoryType methods(TVSFCM::RegisterMethods());
 
         // Call the desired method
-        std::unique_ptr<TVSFCM::ModelBase> ptrMethod = TVSFCM::MakeLikelihoodMethod(id, filename1.c_str(), filename2.c_str());
+        std::unique_ptr<TVSFCM::ModelBase> ptrMethod = TVSFCM::MakeLikelihoodModel(id, filename1.c_str(), filename2.c_str());
 
         // Measure the time elapsed by the exectuion of the method
         const auto start = std::chrono::steady_clock::now();

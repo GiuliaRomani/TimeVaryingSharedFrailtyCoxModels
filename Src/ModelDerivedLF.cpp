@@ -231,30 +231,32 @@ void StochasticTimeDependentCSFM::build_loglikelihood() noexcept{
 //! Method for building the overall log-likelihood in the parallel version
 void StochasticTimeDependentCSFM::build_loglikelihood_parallel() noexcept{
     ll_lf_parallel = [this] (T::VectorXdr& v_parameters_){
-        T::VariableType log_likelihood = -(Dataset::n_groups)*log(M_PI);          //! Overall log-likelihood value
-        T::IdType id = 0;                                                        //! Id of the thread executing an iteration
+        T::VariableType log_likelihood = 0;                 //! Overall log-likelihood value
+        //T::IdType id = 0;                                 //! Id of the thread executing an iteration
 
         // For each group, compute the likelihood and then sum them
         T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
-        T::MapType::iterator it_map;
+        T::MapType::iterator it_map = it_map_begin;
 
     //! Parallel region
     //! If you want to print the iterations execution order, uncomment the related lines and add (id) to (firstprivate)
     omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
-    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map, id) schedule(runtime) reduction(+:log_likelihood)
+    #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::IndexType j = 0; j < n_groups; ++j){
             it_map = std::next(it_map_begin, j);
             const auto& indexes_group = it_map->second;
 
             log_likelihood += ll_group_lf(v_parameters_, indexes_group);
 
-            id = omp_get_thread_num();
-            std::cout << "Iteration " << j << " executed by thread " << id << " out of " << ParallelComponents::n_threads << std::endl;        
-        }   
-
+            //id = omp_get_thread_num();
+            //std::cout << "Iteration " << j << " executed by thread " << id << " out of " << ParallelComponents::n_threads << std::endl;        
+        } 
+    
+        //! Sum the constant term to the log-likelihood value
+        log_likelihood -= (Dataset::n_groups)*log(M_PI);
         return log_likelihood;
     };
-}
+};
 
 //! Method for building the second derivative of the function wrt one direction
 void StochasticTimeDependentCSFM::build_dd_loglikelihood() noexcept{
@@ -324,11 +326,11 @@ void StochasticTimeDependentCSFM::evaluate_loglikelihood() noexcept{
 
     //! Compute the standard error of the parameters
     //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    //compute_se(v_parameters);
+    compute_se(v_parameters);
 
     //! Compute the stardard deviation of the frailty
     //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    //compute_sd_frailty(v_parameters);
+    compute_sd_frailty(v_parameters);
        
     //! Store the results in the class
     result = Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty, 

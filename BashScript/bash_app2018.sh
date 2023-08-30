@@ -25,7 +25,7 @@ make
 cd Src
 
 # Clear the terminal
-#clear 
+clear 
 
 # Execute
 ./main ../Data/DataTool/DataToolFile2018.txt ../Data/DataIndividuals/DataIndividualsFile2018.txt
