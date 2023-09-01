@@ -3,7 +3,7 @@
 DIRS := Src
 DOCSDIRS := Doc
 
-.phony: all clean distclean docs docsclean
+.phony: all docs clean distclean docsclean
 
 all:
 	-for dir in $(DIRS); do (cd $$dir; $(MAKE) all); done

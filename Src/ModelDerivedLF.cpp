@@ -326,11 +326,11 @@ void StochasticTimeDependentCSFM::evaluate_loglikelihood() noexcept{
 
     //! Compute the standard error of the parameters
     //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    compute_se(v_parameters);
+    //compute_se(v_parameters);
 
     //! Compute the stardard deviation of the frailty
     //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    compute_sd_frailty(v_parameters);
+    //compute_sd_frailty(v_parameters);
        
     //! Store the results in the class
     result = Results(name_method, n_parameters, v_parameters, optimal_ll_lf, se, sd_frailty, 

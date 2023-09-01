@@ -45,7 +45,6 @@ The user has to provide three quantities:
     - (2) for "dynamic"
     - (3) for "guided"
     - (4) for "auto".
-    
 If any of the previous values is omitted, the project provides them a default value equal to (1) or (0). 
 
 ## Structure of the TimeVaryingSharedFrailtyCoxModels github folder
@@ -55,14 +54,14 @@ If any of the previous values is omitted, the project provides them a default va
 - Src: the implemented codes.
 
 ## To execute a model:
-- Enter the BashScript folder
-- Choose a bash script 
-- Execute it on terminal. That's it.
+- Change the variable "PACS_PATH" in the "Src/Makefile".
+- Enter the "Data/DataTool" folder and select the file related to an academic year. If you want, change its variables as previously indicated and as also indicated in the file. 
+- Enter the "BashScript" folder, choose the bash script associated to the selected academic year and execute it on terminal. That's it.
 
 ## Recommendations:
-- If you want to change the academic year, change the bash script. 
-- If you want to change some input variables and play with the models, you must change only the files in Data/DataTool and only the indicated variables. Then, follow the instructions in the bash script to run the model, without compiling again the codes.
-- If you want to measure the execution time required by sole the evaluation of the log-likelihood function, go into "Src/ModelDerived... .cpp" and follow the instructions of the method "evaluate_loglikelihoo(...)".
+- If you want to change the academic year, change the bash script.
+- If you want to change some input variables and play with the models, you must change only the files in "Data/DataTool" and only the indicated variables. Then, follow the instructions in the bash script to run the model, without compiling again the codes.
+- If you want to measure the execution time required by sole the evaluation of the log-likelihood function, go into "Src/ModelDerived... .cpp" and follow the instructions of the method "evaluate_loglikelihood(...)".
 - Any bash script contains the command for generating the doxygen documentation (make docs) and all the files are stored in the subfolder "Doc/doxygen". This command open the index.html doxygen page. There is also a command for removing the folder (make docsclean). Actually, they are both commented. If the user wants to use them, he/she has to change both the "OUTPUT_DIRECTORY" tag (line 61) and "INPUT" (line 867) tag of the doxygen configuration file.
 
 

@@ -2,7 +2,7 @@
 # CXXFLAGS: c++20 lots of warning with Eigen (found correspondence on the internet). Move to c++17, no problems. 
 
 # The user has to change this. Fill it with the path of the Project_PACS directory
-PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/Giulia_Project/Project_PACS/Src
+PACS_PATH?=/home/giuliaromani/Desktop/Giulia_PACS/Giulia_Project/TimeVaryingSharedFrailtyCoxModels/Src
 
 # PACS libraries are stored here
 export PACS_LIB_DIR=$(PACS_PATH)/lib
