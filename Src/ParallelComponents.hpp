@@ -4,11 +4,16 @@
 // Include header files
 #include "TypeTraits.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
 
 namespace TVSFCM{
 using T = TypeTraits;
+
+/**
+ * ParallelComponents Class contains the necessary variables for the execution of the 
+ * parallel version of the log-likelihood function. 
+ */
 
 class ParallelComponents{
 public: 

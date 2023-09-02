@@ -1,17 +1,17 @@
 // Include header files
 #include "Results.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
 #include <iomanip>
 
 namespace TVSFCM{
 
-//! Constructor
+// Constructor
 Results::Results(const T::IdNameType& name_model_, const T::NumberType n_parameters_,  const T::VectorXdr& optimal_parameters_, 
                  const T::VariableType optimal_loglikelihood_, const T::VectorXdr& se_, const T::VectorXdr& sd_frailty_,
                  T::NumberType n_threads_, T::NumberType chunk_size_, const T::ScheduleType& schedule_type_name_): 
-                 //! Initialize variables
+                 // Initialize variables
                  name_model(name_model_),
                  n_parameters(n_parameters_), 
                  optimal_parameters(optimal_parameters_), 
@@ -21,16 +21,16 @@ Results::Results(const T::IdNameType& name_model_, const T::NumberType n_paramet
                  n_threads(n_threads_),
                  chunk_size(chunk_size_),
                  schedule_type_name(schedule_type_name_) {
-                    //! Initialize the AIC, calling the method that computes its value
+                    // Initialize the AIC, calling the method that computes its value
                     compute_AIC();
                 };
 
-//! Compute the Akaike Information Criterion
+// Compute the Akaike Information Criterion
 void Results::compute_AIC() noexcept{
     AIC = (2 * n_parameters - 2 * optimal_loglikelihood);
 };
 
-//! Method for printing the results of a time-varying model call
+// Method for printing the results of a time-varying model call
 void Results::print_results() const {
     if(n_threads == 1)
         print_results_noparallel();
@@ -38,7 +38,7 @@ void Results::print_results() const {
         print_results_parallel();
 };
 
-//! Method for printing the results of the parallel implementation
+// Method for printing the results of the parallel implementation
 void Results::print_results_parallel() const noexcept{
     std::cout << "--------------------- Application Summary -----------------------" << std::endl;
     std::cout << std::endl;
@@ -73,7 +73,7 @@ void Results::print_results_parallel() const noexcept{
     std::cout << std::endl;
 };
 
-//! Method for printing the results of the serial implementation
+// Method for printing the results of the serial implementation
 void Results::print_results_noparallel() const noexcept{
     std::cout << "--------------------- Appplication Summary -----------------------" << std::endl;
     std::cout << std::endl;
@@ -105,7 +105,5 @@ void Results::print_results_noparallel() const noexcept{
     }
     std::cout << std::endl;
 };
-
-
 
 } // end namespace

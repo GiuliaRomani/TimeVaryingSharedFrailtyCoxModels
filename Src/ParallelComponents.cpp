@@ -6,19 +6,19 @@
 
 namespace TVSFCM{
     
-//! Constuctor
+// Constuctor
 ParallelComponents::ParallelComponents(const T::FileNameType& filename1_){
-    //! Read the variables from the file
+    // Read the variables from the file
     read_from_file(filename1_);
 
-    //! Check that the id of the schedule type exists
+    // Check that the id of the schedule type exists
     check_schedule_type();
 
-    //! Set the name of the schedule_type
+    // Set the name of the schedule_type
     set_schedule_type_name();
 };
 
-//! Method for reading data from file 
+// Method for reading data from file 
 void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     GetPot datafile(filename1_.c_str());
 
@@ -28,11 +28,11 @@ void ParallelComponents::read_from_file(const T::FileNameType& filename1_){
     chunk_size_ = datafile("ParallelVersion/chunk_size", 0);
     schedule_type_ = datafile("ParallelVersion/id_schedule_type", 1); 
 
-    //! Check the input values are not negative
+    // Check the input values are not negative
     check_condition(n_threads_, chunk_size_, schedule_type_);
 };
 
-//! Method for checking the parallel input variables are positive, otherwise an exception is thrown
+// Method for checking the parallel input variables are positive, otherwise an exception is thrown
 void ParallelComponents::check_condition(T::IntType n_threads_, T::IntType chunk_size_, T::IntType schedule_type_){
     if(n_threads_ < 0)
         throw MyException("Provided negative value for number of threads.");
@@ -46,7 +46,7 @@ void ParallelComponents::check_condition(T::IntType n_threads_, T::IntType chunk
     schedule_type = static_cast<T::IdType>(schedule_type_);
 };
 
-//! Method for checking the scheduling strategy exists
+// Method for checking the scheduling strategy exists
 void ParallelComponents::check_schedule_type() const{
     if(schedule_type < 1 or schedule_type > 4){
         T::ExceptionType msg1 = "Schedule id ";
@@ -56,7 +56,7 @@ void ParallelComponents::check_schedule_type() const{
     }
 };
 
-//! Method for defining the name associated to the id_schedule
+// Method for defining the name associated to the id_schedule
 void ParallelComponents::set_schedule_type_name() noexcept{
     if(schedule_type == 1)
         schedule_type_name = "static";

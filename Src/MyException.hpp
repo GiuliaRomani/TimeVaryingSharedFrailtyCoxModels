@@ -4,18 +4,18 @@
 // Include header files
 #include "TypeTraits.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
 #include <exception>
+
+namespace TVSFCM{
+using T = TypeTraits;
 
 /**
  * Class for the construction of a generic exception, to which it is possible to pass a string content.
  * 
  * It is publicly derived by the standard exception.
 */
-
-namespace TVSFCM{
-using T = TypeTraits;
 
 class MyException: public std::exception{
 public:

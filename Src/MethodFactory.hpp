@@ -6,7 +6,7 @@
 #include "ModelDerived.hpp"
 #include "MyException.hpp"
 
-// Include libraries
+// Include 
 #include <memory>
 #include <iostream>
 

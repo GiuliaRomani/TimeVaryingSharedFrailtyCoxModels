@@ -1,7 +1,7 @@
 #ifndef TYPETRAITS_HPP
 #define TYPETRAITS_HPP
 
-// Include libraries
+// Include 
 #include <string>
 #include <map>
 #include <vector>
@@ -9,11 +9,8 @@
 #include <tuple>
 #include <Eigen/Dense>
 
-/**
- * Struct containing the type aliases used in the project.
-*/
-
 namespace TVSFCM{
+//! Struct containing the type aliases used in the project.
 
 struct TypeTraits{
     using VariableType = double;                    //! Type used to indicate the basic variable

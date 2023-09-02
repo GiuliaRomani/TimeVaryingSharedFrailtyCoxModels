@@ -4,8 +4,11 @@
 // Include header files
 #include "TypeTraits.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
+
+namespace TVSFCM{
+using T = TypeTraits;
 
 /**
  * Class for the temporal domain. 
@@ -13,9 +16,6 @@
  * It reads the variables from the input file using GetPot and controls everything has been defined correctly, 
  * with no mistakes. Otherwise an exception is thrown for each occurred error.
 */
-
-namespace TVSFCM{
-using T = TypeTraits;
 
 class TimeDomain{
 public:

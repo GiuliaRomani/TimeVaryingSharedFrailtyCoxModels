@@ -14,13 +14,13 @@
 cd ..
 
 # Clean the sub-directories
-#make distclean
+make distclean
 
 # Create doxygen documentation. It directly opens the index.html file
 #make docs
 
 # Compile 
-#make
+make
 
 # Change directory and go in Src, where the executable ./main is contained
 cd Src

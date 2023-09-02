@@ -3,50 +3,50 @@
 #include "ModelDerived.hpp"
 #include "MathFunctions.cpp"
 
-// Include libraries
+// Include 
 #include <cmath>
 #include <tuple>
 #include <algorithm>
 #include <random>
 
+namespace TVSFCM{
+using T = TypeTraits;
+
 /**
  * Implementation of the methods declared in the class "AdaptedPaikeaM"
 */
 
-namespace TVSFCM{
-using T = TypeTraits;
-
-//! Constructor
+// Constructor
 AdaptedPaikeaM::AdaptedPaikeaM(const T::FileNameType& filename1_, const T::FileNameType& filename2_):
-        //! Construction of the base classes
+        // Construction of the base classes
         ModelBase(filename1_, filename2_),
         Parameters(filename1_, 2 * Dataset::n_intervals + Dataset::n_regressors + 2, 
                     Dataset::n_intervals, Dataset::n_regressors, 5, 
                     {Dataset::n_intervals, Dataset::n_regressors, 1, 1, Dataset::n_intervals}){
             
-            //! Initialize the number of parameters
+            // Initialize the number of parameters
             compute_n_parameters();
 
-            //! Resize standard error vector and hessian diagonal according to the number of parameters
+            // Resize standard error vector and hessian diagonal according to the number of parameters
             hessian_diag.resize(n_parameters);
             se.resize(n_parameters);
 
-            //! Build the log-likelihood functions
+            // Build the log-likelihood functions
             build_loglikelihood();
             build_dd_loglikelihood();
 
-            //! If the number of declared threads is > 1, then build also the log-likelihood function for the parallel version
+            // If the number of declared threads is > 1, then build also the log-likelihood function for the parallel version
             if(n_threads > 1)
                 build_loglikelihood_parallel();
 
 };
         
-//! Virtual method for computing the number of parameters
+// Virtual method for computing the number of parameters
 void AdaptedPaikeaM::compute_n_parameters() noexcept{
     n_parameters = (2 * Dataset::n_intervals + Dataset::n_regressors + 2);
 };
 
-//! Virtual method for extracting the parameters from the vector of parameters (using methods of the Eigen library)
+// Virtual method for extracting the parameters from the vector of parameters (using methods of the Eigen library)
 T::TuplePaikType AdaptedPaikeaM::extract_parameters(T::VectorXdr& v_parameters_) noexcept{
     T::VectorXdr phi = v_parameters_.head(Dataset::n_intervals);                  
     T::VectorXdr betar = v_parameters_.block(Dataset::n_intervals, 0, Dataset::n_regressors,1);
@@ -58,14 +58,14 @@ T::TuplePaikType AdaptedPaikeaM::extract_parameters(T::VectorXdr& v_parameters_)
     return std::make_tuple(phi, betar, mu1, mu2, nu, gammak);
 };
 
-//! Method for extracting the variables related to dataset and to a precise group
+// Method for extracting the variables related to dataset and to a precise group
 T::TupleMatrixAType AdaptedPaikeaM::extract_matrixA_variables(T::SharedPtrType indexes_group_, T::VectorXdr& phi_, T::VectorXdr& betar_) noexcept{
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::MatrixXdr A_ijk(n_individuals_group, Dataset::n_intervals);
     T::VectorXdr A_ik(Dataset::n_intervals);
     T::VariableType A_i;
 
-    //! Compute A_ijk
+    // Compute A_ijk
     T::IndexType index = 0;
     T::VariableType dataset_betar = 0;
     for(const auto &i: *(indexes_group_)){
@@ -76,22 +76,22 @@ T::TupleMatrixAType AdaptedPaikeaM::extract_matrixA_variables(T::SharedPtrType i
         index += 1;
     }
 
-    //! Compute A_ik and A_i
+    // Compute A_ik and A_i
     A_ik = A_ijk.colwise().sum();
     A_i = A_ik.sum();
 
     return std::make_tuple(A_ijk, A_ik, A_i);
 };
 
-//! Method for extracting the dropout variables related to a group
+// Method for extracting the dropout variables related to a group
 T::TupleDropoutType AdaptedPaikeaM::extract_dropout_variables(T::SharedPtrType indexes_group_) noexcept{
-    //! Define the variables 
+    // Define the variables 
     T::NumberType n_individuals_group = (*indexes_group_).size();
     T::MatrixXdr d_ijk(n_individuals_group, Dataset::n_intervals);
     T::VectorXdr d_ik(Dataset::n_intervals);
     T::VariableType d_i;
 
-    //! Compute d_ijk
+    // Compute d_ijk
     T::IndexType index = 0;
     for(const auto &i: (*indexes_group_)){
     	for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
@@ -100,24 +100,24 @@ T::TupleDropoutType AdaptedPaikeaM::extract_dropout_variables(T::SharedPtrType i
     	index += 1;
     }   
 
-    //! Compute d_ik and d_i
+    // Compute d_ik and d_i
     d_ik = d_ijk.colwise().sum();
     d_i = d_ijk.sum();
 
     return std::tuple(d_ijk, d_ik, d_i);
 };
 
-//! Method for building the overall and group log-likelihood functions
+// Method for building the overall and group log-likelihood functions
 void AdaptedPaikeaM::build_loglikelihood() noexcept{
-    //! Implement the function ll_paik
+    // Implement the function ll_paik
     ll_paik = [this] (T::VectorXdr& v_parameters_){              
         T::VariableType log_likelihood_group, log_likelihood = 0;
 
-        //! For each group, compute the log-likelihood and then sum them
+        // For each group, compute the log-likelihood and then sum them
         T::MapType::iterator it_map = Dataset::map_groups.begin();
         T::MapType::iterator it_map_end = Dataset::map_groups.end();
         for(; it_map != it_map_end; ++it_map){
-            //! All the indexes in a group
+            // Extract the shared pointer
             const auto& indexes_group = it_map->second;
 
             log_likelihood_group = ll_group_paik(v_parameters_, indexes_group); 
@@ -127,14 +127,14 @@ void AdaptedPaikeaM::build_loglikelihood() noexcept{
     };
 
     
-    //! Implement the function ll_group_paik
+    // Implement the function ll_group_paik
     ll_group_paik = [this] (T::VectorXdr& v_parameters_, T::SharedPtrType indexes_group_){     
-        //! Extract single parameters from the vector using the methods for extracting the variables and the parameters
+        // Extract variables and parameters from the vector and matrices
         auto [phi, betar, mu1, mu2, nu, gammak] = extract_parameters(v_parameters_);
         auto [A_ijk, A_ik, A_i] = extract_matrixA_variables(indexes_group_, phi, betar);
         auto [d_ijk, d_ik, d_i] = extract_dropout_variables(indexes_group_);
 
-        //! Compute the first term of the log-likelihood and then subtract the second term
+        // Compute the first term of the log-likelihood and then subtract the second term
 	    T::VariableType  dataset_betar, loglik1 = 0.;
 	    for(const auto &i: *indexes_group_){
 	        dataset_betar = Dataset::dataset.row(i) * betar;
@@ -144,13 +144,13 @@ void AdaptedPaikeaM::build_loglikelihood() noexcept{
 	    }
 	    loglik1 -= (mu1/nu) * log(1 + nu * A_i);
 
-        //! Compute the third term of the formula
+        // Compute the third term of the formula
 	    T::VariableType loglik2 = 0.;
 	    for(T::IndexType k = 0; k < Dataset::n_intervals; ++k){
 	        loglik2 -= (mu2/gammak(k)) * log(1 + gammak(k) * A_ik(k));
 	    }
 	
-        //! Compute the rest of the formula (second line)
+        // Compute the rest of the formula (second line)
         T::VariableType result, loglik4, loglik3 = 0.;
         T::VariableType gamma_res1, gamma_res2, gamma_res3, gamma_res4 = 0.;
         T::VariableType arg1, arg2, arg3 = 0.;
@@ -174,7 +174,7 @@ void AdaptedPaikeaM::build_loglikelihood() noexcept{
                 gamma_res3 = tgamma(arg2 - l);
                 gamma_res4 = tgamma(mu1/nu + l);
 
-                //! Cast for negative power
+                // Cast for negative power
                 ll = static_cast<T::VariableType>(l);
                 d_ik_sizel = static_cast<T::VariableType>(d_ik_size);
                 exp1 = ll - d_ik_sizel;
@@ -189,24 +189,24 @@ void AdaptedPaikeaM::build_loglikelihood() noexcept{
     };
 };
 
-//! Build the overall log-likelihood function in the parallel version
+// Build the overall log-likelihood function in the parallel version
 void AdaptedPaikeaM::build_loglikelihood_parallel() noexcept {
     ll_paik_parallel = [this] (T::VectorXdr& v_parameters_){
-        T::VariableType log_likelihood = 0;             //! Overall log-likelihood value
-        //T::IdType id = 0;                               //! Id of the thread executing an iteration
+        T::VariableType log_likelihood = 0;             // Overall log-likelihood value
+        //T::IdType id = 0;                               // Id of the thread executing an iteration
 
-        //! Loop over the map through an iterator
+        // Loop over the map through an iterator
         T::MapType::iterator it_map_begin = Dataset::map_groups.begin();
         T::MapType::iterator it_map = it_map_begin;
 
-    //! Parallel region
-    //! If you want to print the iterations execution order, uncomment the related lines and add (id) to (firstprivate)
+    // Parallel region
+    // If you want to print the iterations execution order, uncomment the related lines and add (id) to (firstprivate)
     omp_set_schedule(omp_sched_t(ParallelComponents::schedule_type), ParallelComponents::chunk_size);
     #pragma omp parallel for num_threads(ParallelComponents::n_threads) firstprivate(it_map) schedule(runtime) reduction(+:log_likelihood)
         for(T::IndexType j = 0; j < n_groups; ++j){
             it_map = std::next(it_map_begin, j);
             const auto& indexes_group = it_map->second;
-
+            
             log_likelihood += ll_group_paik(v_parameters_, indexes_group);
 
             //id = omp_get_thread_num();
@@ -216,10 +216,10 @@ void AdaptedPaikeaM::build_loglikelihood_parallel() noexcept {
     };
 };
 
-//! Method for building the second derivative of the log-likelihood function wrt one direction.
-//! Even if we use more than one thread, the derivative is not computed with the parallel version of the log-likelihood but with the serial version.
+// Method for building the second derivative of the log-likelihood function wrt one direction.
+// Even if we use more than one thread, the derivative is not computed with the parallel version of the log-likelihood but with the serial version.
 void AdaptedPaikeaM::build_dd_loglikelihood() noexcept{
-    //! Implement the function dd_ll_pp
+    // Implement the function dd_ll_pp
     dd_ll_paik = [this] (T::IndexType index_, T::VectorXdr& v_parameters_){
         T::VariableType value = v_parameters_(index_);
         T::VariableType valueplush = value + h_dd;
@@ -237,14 +237,14 @@ void AdaptedPaikeaM::build_dd_loglikelihood() noexcept{
     };
 };
 
-//! Method for computing the diagonal of the hessian matrix
+// Method for computing the diagonal of the hessian matrix
 void AdaptedPaikeaM::compute_hessian_diagonal(T::VectorXdr& v_parameters_) noexcept{    
     for(T::IndexType i = 0; i < n_parameters; ++i){
         hessian_diag(i) = dd_ll_paik(i, v_parameters_);
     }
 };
 
-//! Compute the standard error of the parameters
+// Compute the standard error of the parameters
 void AdaptedPaikeaM::compute_se(T::VectorXdr& v_parameters_) noexcept{
     compute_hessian_diagonal(v_parameters_);
     T::VariableType information_element;
@@ -255,7 +255,7 @@ void AdaptedPaikeaM::compute_se(T::VectorXdr& v_parameters_) noexcept{
      }
 };
 
-//! Compute the standrd deviation of the frailty
+// Compute the standrd deviation of the frailty
 void AdaptedPaikeaM::compute_sd_frailty(T::VectorXdr& v_parameters_) noexcept{
     T::TuplePaikType extracted_parameters = extract_parameters(v_parameters_);
     auto mu1 = std::get<2>(extracted_parameters);
@@ -269,27 +269,27 @@ void AdaptedPaikeaM::compute_sd_frailty(T::VectorXdr& v_parameters_) noexcept{
     }
 }
 
-//! Method for executing the log-likelihood
+// Method for executing the log-likelihood
 void AdaptedPaikeaM::evaluate_loglikelihood() noexcept{
-    //! To print the numerosity of each group
+    // To print the numerosity of each group
     //Dataset::print_dimension_groups();
 
-    //! According to the number of threads, compute the log-likelihood in the parallel or in the serial way
+    // According to the number of threads, compute the log-likelihood in the parallel or in the serial way
     T::VariableType optimal_ll_paik = 0.;
     if(n_threads == 1)
         optimal_ll_paik = ll_paik(v_parameters);
     else
         optimal_ll_paik = ll_paik_parallel(v_parameters);
 
-    //! Compute the standard error of the parameters
-    //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    //compute_se(v_parameters);
+    // Compute the standard error of the parameters
+    // Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
+    compute_se(v_parameters);
 
-    //! Compute the standard deviation fo the frailty
-    //! Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
-    //compute_sd_frailty(v_parameters);
+    // Compute the standard deviation fo the frailty
+    // Comment this method if you only want to compute the log-likelihood function and measure its elapsed time
+    compute_sd_frailty(v_parameters);
        
-    //! Store the results in the class
+    // Store the results in the class
     result = Results(name_method, n_parameters, v_parameters, optimal_ll_paik, se, sd_frailty, 
                     ParallelComponents::n_threads, ParallelComponents::chunk_size, ParallelComponents::schedule_type_name);
 };

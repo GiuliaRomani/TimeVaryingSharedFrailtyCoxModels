@@ -1,12 +1,12 @@
-## General description of the Project of the PACS course
+# General description of the Project of the PACS course
 The Project of the PACS course is associated to my work thesis, developed in the statistical context of "survival analysis" and based on the paper "Centre-Effect on Survival After Bone Marrow Transplantation: Application of Time-Dependent Frailty Models", written by C.M. Wintrebert, H. Putter, A.H. Zwinderman and J.C. van Houwelingen. 
 
 Briefly, this paper describes three different "Time-Varying Shared Frailty Cox Models", that are elaborated and complex Cox regression models, at which a time-varying random term (called frailty) is added for studying the temporal behaviour of a portion of data heterogeneity that cannot be solely explained by the regression coefficients. More details are provided in the project report and in my thesis. 
 We apply these models to the PoliMi dataset.
 
-No numerical codes fitting these time-varying models are available and the ones implemented by us in R are quite slow. Therefore, this project re-implements in C++ a consistent portion of the codes and suggests how to further speed up them through the introduction of parallel computing (precisely, OpenMP).
+No numerical codes fitting these time-varying models are available and the ones implemented by me and my advisors in R are quite slow. Therefore, this project re-implements in C++ a consistent portion of the codes and suggests how to further speed up them through the introduction of parallel computing (precisely, OpenMP).
 
-## Structure of the .txt files
+### Structure of the .txt files
 The implemented codes require two input .txt files, that are called "DataIndividualsFile.txt" and "DataToolFile.txt". They contain the dataset on which the models will be applied, the optimal results and some other variables.
 In detail:
 
@@ -25,7 +25,7 @@ All the other lines must have the following structure:
 
 Four couples of files are present: a couple refers to the test case, to test the codes, and each one of the others refers to a dataset that contains students enrolled only in a precise academic year (i.e. 2010, 2018, 2017-2018). These files differ in the number of students, TimeDomain and Parameters variables.
 
-## What the user can do
+### What the user can do
 While the variables related to the dataset are fixed, the user can change three important blocks of the previous list: DiscretizationStep, Model and ParallelVersion.
 
 DiscretizationStep: It is the discretization step used for the numerical approximation of the second derivative of a precise function.
@@ -45,20 +45,20 @@ The user has to provide three quantities:
     - (2) for "dynamic"
     - (3) for "guided"
     - (4) for "auto".
-If any of the previous values is omitted, the project provides them a default value equal to (1) or (0). 
+If any of the previous values is omitted, a default value equal to (1) or (0) is provided.
 
-## Structure of the TimeVaryingSharedFrailtyCoxModels github folder
+### Structure of the TimeVaryingSharedFrailtyCoxModels folder
 - BashScript: several bash scripts are contained and each one refers to a precide academic year, except "bash_test.sh" that tests the models. They contain all the commands to compile and run the desired model, with the input and data provided. 
 - Data: the .txt input files are grouped in other two folders: DataTool and DataIndividuals.
 - Doc: the slides and the report of the Project, plus the doxygen configuration file.
 - Src: the implemented codes.
 
-## To execute a model:
+### To execute a model:
 - Change the variable "PACS_PATH" in the "Src/Makefile".
 - Enter the "Data/DataTool" folder and select the file related to an academic year. If you want, change its variables as previously indicated and as also indicated in the file. 
 - Enter the "BashScript" folder, choose the bash script associated to the selected academic year and execute it on terminal. That's it.
 
-## Recommendations:
+### Recommendations:
 - If you want to change the academic year, change the bash script.
 - If you want to change some input variables and play with the models, you must change only the files in "Data/DataTool" and only the indicated variables. Then, follow the instructions in the bash script to run the model, without compiling again the codes.
 - If you want to measure the execution time required by sole the evaluation of the log-likelihood function, go into "Src/ModelDerived... .cpp" and follow the instructions of the method "evaluate_loglikelihood(...)".

@@ -5,7 +5,7 @@
 #include "TypeTraits.hpp"
 #include "TimeDomain.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
 
 // Class 

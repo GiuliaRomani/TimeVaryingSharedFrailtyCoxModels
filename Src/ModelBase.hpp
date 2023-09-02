@@ -6,8 +6,12 @@
 #include "Results.hpp"
 #include "ParallelComponents.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
+
+// Class
+namespace TVSFCM{
+using T = TypeTraits;
 
 /**
  * ModelBase class: abstract base class for any Time-Varying Shared Frailty Cox model. It define the basic data and function members that
@@ -25,10 +29,6 @@
  * it is publicly derived by the Dataset class and ParallelComponents,
  * for using the dataset, some useful variables of the temporal domain and the variables of the parallel computing.
 */
-
-// Class
-namespace TVSFCM{
-using T = TypeTraits;
 
 class ModelBase: public Dataset,
                  public ParallelComponents{
@@ -108,7 +108,6 @@ protected:
     */
     virtual void compute_se(T::VectorXdr& v_parameters_) = 0;
     
-
     /**
      * Virtual pure method for initializing and computing the standard deviation 
      * of the frailty variance

@@ -4,13 +4,13 @@
 // Include header files
 #include "TypeTraits.hpp"
 
+namespace TVSFCM{
+using T = TypeTraits;
+
 /**
  * Results class contains the results of the application of one time-varying model, 
  * whose name is specified.
 */
-
-namespace TVSFCM{
-using T = TypeTraits;
 
 class Results{
 public:

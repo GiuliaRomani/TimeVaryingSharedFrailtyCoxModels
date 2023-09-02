@@ -4,8 +4,11 @@
 // INclude header files
 #include "TypeTraits.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
+
+namespace TVSFCM{
+using T = TypeTraits;
 
 /**
  * Parameters class contains the unknown constrained parameters of the models. 
@@ -18,9 +21,6 @@
  * by controlling that each variable is contained in its range so that no problems arise during the 
  * computation of the log-likelihood. Indeed, if only a parameter is out of range, it could induce not valid operations.
 */
-
-namespace TVSFCM{
-using T = TypeTraits;
 
 class Parameters{
 public:

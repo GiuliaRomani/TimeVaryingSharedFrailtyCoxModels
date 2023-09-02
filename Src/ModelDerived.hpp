@@ -6,9 +6,12 @@
 #include "QuadraturePoints.hpp"
 #include "Parameters.hpp"
 
-// Include libraries
+// Include 
 #include <iostream>
 #include <functional>
+
+namespace TVSFCM{
+using T = TypeTraits;
 
 /**
  * For each model, a class publicly derived from the ModelBase class and from the Parameters class is created. This implements one of the three
@@ -16,10 +19,6 @@
  * 
  * This class is thus initialized only after having initialized the other two base classes.
 */
-
-
-namespace TVSFCM{
-using T = TypeTraits;
 
 //! Class for implementing the Adapted Paik et al.'s Model
 class AdaptedPaikeaM final: public ModelBase, 

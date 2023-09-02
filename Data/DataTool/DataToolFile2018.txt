@@ -40,8 +40,8 @@
 
 [ParallelVersion]
 	n_threads = 1			# Change
-	chunk_size = 0			# Change
-	id_schedule_type = 4		# Change ((1, static), (2, dynamic), (3, guided), (4, auto))
+	chunk_size = 4			# Change
+	id_schedule_type = 1		# Change ((1, static), (2, dynamic), (3, guided), (4, auto))
 [../]
 
 
